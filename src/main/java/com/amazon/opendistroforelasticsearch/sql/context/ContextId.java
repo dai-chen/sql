@@ -13,25 +13,15 @@
  *   permissions and limitations under the License.
  */
 
-package com.amazon.opendistroforelasticsearch.sql.query;
+package com.amazon.opendistroforelasticsearch.sql.context;
 
-import com.amazon.opendistroforelasticsearch.sql.domain.QueryStatement;
-import com.amazon.opendistroforelasticsearch.sql.exception.SqlParseException;
 import com.amazon.opendistroforelasticsearch.sql.executor.format.Option;
-import com.amazon.opendistroforelasticsearch.sql.request.SqlRequest;
-import org.elasticsearch.client.Client;
 
-public interface QueryAction {
+/**
+ * Context ID that is optional field in protocol
+ */
+public interface ContextId extends Option {
 
-    SqlElasticRequestBuilder explain() throws SqlParseException;
+    ContextId EMPTY = json -> {};
 
-    QueryStatement getQueryStatement();
-
-    Client getClient();
-
-    void setSqlRequest(SqlRequest sqlRequest);
-
-    default Option[] options() {
-        return new Option[0];
-    }
 }

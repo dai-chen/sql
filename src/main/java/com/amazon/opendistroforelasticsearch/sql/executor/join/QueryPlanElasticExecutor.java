@@ -26,11 +26,11 @@ import java.util.List;
  * existing framework. In future, QueryPlanner should be executed by itself and leave the response sent back
  * or other post-processing logic to ElasticDefaultRestExecutor.
  */
-class QueryPlanElasticExecutor extends ElasticJoinExecutor {
+public class QueryPlanElasticExecutor extends ElasticJoinExecutor {
 
     private final QueryPlanner queryPlanner;
 
-    QueryPlanElasticExecutor(HashJoinQueryPlanRequestBuilder request) {
+    public QueryPlanElasticExecutor(HashJoinQueryPlanRequestBuilder request) {
         super(request);
         this.queryPlanner = request.plan();
     }

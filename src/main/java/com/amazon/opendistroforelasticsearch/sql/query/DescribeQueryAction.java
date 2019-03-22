@@ -21,7 +21,7 @@ import org.elasticsearch.client.Client;
 import com.amazon.opendistroforelasticsearch.sql.domain.IndexStatement;
 import com.amazon.opendistroforelasticsearch.sql.domain.QueryStatement;
 
-public class DescribeQueryAction extends QueryAction {
+public class DescribeQueryAction extends BaseQueryAction {
 
     private final IndexStatement statement;
 

@@ -20,6 +20,7 @@ import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.test.ESIntegTestCase;
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.locationtech.jts.util.Assert;
 
@@ -30,6 +31,7 @@ import java.util.Set;
  */
 @ESIntegTestCase.SuiteScopeTestCase
 @ThreadLeakScope(ThreadLeakScope.Scope.NONE)
+@Ignore
 public class CursorIT extends SQLIntegTestCase {
 
     @Override

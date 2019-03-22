@@ -15,14 +15,17 @@
 
 package com.amazon.opendistroforelasticsearch.sql.plugin;
 
-import java.sql.SQLFeatureNotSupportedException;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.amazon.opendistroforelasticsearch.sql.context.ContextualQueryAction;
+import com.amazon.opendistroforelasticsearch.sql.context.QueryContextManager;
 import com.amazon.opendistroforelasticsearch.sql.exception.SqlParseException;
 import com.amazon.opendistroforelasticsearch.sql.query.ESActionFactory;
 import com.amazon.opendistroforelasticsearch.sql.query.QueryAction;
+import com.amazon.opendistroforelasticsearch.sql.request.SqlRequest;
 import org.elasticsearch.client.Client;
+
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class SearchDao {
@@ -59,6 +62,18 @@ public class SearchDao {
 		return ESActionFactory.create(client, sql);
 	}
 
-
+    public QueryAction explain(QueryContextManager manager, SqlRequest request) throws SqlParseException,
+                                                                                   SQLFeatureNotSupportedException {
+        if (manager.isExistingContext(request)) {
+            return new ContextualQueryAction(request, manager);
+        }
+        else {
+            QueryAction queryAction = explain(request.getSql());
+            if (manager.isNewContext(request)) {
+                return new ContextualQueryAction(request, manager, queryAction);
+            }
+            return queryAction;
+        }
+    }
 
 }

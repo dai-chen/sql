@@ -44,7 +44,7 @@ import java.util.ArrayList;
 /**
  * Transform SQL query to standard Elasticsearch search query
  */
-public class DefaultQueryAction extends QueryAction {
+public class DefaultQueryAction extends BaseQueryAction {
 
     private final Select select;
     private SearchRequestBuilder request;

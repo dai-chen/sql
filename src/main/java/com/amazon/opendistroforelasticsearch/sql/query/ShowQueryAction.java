@@ -22,7 +22,7 @@ import com.amazon.opendistroforelasticsearch.sql.domain.QueryStatement;
 
 import static com.amazon.opendistroforelasticsearch.sql.utils.Util.prepareIndexRequestBuilder;
 
-public class ShowQueryAction extends QueryAction {
+public class ShowQueryAction extends BaseQueryAction {
 
     private final IndexStatement statement;
 

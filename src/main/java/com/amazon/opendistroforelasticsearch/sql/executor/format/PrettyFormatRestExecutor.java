@@ -15,6 +15,8 @@
 
 package com.amazon.opendistroforelasticsearch.sql.executor.format;
 
+import com.amazon.opendistroforelasticsearch.sql.context.ContextualQueryAction;
+import com.amazon.opendistroforelasticsearch.sql.exception.SqlParseException;
 import com.amazon.opendistroforelasticsearch.sql.executor.QueryActionElasticExecutor;
 import com.amazon.opendistroforelasticsearch.sql.executor.RestExecutor;
 import com.amazon.opendistroforelasticsearch.sql.query.join.BackOffRetryStrategy;
@@ -24,6 +26,7 @@ import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestStatus;
 import com.amazon.opendistroforelasticsearch.sql.query.QueryAction;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class PrettyFormatRestExecutor implements RestExecutor {
@@ -61,8 +64,11 @@ public class PrettyFormatRestExecutor implements RestExecutor {
         Protocol protocol;
 
         try {
-            Object queryResult = QueryActionElasticExecutor.executeAnyAction(client, queryAction);
-            protocol = new Protocol(client, queryAction.getQueryStatement(), queryResult, format);
+            protocol = new Protocol(client,
+                                    queryAction.getQueryStatement(),
+                                    queryResult(client, queryAction),
+                                    format,
+                                    queryAction.options());
         } catch (Exception e) {
             // TODO Might require some refactoring, Exceptions that happen in RestSqAction code before invoking execution
             // TODO are being caught in RestController (line 242) and being sent as a bytesRestResponse
@@ -71,5 +77,12 @@ public class PrettyFormatRestExecutor implements RestExecutor {
         }
 
         return protocol.format();
+    }
+
+    private Object queryResult(Client client, QueryAction action) throws IOException, SqlParseException {
+        if (action instanceof ContextualQueryAction) {
+            return ((ContextualQueryAction) action).execute();
+        }
+        return QueryActionElasticExecutor.executeAnyAction(client, action);
     }
 }

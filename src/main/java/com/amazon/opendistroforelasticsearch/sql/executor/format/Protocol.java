@@ -15,6 +15,7 @@
 
 package com.amazon.opendistroforelasticsearch.sql.executor.format;
 
+import com.amazon.opendistroforelasticsearch.sql.context.ContextId;
 import org.elasticsearch.client.Client;
 import com.amazon.opendistroforelasticsearch.sql.executor.format.DataRows.Row;
 import com.amazon.opendistroforelasticsearch.sql.executor.format.Schema.Column;
@@ -41,8 +42,12 @@ public class Protocol {
     private ResultSet resultSet;
     private ErrorMessage error;
 
-    public Protocol(Client client, QueryStatement query, Object queryResult, String formatType) {
+    /** Extra optional fields */
+    private final Option[] options;
+
+    public Protocol(Client client, QueryStatement query, Object queryResult, String formatType, Option... options) {
         this.formatType = formatType;
+        this.options = options;
 
         this.status = OK_STATUS;
         this.resultSet = loadResultSet(client, query, queryResult);
@@ -52,6 +57,7 @@ public class Protocol {
 
     public Protocol(Exception e) {
         this.formatType = null;
+        this.options = new Option[0];
         this.status = ERROR_STATUS;
         this.error = new ErrorMessage(e, ERROR_STATUS);
     }
@@ -108,6 +114,9 @@ public class Protocol {
         formattedOutput.put("schema", getSchemaAsJson());
         formattedOutput.put("datarows", getDataRowsAsJson());
 
+        for (Option option : options) {
+            option.format(formattedOutput);
+        }
         return formattedOutput.toString(2);
     }
 

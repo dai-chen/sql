@@ -54,6 +54,19 @@ public class SqlRequest {
         return this.jsonContent;
     }
 
+    public int fetchSize() {
+        String size = fieldValue("fetch_size");
+        return size.isEmpty() ? 0 : Integer.parseInt(size);
+    }
+
+    public String cursor() {
+        return fieldValue("cursor");
+    }
+
+    private String fieldValue(String fieldName) {
+        return (jsonContent == null) ? "" : jsonContent.optString(fieldName);
+    }
+
     /**
      * JSONObject's getJSONObject method will return just the value, this helper method is to extract the key and
      * value of 'filter' and return the JSON as a string.

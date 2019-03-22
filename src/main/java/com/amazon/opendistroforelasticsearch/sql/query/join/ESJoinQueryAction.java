@@ -21,19 +21,19 @@ import com.amazon.opendistroforelasticsearch.sql.domain.Select;
 import com.amazon.opendistroforelasticsearch.sql.domain.TableOnJoinSelect;
 import com.amazon.opendistroforelasticsearch.sql.domain.hints.Hint;
 import com.amazon.opendistroforelasticsearch.sql.exception.SqlParseException;
-import com.amazon.opendistroforelasticsearch.sql.query.planner.HashJoinQueryPlanRequestBuilder;
-import org.elasticsearch.client.Client;
+import com.amazon.opendistroforelasticsearch.sql.query.BaseQueryAction;
 import com.amazon.opendistroforelasticsearch.sql.query.DefaultQueryAction;
-import com.amazon.opendistroforelasticsearch.sql.query.QueryAction;
 import com.amazon.opendistroforelasticsearch.sql.query.SqlElasticRequestBuilder;
+import com.amazon.opendistroforelasticsearch.sql.query.planner.HashJoinQueryPlanRequestBuilder;
 import com.amazon.opendistroforelasticsearch.sql.query.planner.core.Config;
+import org.elasticsearch.client.Client;
 
 import java.util.List;
 
 /**
  * Created by Eliran on 15/9/2015.
  */
-public abstract class ESJoinQueryAction extends QueryAction {
+public abstract class ESJoinQueryAction extends BaseQueryAction {
 
     protected JoinSelect joinSelect;
 

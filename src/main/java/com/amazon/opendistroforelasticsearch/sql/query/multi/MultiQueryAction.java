@@ -15,14 +15,14 @@
 
 package com.amazon.opendistroforelasticsearch.sql.query.multi;
 
+import com.amazon.opendistroforelasticsearch.sql.domain.Field;
 import com.amazon.opendistroforelasticsearch.sql.domain.Select;
 import com.amazon.opendistroforelasticsearch.sql.exception.SqlParseException;
+import com.amazon.opendistroforelasticsearch.sql.query.BaseQueryAction;
+import com.amazon.opendistroforelasticsearch.sql.query.DefaultQueryAction;
+import com.amazon.opendistroforelasticsearch.sql.query.SqlElasticRequestBuilder;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
-import com.amazon.opendistroforelasticsearch.sql.domain.Field;
-import com.amazon.opendistroforelasticsearch.sql.query.DefaultQueryAction;
-import com.amazon.opendistroforelasticsearch.sql.query.QueryAction;
-import com.amazon.opendistroforelasticsearch.sql.query.SqlElasticRequestBuilder;
 
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * Created by Eliran on 19/8/2016.
  */
-public class MultiQueryAction extends QueryAction {
+public class MultiQueryAction extends BaseQueryAction {
     private MultiQuerySelect multiQuerySelect;
     public MultiQueryAction(Client client, MultiQuerySelect multiSelect) {
         super(client, null);

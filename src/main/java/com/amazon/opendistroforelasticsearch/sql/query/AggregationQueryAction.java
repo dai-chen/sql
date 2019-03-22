@@ -49,7 +49,7 @@ import java.util.Map;
 /**
  * Transform SQL query to Elasticsearch aggregations query
  */
-public class AggregationQueryAction extends QueryAction {
+public class AggregationQueryAction extends BaseQueryAction {
 
     private final Select select;
     private AggMaker aggMaker = new AggMaker();

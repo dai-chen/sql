@@ -16,6 +16,7 @@
 package com.amazon.opendistroforelasticsearch.sql.plugin;
 
 import com.alibaba.druid.sql.parser.ParserException;
+import com.amazon.opendistroforelasticsearch.sql.context.QueryContextManager;
 import com.amazon.opendistroforelasticsearch.sql.exception.SqlParseException;
 import com.amazon.opendistroforelasticsearch.sql.executor.ActionRequestRestExecutorFactory;
 import com.amazon.opendistroforelasticsearch.sql.executor.RestExecutor;
@@ -48,6 +49,9 @@ import static org.elasticsearch.rest.RestStatus.SERVICE_UNAVAILABLE;
 public class RestSqlAction extends BaseRestHandler {
     private static final Logger LOG = LogManager.getLogger(RestSqlAction.class);
 
+    /** Query context as singleton as rest handler */
+    private final QueryContextManager queryContextMgr;
+
     /** API endpoint path */
     public static final String QUERY_API_ENDPOINT = "/_opendistro/_sql";
     public static final String EXPLAIN_API_ENDPOINT = QUERY_API_ENDPOINT + "/_explain";
@@ -58,6 +62,8 @@ public class RestSqlAction extends BaseRestHandler {
         restController.registerHandler(RestRequest.Method.GET, QUERY_API_ENDPOINT, this);
         restController.registerHandler(RestRequest.Method.POST, EXPLAIN_API_ENDPOINT, this);
         restController.registerHandler(RestRequest.Method.GET, EXPLAIN_API_ENDPOINT, this);
+
+        queryContextMgr = new QueryContextManager();
     }
 
     @Override

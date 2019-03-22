@@ -28,7 +28,7 @@ import org.elasticsearch.index.reindex.DeleteByQueryAction;
 import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.index.reindex.DeleteByQueryRequestBuilder;
 
-public class DeleteQueryAction extends QueryAction {
+public class DeleteQueryAction extends BaseQueryAction {
 
 	private final Delete delete;
 	private DeleteByQueryRequestBuilder request;
