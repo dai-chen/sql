@@ -19,19 +19,16 @@ import com.amazon.opendistroforelasticsearch.sql.context.cursor.CursorContextId;
 import com.amazon.opendistroforelasticsearch.sql.context.cursor.CursorQueryContext;
 import com.amazon.opendistroforelasticsearch.sql.query.QueryAction;
 import com.amazon.opendistroforelasticsearch.sql.request.SqlRequest;
-import org.elasticsearch.search.SearchHits;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.amazon.opendistroforelasticsearch.sql.context.QueryContext.FetchEvent;
 
 /**
  * Query context manager
  */
 public class QueryContextManager {
 
-    private final Map<ContextId, QueryContext> contextById = new HashMap<>(); // TODO: concurrency control
+    private final Map<ContextId, QueryContext> contextById = new HashMap<>(); // TODO: concurrency control and expiration policy
 
     /**
      * Does query request have contextual field which indicates that parsing/translating work can be skipped.
@@ -40,28 +37,22 @@ public class QueryContextManager {
      * @return          true if request has contextual field
      */
     public boolean isExistingContext(SqlRequest request) {
-        return !request.cursor().isEmpty(); // AND valid ID AND found context related
+        return !request.cursor().isEmpty();
     }
 
     public boolean isNewContext(SqlRequest request) {
         return request.fetchSize() > 0;
     }
 
-    public QueryContext find(SqlRequest request) {
-        return find(new CursorContextId(request));
+    public QueryContext create(SqlRequest request, QueryAction action) {
+        if (isExistingContext(request)) {
+            return contextById.remove(new CursorContextId(request));
+        }
+        return new CursorQueryContext(request, action);
     }
 
-    public QueryContext find(ContextId contextId) {
-        return contextById.get(contextId);
+    public void update(QueryContext context) {
+        contextById.put(context.getId(), context);
     }
 
-    public ContextId handleBuildEvent(SqlRequest request, QueryAction action) {
-        CursorContextId contextId = new CursorContextId(request);
-        contextById.put(contextId, new CursorQueryContext(action));
-        return contextId;
-    }
-
-    public void handleFetchEvent(ContextId contextId) {
-        find(contextId).handle(new FetchEvent());
-    }
 }

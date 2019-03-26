@@ -15,42 +15,66 @@
 
 package com.amazon.opendistroforelasticsearch.sql.context.cursor;
 
+import com.amazon.opendistroforelasticsearch.sql.context.ContextId;
 import com.amazon.opendistroforelasticsearch.sql.context.QueryContext;
-import com.amazon.opendistroforelasticsearch.sql.exception.SqlParseException;
-import com.amazon.opendistroforelasticsearch.sql.executor.ElasticHitsExecutor;
-import com.amazon.opendistroforelasticsearch.sql.executor.join.QueryPlanElasticExecutor;
+import com.amazon.opendistroforelasticsearch.sql.context.fsm.ESScrollFSM;
+import com.amazon.opendistroforelasticsearch.sql.context.fsm.FSM;
+import com.amazon.opendistroforelasticsearch.sql.context.fsm.FSM.Event;
+import com.amazon.opendistroforelasticsearch.sql.context.fsm.FSM.EventType;
+import com.amazon.opendistroforelasticsearch.sql.context.fsm.FSM.Page;
 import com.amazon.opendistroforelasticsearch.sql.query.QueryAction;
-import com.amazon.opendistroforelasticsearch.sql.query.SqlElasticRequestBuilder;
-import com.amazon.opendistroforelasticsearch.sql.query.join.ESJoinQueryAction;
-import com.amazon.opendistroforelasticsearch.sql.query.planner.HashJoinQueryPlanRequestBuilder;
+import com.amazon.opendistroforelasticsearch.sql.request.SqlRequest;
+import org.elasticsearch.search.SearchHits;
+
+import java.util.Objects;
+
+import static com.amazon.opendistroforelasticsearch.sql.context.fsm.FSM.EventType.BUILD;
+import static com.amazon.opendistroforelasticsearch.sql.context.fsm.FSM.EventType.FETCH;
 
 /**
  * Query context for cursor support
  */
 public class CursorQueryContext implements QueryContext {
 
-    private final QueryAction queryAction;
-    private final ElasticHitsExecutor executor;
+    private final SqlRequest request;
 
-    public CursorQueryContext(QueryAction action) {
-        this.queryAction = action;
-        this.executor = createExecutor();
+    private final QueryAction action;
+
+    private final FSM fsm;
+
+    private ContextId contextId;
+
+    public CursorQueryContext(SqlRequest request, QueryAction action) {
+        this.request = request;
+        this.action = action;
+        this.fsm = new ESScrollFSM(action);
+        //this.executor = createExecutor(action);
+
+        fire(BUILD);
     }
 
     @Override
-    public QueryAction queryAction() {
-        return queryAction;
+    public ContextId getId() {
+        Objects.requireNonNull(contextId, "Context ID is not generated yet");
+        return contextId;
     }
 
     @Override
-    public void handle(Event event) {
+    public SearchHits fetch() {
+        fire(FETCH);
 
+        Page page = fsm.getPage();
+        if (contextId == null) {
+            contextId = new CursorContextId(page.getScrollId());
+        }
+        return page.getResult();
     }
 
-    private ElasticHitsExecutor createExecutor() {
-        if (queryAction instanceof ESJoinQueryAction) {
+    /*
+    private ElasticHitsExecutor createExecutor(QueryAction action) {
+        if (action instanceof ESJoinQueryAction) {
             try {
-                SqlElasticRequestBuilder request = queryAction.explain();
+                SqlElasticRequestBuilder request = action.explain();
                 if (request instanceof HashJoinQueryPlanRequestBuilder) {
                     return new QueryPlanElasticExecutor((HashJoinQueryPlanRequestBuilder) request);
                 }
@@ -59,7 +83,12 @@ public class CursorQueryContext implements QueryContext {
                 throw new IllegalStateException("Failed to create executor for new query context", e);
             }
         }
-        throw new UnsupportedOperationException("Don't support cursor for query action: " + queryAction.getClass().getSimpleName());
+        throw new UnsupportedOperationException("Don't support cursor for query action: " + action.getClass().getSimpleName());
+    }
+    */
+
+    private void fire(EventType type) {
+        fsm.handle(new Event(type, request, action));
     }
 
 }

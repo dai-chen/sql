@@ -15,7 +15,6 @@
 
 package com.amazon.opendistroforelasticsearch.sql.context;
 
-import com.amazon.opendistroforelasticsearch.sql.context.cursor.CursorContextId;
 import com.amazon.opendistroforelasticsearch.sql.domain.QueryStatement;
 import com.amazon.opendistroforelasticsearch.sql.executor.format.Option;
 import com.amazon.opendistroforelasticsearch.sql.query.QueryAction;
@@ -31,37 +30,31 @@ import java.util.Objects;
  */
 public class ContextualQueryAction implements QueryAction {
 
-    private final SqlRequest sqlRequest;
+    private final SqlRequest request;
+
     private final QueryContextManager queryContextMgr;
+
     private final QueryAction queryAction;
 
-    /** Context ID generated or parsed out of request */
-    private ContextId contextId;
-
-    public ContextualQueryAction(SqlRequest request, QueryContextManager manager) {
-        this(request, manager, manager.find(request).queryAction());
-    }
+    private QueryContext queryContext;
 
     public ContextualQueryAction(SqlRequest request, QueryContextManager manager, QueryAction action) {
-        this.sqlRequest = request;
+        this.request = request;
         this.queryContextMgr = manager;
         this.queryAction = action;
     }
 
     public SearchHits execute() {
-        if (queryContextMgr.isNewContext(sqlRequest)) {
-            contextId = queryContextMgr.handleBuildEvent(sqlRequest, queryAction);
-        } else {
-            contextId = new CursorContextId(sqlRequest); //TODO: hide and relate all cursor factory logic together
-        }
-        queryContextMgr.handleFetchEvent(contextId);
-        return SearchHits.empty();
+        queryContext = queryContextMgr.create(request, queryAction);
+        SearchHits hits = queryContext.fetch();
+        queryContextMgr.update(queryContext);
+        return hits;
     }
 
     @Override
     public Option[] options() {
-        Objects.requireNonNull(contextId, "Context ID is not ready");
-        return new Option[]{ contextId };
+        Objects.requireNonNull(queryContext, "Query context is not ready");
+        return new Option[]{ queryContext.getId() };
     }
 
     @Override

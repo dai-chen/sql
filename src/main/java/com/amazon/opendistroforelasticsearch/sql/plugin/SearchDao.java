@@ -62,18 +62,14 @@ public class SearchDao {
 		return ESActionFactory.create(client, sql);
 	}
 
-    public QueryAction explain(QueryContextManager manager, SqlRequest request) throws SqlParseException,
-                                                                                   SQLFeatureNotSupportedException {
-        if (manager.isExistingContext(request)) {
-            return new ContextualQueryAction(request, manager);
+    public QueryAction explain(SqlRequest request, QueryContextManager manager)
+			throws SqlParseException, SQLFeatureNotSupportedException {
+
+		QueryAction action = explain(request.getSql());
+        if (manager.isExistingContext(request) || manager.isNewContext(request)) {
+            return new ContextualQueryAction(request, manager, action);
         }
-        else {
-            QueryAction queryAction = explain(request.getSql());
-            if (manager.isNewContext(request)) {
-                return new ContextualQueryAction(request, manager, queryAction);
-            }
-            return queryAction;
-        }
+        return action;
     }
 
 }

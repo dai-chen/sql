@@ -15,31 +15,23 @@
 
 package com.amazon.opendistroforelasticsearch.sql.context;
 
-import com.amazon.opendistroforelasticsearch.sql.query.QueryAction;
+import org.elasticsearch.search.SearchHits;
 
+/**
+ * Query context
+ */
 public interface QueryContext {
 
     /**
-     * Query action with all information of the original query.
-     * @return  query action
+     * Return context ID (probably generated after first fetch)
+     *
+     * @return context ID
      */
-    QueryAction queryAction();
+    ContextId getId();
 
     /**
      * Handle and transit state according to incoming event.
-     * @param event     event
      */
-    void handle(Event event);
+    SearchHits fetch();
 
-    interface Event {
-    }
-
-    class BuildEvent implements Event {
-    }
-
-    class FetchEvent implements Event {
-    }
-
-    class ClearEvent implements Event {
-    }
 }

@@ -36,6 +36,10 @@ public class CursorContextId implements ContextId {
         this.cursorId = request.cursor().isEmpty() ? generate() : request.cursor();
     }
 
+    public CursorContextId(String cursorId) {
+        this.cursorId = cursorId;
+    }
+
     @Override
     public void format(JSONObject json) {
         json.append(CURSOR_FIELD_NAME, cursorId);
