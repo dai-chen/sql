@@ -15,24 +15,10 @@
 
 package com.amazon.opendistroforelasticsearch.sql.context;
 
-import com.amazon.opendistroforelasticsearch.sql.request.SqlRequest;
-import org.elasticsearch.search.SearchHits;
+public interface Scrollable {
 
-/**
- * Query context
- */
-public interface QueryContext {
+    void setFetchSize(int size);
 
-    /**
-     * Return context ID (probably generated after first fetch)
-     *
-     * @return context ID
-     */
-    ContextId getId();
-
-    /**
-     * Handle and transit state according to incoming event.
-     */
-    SearchHits fetch(SqlRequest request);
+    void setScrollId(String id);
 
 }

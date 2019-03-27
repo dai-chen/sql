@@ -15,6 +15,7 @@
 
 package com.amazon.opendistroforelasticsearch.sql.query;
 
+import com.amazon.opendistroforelasticsearch.sql.context.Scrollable;
 import com.amazon.opendistroforelasticsearch.sql.domain.Field;
 import com.amazon.opendistroforelasticsearch.sql.domain.KVValue;
 import com.amazon.opendistroforelasticsearch.sql.domain.MethodField;
@@ -26,6 +27,7 @@ import com.amazon.opendistroforelasticsearch.sql.domain.hints.HintType;
 import com.amazon.opendistroforelasticsearch.sql.exception.SqlParseException;
 import com.amazon.opendistroforelasticsearch.sql.rewriter.nestedfield.NestedFieldProjection;
 import com.amazon.opendistroforelasticsearch.sql.query.maker.QueryMaker;
+import org.apache.logging.log4j.util.Strings;
 import org.elasticsearch.action.search.*;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
@@ -44,10 +46,14 @@ import java.util.ArrayList;
 /**
  * Transform SQL query to standard Elasticsearch search query
  */
-public class DefaultQueryAction extends BaseQueryAction {
+public class DefaultQueryAction extends BaseQueryAction implements Scrollable {
 
     private final Select select;
     private SearchRequestBuilder request;
+
+    /** Fields for cursor support */
+    private int fetchSize;
+    private String scrollId;
 
     public DefaultQueryAction(Client client, Select select) {
         super(client, select);
@@ -59,16 +65,19 @@ public class DefaultQueryAction extends BaseQueryAction {
     }
 
     @Override
+    public void setFetchSize(int size) {
+        this.fetchSize = size;
+    }
+
+    @Override
+    public void setScrollId(String id) {
+        this.scrollId = id;
+    }
+
+    @Override
     public SqlElasticSearchRequestBuilder explain() throws SqlParseException {
-        Hint scrollHint = null;
-        for (Hint hint : select.getHints()) {
-            if (hint.getType() == HintType.USE_SCROLL) {
-                scrollHint = hint;
-                break;
-            }
-        }
-        if (scrollHint != null && scrollHint.getParams()[0] instanceof String) {
-            return new SqlElasticSearchRequestBuilder(new SearchScrollRequestBuilder(client, SearchScrollAction.INSTANCE, (String) scrollHint.getParams()[0]).setScroll(new TimeValue((Integer) scrollHint.getParams()[1])));
+        if (Strings.isNotEmpty(scrollId)) {
+            return new SqlElasticSearchRequestBuilder(new SearchScrollRequestBuilder(client, SearchScrollAction.INSTANCE, scrollId).setScroll(new TimeValue(60 * 1000)));
         }
 
         this.request = new SearchRequestBuilder(client, SearchAction.INSTANCE);
@@ -80,10 +89,10 @@ public class DefaultQueryAction extends BaseQueryAction {
         setSorts(select.getOrderBys());
         setLimit(select.getOffset(), select.getRowCount());
 
-        if (scrollHint != null) {
+        if (fetchSize > 0) {
             if (!select.isOrderdSelect())
                 request.addSort(FieldSortBuilder.DOC_FIELD_NAME, SortOrder.ASC);
-            request.setSize((Integer) scrollHint.getParams()[0]).setScroll(new TimeValue((Integer) scrollHint.getParams()[1]));
+            request.setSize(fetchSize).setScroll(new TimeValue(60 * 1000)); // Configurable timeout
         } else {
             request.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
         }

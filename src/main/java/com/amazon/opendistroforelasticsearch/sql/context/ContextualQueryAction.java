@@ -30,7 +30,7 @@ import java.util.Objects;
  */
 public class ContextualQueryAction implements QueryAction {
 
-    private final SqlRequest request;
+    private final SqlRequest sqlRequest;
 
     private final QueryContextManager queryContextMgr;
 
@@ -38,15 +38,15 @@ public class ContextualQueryAction implements QueryAction {
 
     private QueryContext queryContext;
 
-    public ContextualQueryAction(SqlRequest request, QueryContextManager manager, QueryAction action) {
-        this.request = request;
+    public ContextualQueryAction(QueryContextManager manager, SqlRequest request, QueryAction action) {
+        this.sqlRequest = request;
         this.queryContextMgr = manager;
         this.queryAction = action;
     }
 
     public SearchHits execute() {
-        queryContext = queryContextMgr.create(request, queryAction);
-        SearchHits hits = queryContext.fetch();
+        queryContext = queryContextMgr.get(sqlRequest, queryAction);
+        SearchHits hits = queryContext.fetch(sqlRequest);
         queryContextMgr.update(queryContext);
         return hits;
     }

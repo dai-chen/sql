@@ -44,7 +44,7 @@ public class QueryContextManager {
         return request.fetchSize() > 0;
     }
 
-    public QueryContext create(SqlRequest request, QueryAction action) {
+    public QueryContext get(SqlRequest request, QueryAction action) {
         if (isExistingContext(request)) {
             return contextById.remove(new CursorContextId(request));
         }

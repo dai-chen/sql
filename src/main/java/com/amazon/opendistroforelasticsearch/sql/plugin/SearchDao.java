@@ -67,7 +67,7 @@ public class SearchDao {
 
 		QueryAction action = explain(request.getSql());
         if (manager.isExistingContext(request) || manager.isNewContext(request)) {
-            return new ContextualQueryAction(request, manager, action);
+            return new ContextualQueryAction(manager, request, action);
         }
         return action;
     }
