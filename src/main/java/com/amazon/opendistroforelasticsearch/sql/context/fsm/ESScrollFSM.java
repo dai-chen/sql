@@ -22,7 +22,6 @@ import com.amazon.opendistroforelasticsearch.sql.query.SqlElasticRequestBuilder;
 import com.amazon.opendistroforelasticsearch.sql.query.SqlElasticSearchRequestBuilder;
 import com.amazon.opendistroforelasticsearch.sql.request.SqlRequest;
 import org.elasticsearch.action.ActionResponse;
-import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollAction;
