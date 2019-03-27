@@ -76,10 +76,6 @@ public class DefaultQueryAction extends BaseQueryAction implements Scrollable {
 
     @Override
     public SqlElasticSearchRequestBuilder explain() throws SqlParseException {
-        if (Strings.isNotEmpty(scrollId)) {
-            return new SqlElasticSearchRequestBuilder(new SearchScrollRequestBuilder(client, SearchScrollAction.INSTANCE, scrollId).setScroll(new TimeValue(60 * 1000)));
-        }
-
         this.request = new SearchRequestBuilder(client, SearchAction.INSTANCE);
         setIndicesAndTypes();
 
@@ -96,6 +92,7 @@ public class DefaultQueryAction extends BaseQueryAction implements Scrollable {
         } else {
             request.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
         }
+
         updateRequestWithIndexAndRoutingOptions(select, request);
         updateRequestWithHighlight(select, request);
         updateRequestWithCollapse(select, request);
