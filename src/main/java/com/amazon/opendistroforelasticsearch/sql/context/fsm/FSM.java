@@ -33,6 +33,7 @@ public abstract class FSM {
 
     public FSM() {
         TRANSITION.put(State.START, EventType.BUILD, State.BUILDING);
+        TRANSITION.put(State.START, EventType.FETCH, State.BUILDING);
         TRANSITION.put(State.START, EventType.CLEAR, State.CLEARING);
 
         TRANSITION.put(State.BUILDING, EventType.FETCH, State.LOCAL_FETCHING);
@@ -53,8 +54,15 @@ public abstract class FSM {
                 String.format("Unknown state transition from state %s by event %s", curState, event));
         }
 
-        state.apply(this, event);
+        State oldState = curState;
         curState = state;
+        try {
+            state.apply(this, event);
+        }
+        catch (Exception e) {
+            curState = oldState;
+            throw new IllegalStateException("Error happened in state transition handler method", e);
+        }
     }
 
     public abstract Page getPage();
@@ -114,17 +122,6 @@ public abstract class FSM {
 
         public void apply(FSM fsm, Event event) {
             handler.accept(fsm, event);
-
-            // Automate state transition in some case
-            /*
-            if ((fsm.curState == LOCAL_FETCHING || fsm.curState == REMOTE_FETCHING)
-                    && fsm.getState().getResult().getTotalHits() == 0) {
-                fsm.handle(EventType.NO_MORE_DATA);
-            }
-            else if (fsm.curState == CLEARING) {
-                fsm.handle(EventType.CLOSE);
-            }
-            */
         }
     }
 

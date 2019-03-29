@@ -48,7 +48,7 @@ public class QueryContextManager {
         if (isExistingContext(request)) {
             return contextById.remove(new CursorContextId(request));
         }
-        return new CursorQueryContext(request, action);
+        return new CursorQueryContext();
     }
 
     public void update(QueryContext context) {

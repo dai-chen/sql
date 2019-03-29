@@ -15,9 +15,7 @@
 
 package com.amazon.opendistroforelasticsearch.sql.context.fsm;
 
-import com.amazon.opendistroforelasticsearch.sql.context.Scrollable;
 import com.amazon.opendistroforelasticsearch.sql.exception.SqlParseException;
-import com.amazon.opendistroforelasticsearch.sql.query.QueryAction;
 import com.amazon.opendistroforelasticsearch.sql.query.SqlElasticRequestBuilder;
 import com.amazon.opendistroforelasticsearch.sql.query.SqlElasticSearchRequestBuilder;
 import com.amazon.opendistroforelasticsearch.sql.request.SqlRequest;
@@ -30,6 +28,7 @@ import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.unit.TimeValue;
 
 import static com.amazon.opendistroforelasticsearch.sql.context.fsm.FSM.EventType.CLOSE;
+import static com.amazon.opendistroforelasticsearch.sql.context.fsm.FSM.EventType.FETCH;
 import static com.amazon.opendistroforelasticsearch.sql.context.fsm.FSM.EventType.NO_MORE_DATA;
 
 /**
@@ -49,7 +48,11 @@ public class ESScrollFSM extends FSM {
 
     @Override
     protected void build(Event event) {
-        // Nothing to maintain across the requests
+        // Nothing to build and maintain across the requests
+
+        if (event.getType() == FETCH) {
+            handle(new Event(FETCH, event));
+        }
     }
 
     @Override
@@ -76,17 +79,6 @@ public class ESScrollFSM extends FSM {
     @Override
     protected void clear(Event event) {
         handle(new Event(CLOSE, event));
-    }
-
-    private QueryAction addScrollContext(Event event) {
-        QueryAction action = event.getAction();
-        if (!(action instanceof Scrollable)) {
-            throw new IllegalStateException("Query action is not scrollable");
-        }
-
-        ((Scrollable) action).setFetchSize(event.getRequest().fetchSize());
-        ((Scrollable) action).setScrollId(event.getRequest().cursor());
-        return action;
     }
 
     private SqlElasticRequestBuilder explain(Event event) throws SqlParseException {

@@ -30,6 +30,7 @@ import com.amazon.opendistroforelasticsearch.sql.query.SqlElasticRequestBuilder;
 import com.amazon.opendistroforelasticsearch.sql.query.join.ESJoinQueryActionFactory;
 import com.amazon.opendistroforelasticsearch.sql.query.planner.HashJoinQueryPlanRequestBuilder;
 import com.amazon.opendistroforelasticsearch.sql.query.planner.core.QueryPlanner;
+import com.amazon.opendistroforelasticsearch.sql.util.ScrollSearchHits;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
@@ -57,7 +58,6 @@ import org.mockito.Spy;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory.newConfigurationBuilder;
@@ -146,7 +146,7 @@ public abstract class QueryPlannerTest {
         when(mockReqBuilder.get()).thenReturn(response);
     }
 
-    protected SearchHits query(String sql, MockSearchHits mockHits1, MockSearchHits mockHits2) {
+    protected SearchHits query(String sql, ScrollSearchHits mockHits1, ScrollSearchHits mockHits2) {
         doAnswer(mockHits1).when(response1).getHits();
         doAnswer(mockHits2).when(response2).getHits();
 
@@ -196,69 +196,20 @@ public abstract class QueryPlannerTest {
         return expr;
     }
 
-    /**
-     * Mock SearchHits and slice and return in batch.
-     */
-    protected static class MockSearchHits implements Answer<SearchHits> {
-
-        private final SearchHit[] allHits;
-
-        private final int batchSize; //TODO: should be inferred from mock object dynamically
-
-        private int callCnt;
-
-        MockSearchHits(SearchHit[] allHits, int batchSize) {
-            this.allHits = allHits;
-            this.batchSize = batchSize;
-        }
-
-        @Override
-        public SearchHits answer(InvocationOnMock invocation) {
-            SearchHit[] curBatch;
-            if (isNoMoreBatch()) {
-                curBatch = new SearchHit[0];
-            } else {
-                curBatch = currentBatch();
-                callCnt++;
-            }
-            return new SearchHits(curBatch, allHits.length, 0);
-        }
-
-        private boolean isNoMoreBatch() {
-            return callCnt > allHits.length / batchSize;
-        }
-
-        private SearchHit[] currentBatch() {
-            return Arrays.copyOfRange(allHits, startIndex(), endIndex());
-        }
-
-        private int startIndex() {
-            return callCnt * batchSize;
-        }
-
-        private int endIndex() {
-            return Math.min(startIndex() + batchSize, allHits.length);
-        }
-
-        private void reset() {
-            callCnt = 0;
-        }
-    }
-
-    protected MockSearchHits employees(SearchHit... mockHits) {
+    protected ScrollSearchHits employees(SearchHit... mockHits) {
         return employees(5, mockHits);
     }
 
-    protected MockSearchHits employees(int pageSize, SearchHit... mockHits) {
-        return new MockSearchHits(mockHits, pageSize);
+    protected ScrollSearchHits employees(int pageSize, SearchHit... mockHits) {
+        return new ScrollSearchHits(mockHits, pageSize);
     }
 
-    protected MockSearchHits departments(SearchHit... mockHits) {
+    protected ScrollSearchHits departments(SearchHit... mockHits) {
         return departments(5, mockHits);
     }
 
-    protected MockSearchHits departments(int pageSize, SearchHit... mockHits) {
-        return new MockSearchHits(mockHits, pageSize);
+    protected ScrollSearchHits departments(int pageSize, SearchHit... mockHits) {
+        return new ScrollSearchHits(mockHits, pageSize);
     }
 
     protected SearchHit employee(int docId, String lastname, String departmentId) {

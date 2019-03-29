@@ -15,6 +15,7 @@
 
 package com.amazon.opendistroforelasticsearch.sql.context;
 
+import com.amazon.opendistroforelasticsearch.sql.query.QueryAction;
 import com.amazon.opendistroforelasticsearch.sql.request.SqlRequest;
 import org.elasticsearch.search.SearchHits;
 
@@ -33,6 +34,6 @@ public interface QueryContext {
     /**
      * Handle and transit state according to incoming event.
      */
-    SearchHits fetch(SqlRequest request);
+    SearchHits fetch(SqlRequest request, QueryAction action);
 
 }

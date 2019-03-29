@@ -28,7 +28,6 @@ import org.elasticsearch.search.SearchHits;
 
 import java.util.Objects;
 
-import static com.amazon.opendistroforelasticsearch.sql.context.fsm.FSM.EventType.BUILD;
 import static com.amazon.opendistroforelasticsearch.sql.context.fsm.FSM.EventType.FETCH;
 
 /**
@@ -36,18 +35,12 @@ import static com.amazon.opendistroforelasticsearch.sql.context.fsm.FSM.EventTyp
  */
 public class CursorQueryContext implements QueryContext {
 
-    private final QueryAction queryAction;
-
     private final FSM fsm;
 
     private ContextId contextId;
 
-    public CursorQueryContext(SqlRequest request, QueryAction action) {
-        this.queryAction = action;
+    public CursorQueryContext() {
         this.fsm = new ESScrollFSM();
-        //this.executor = createExecutor(action);
-
-        fire(BUILD, request);
     }
 
     @Override
@@ -57,8 +50,8 @@ public class CursorQueryContext implements QueryContext {
     }
 
     @Override
-    public SearchHits fetch(SqlRequest request) {
-        fire(FETCH, request);
+    public SearchHits fetch(SqlRequest request, QueryAction action) {
+        fire(FETCH, request, action);
 
         Page page = fsm.getPage();
         if (contextId == null) {
@@ -84,8 +77,8 @@ public class CursorQueryContext implements QueryContext {
     }
     */
 
-    private void fire(EventType type, SqlRequest request) {
-        fsm.handle(new Event(type, request, queryAction));
+    private void fire(EventType type, SqlRequest request, QueryAction action) {
+        fsm.handle(new Event(type, request, action));
     }
 
 }

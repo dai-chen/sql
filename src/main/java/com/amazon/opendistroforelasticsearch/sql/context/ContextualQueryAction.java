@@ -46,7 +46,7 @@ public class ContextualQueryAction implements QueryAction {
 
     public SearchHits execute() {
         queryContext = queryContextMgr.get(sqlRequest, queryAction);
-        SearchHits hits = queryContext.fetch(sqlRequest);
+        SearchHits hits = queryContext.fetch(sqlRequest, queryAction);
         queryContextMgr.update(queryContext);
         return hits;
     }
