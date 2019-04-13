@@ -21,6 +21,7 @@ import com.amazon.opendistroforelasticsearch.sql.executor.ActionRequestRestExecu
 import com.amazon.opendistroforelasticsearch.sql.executor.RestExecutor;
 import com.amazon.opendistroforelasticsearch.sql.executor.format.ErrorMessage;
 import com.amazon.opendistroforelasticsearch.sql.query.QueryAction;
+import com.amazon.opendistroforelasticsearch.sql.request.LifecycleListeners;
 import com.amazon.opendistroforelasticsearch.sql.request.SqlRequest;
 import com.amazon.opendistroforelasticsearch.sql.request.SqlRequestFactory;
 import org.apache.logging.log4j.LogManager;
@@ -52,12 +53,16 @@ public class RestSqlAction extends BaseRestHandler {
     public static final String QUERY_API_ENDPOINT = "/_opendistro/_sql";
     public static final String EXPLAIN_API_ENDPOINT = QUERY_API_ENDPOINT + "/_explain";
 
-    public RestSqlAction(Settings settings, RestController restController) {
+    private final LifecycleListeners listeners;
+
+    public RestSqlAction(Settings settings, RestController restController, LifecycleListeners listeners) {
         super(settings);
         restController.registerHandler(RestRequest.Method.POST, QUERY_API_ENDPOINT, this);
         restController.registerHandler(RestRequest.Method.GET, QUERY_API_ENDPOINT, this);
         restController.registerHandler(RestRequest.Method.POST, EXPLAIN_API_ENDPOINT, this);
         restController.registerHandler(RestRequest.Method.GET, EXPLAIN_API_ENDPOINT, this);
+
+        this.listeners = listeners;
     }
 
     @Override
@@ -69,6 +74,8 @@ public class RestSqlAction extends BaseRestHandler {
     protected RestChannelConsumer prepareRequest(RestRequest request, NodeClient client) {
         try {
             final SqlRequest sqlRequest = SqlRequestFactory.getSqlRequest(request);
+            listeners.onStart(sqlRequest);
+
             final QueryAction queryAction = new SearchDao(client).explain(sqlRequest.getSql());
             queryAction.setSqlRequest(sqlRequest);
 

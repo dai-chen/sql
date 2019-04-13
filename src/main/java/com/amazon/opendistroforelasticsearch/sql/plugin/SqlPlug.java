@@ -17,6 +17,8 @@ package com.amazon.opendistroforelasticsearch.sql.plugin;
 
 import com.amazon.opendistroforelasticsearch.sql.executor.AsyncRestExecutor;
 import com.amazon.opendistroforelasticsearch.sql.esdomain.LocalClusterState;
+import com.amazon.opendistroforelasticsearch.sql.request.LifecycleListener;
+import com.amazon.opendistroforelasticsearch.sql.request.LifecycleListeners;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.metadata.IndexNameExpressionResolver;
 import org.elasticsearch.cluster.node.DiscoveryNodes;
@@ -47,6 +49,8 @@ import java.util.function.Supplier;
 
 public class SqlPlug extends Plugin implements ActionPlugin {
 
+	private final LifecycleListeners listeners = new LifecycleListeners();
+
 	public SqlPlug() {
 	}
 
@@ -63,7 +67,7 @@ public class SqlPlug extends Plugin implements ActionPlugin {
 	@Override
 	public List<RestHandler> getRestHandlers(Settings settings, RestController restController, ClusterSettings clusterSettings, IndexScopedSettings indexScopedSettings, SettingsFilter settingsFilter, IndexNameExpressionResolver indexNameExpressionResolver, Supplier<DiscoveryNodes> nodesInCluster) {
 	    LocalClusterState.state().setResolver(indexNameExpressionResolver);
-		return Collections.singletonList(new RestSqlAction(settings, restController));
+		return Collections.singletonList(new RestSqlAction(settings, restController, listeners));
 	}
 
     @Override
