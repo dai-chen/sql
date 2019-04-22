@@ -15,8 +15,6 @@
 
 package com.amazon.opendistroforelasticsearch.sql.esintgtest;
 
-import com.carrotsearch.randomizedtesting.annotations.ThreadLeakScope;
-import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.test.ESIntegTestCase;
 import org.json.JSONObject;
@@ -24,22 +22,20 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.locationtech.jts.util.Assert;
 
-import java.util.Set;
+import static com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase.Index.ACCOUNT;
+import static com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase.Index.PEOPLE;
 
 /**
  *
  */
-@ESIntegTestCase.SuiteScopeTestCase
-@ThreadLeakScope(ThreadLeakScope.Scope.NONE)
 @Ignore
 public class CursorIT extends SQLIntegTestCase {
 
     @Override
     public void setupSuiteScopeCluster() throws Exception {
-        AdminClient adminClient = this.admin();
         Client esClient = ESIntegTestCase.client();
-        loadAccountIndex(adminClient, esClient);
-        loadPeopleIndex(adminClient, esClient);
+        loadIndex(ACCOUNT);
+        loadIndex(PEOPLE);
     }
 
     @Test

@@ -29,18 +29,30 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.UUID;
 
 public class SqlRequest {
+
+    public static final SqlRequest NULL = new SqlRequest("Unassigned", "", null);
+
+    /** Unique request ID for tracking */
+    private final String id;
 
     String sql;
     JSONObject jsonContent;
 
-    public SqlRequest(String sql, JSONObject jsonContent) {
+
+    public SqlRequest(String id, String sql, JSONObject jsonContent) {
+        this.id = id;
         this.sql = sql;
         this.jsonContent = jsonContent;
     }
 
-    private boolean isValidJson(String json) {
+    public SqlRequest(String sql, JSONObject jsonContent) {
+        this(UUID.randomUUID().toString(), sql, jsonContent);
+    }
+
+    private static boolean isValidJson(String json) {
         try {
             new JSONObject(json);
         } catch (JSONException e) {
@@ -67,13 +79,15 @@ public class SqlRequest {
         return (jsonContent == null) ? "" : jsonContent.optString(fieldName);
     }
 
+    public String getId() { return id; }
+
     /**
      * JSONObject's getJSONObject method will return just the value, this helper method is to extract the key and
      * value of 'filter' and return the JSON as a string.
      */
     private String getFilterObjectAsString(JSONObject jsonContent) {
         String filterVal = jsonContent.getJSONObject("filter").toString();
-        return "{" + "\"filter\":" + filterVal + "}";
+        return "{\"filter\":" + filterVal + "}";
     }
 
     private boolean hasFilterInRequest() {

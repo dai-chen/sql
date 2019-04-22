@@ -15,9 +15,7 @@
 
 package com.amazon.opendistroforelasticsearch.sql.esintgtest;
 
-import com.carrotsearch.randomizedtesting.annotations.ThreadLeakScope;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.test.ESIntegTestCase;
 
@@ -30,18 +28,11 @@ import java.io.IOException;
 
 // Refer to https://www.elastic.co/guide/en/elasticsearch/reference/6.5/integration-tests.html
 // for detailed ESIntegTestCase usages doc.
-@ESIntegTestCase.SuiteScopeTestCase
-@ThreadLeakScope(ThreadLeakScope.Scope.NONE)
 public class PreparedStatementIT extends SQLIntegTestCase {
 
-    // Please note that, we cannot use @BeforeClass method to prepare test data, because the testing cluster is NOT ready
-    // when @BeforeClass method is invoked, you will get NPE when trying to get cluster client
     @Override
-    public void setupSuiteScopeCluster() throws Exception {
-        AdminClient adminClient = this.admin();
-        Client esClient = ESIntegTestCase.client();
-
-        loadAccountIndex(adminClient, esClient);
+    protected void init() throws Exception {
+        loadIndex(Index.ACCOUNT);
     }
 
     @Test
@@ -55,7 +46,7 @@ public class PreparedStatementIT extends SQLIntegTestCase {
     public void testPreparedStatement() throws IOException {
         int ageToCompare = 35;
 
-        JSONObject response = query(String.format("{\n" +
+        JSONObject response = executeRequest(String.format("{\n" +
                 "  \"query\": \"SELECT * FROM %s/account WHERE age > ? AND state in (?, ?) LIMIT ?\",\n" +
                 "  \"parameters\": [\n" +
                 "    {\n" +

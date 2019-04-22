@@ -76,4 +76,8 @@ public class ContextualQueryAction implements QueryAction {
     public void setSqlRequest(SqlRequest sqlRequest) {
     }
 
+    @Override
+    public SqlRequest getSqlRequest() {
+        return SqlRequest.NULL;
+    }
 }

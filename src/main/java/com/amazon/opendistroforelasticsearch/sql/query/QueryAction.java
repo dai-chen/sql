@@ -31,6 +31,8 @@ public interface QueryAction {
 
     void setSqlRequest(SqlRequest sqlRequest);
 
+    SqlRequest getSqlRequest();
+
     default Option[] options() {
         return new Option[0];
     }
