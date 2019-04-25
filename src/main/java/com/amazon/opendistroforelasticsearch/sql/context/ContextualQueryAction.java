@@ -26,21 +26,21 @@ import org.elasticsearch.search.SearchHits;
 import java.util.Objects;
 
 /**
- * Contextual query action prevents actual parsing/translating happen and make use of context to handle the request.
+ * Contextual query action passes and uses query context to handle request eventually.
  */
 public class ContextualQueryAction implements QueryAction {
 
-    private final SqlRequest sqlRequest;
-
     private final QueryContextManager queryContextMgr;
+
+    private final SqlRequest sqlRequest;
 
     private final QueryAction queryAction;
 
     private QueryContext queryContext;
 
     public ContextualQueryAction(QueryContextManager manager, SqlRequest request, QueryAction action) {
-        this.sqlRequest = request;
         this.queryContextMgr = manager;
+        this.sqlRequest = request;
         this.queryAction = action;
     }
 
@@ -53,13 +53,13 @@ public class ContextualQueryAction implements QueryAction {
 
     @Override
     public Option[] options() {
-        Objects.requireNonNull(queryContext, "Query context is not ready");
+        Objects.requireNonNull(queryContext, "Query context is not set");
         return new Option[]{ queryContext.getId() };
     }
 
     @Override
     public SqlElasticRequestBuilder explain() {
-        throw new UnsupportedOperationException("Contextual query is only supported by our pretty formatter");
+        throw new UnsupportedOperationException("Contextual query is only supported by pretty formatter");
     }
 
     @Override
@@ -74,10 +74,11 @@ public class ContextualQueryAction implements QueryAction {
 
     @Override
     public void setSqlRequest(SqlRequest sqlRequest) {
+        queryAction.setSqlRequest(sqlRequest);
     }
 
     @Override
     public SqlRequest getSqlRequest() {
-        return SqlRequest.NULL;
+        return queryAction.getSqlRequest();
     }
 }

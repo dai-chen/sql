@@ -15,12 +15,9 @@
 
 package com.amazon.opendistroforelasticsearch.sql.esintgtest;
 
-import org.elasticsearch.client.Client;
-import org.elasticsearch.test.ESIntegTestCase;
 import org.json.JSONObject;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.locationtech.jts.util.Assert;
 
 import static com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase.Index.ACCOUNT;
 import static com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase.Index.PEOPLE;
@@ -32,8 +29,7 @@ import static com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestC
 public class CursorIT extends SQLIntegTestCase {
 
     @Override
-    public void setupSuiteScopeCluster() throws Exception {
-        Client esClient = ESIntegTestCase.client();
+    public void init() throws Exception {
         loadIndex(ACCOUNT);
         loadIndex(PEOPLE);
     }
@@ -58,7 +54,7 @@ public class CursorIT extends SQLIntegTestCase {
     //TODO: jdbc, raw ...
 
     private void compareResultWithAndWithoutCursor(String query) {
-        Assert.equals(
+        assertEquals(
             queryWithCursor(query),
             queryWithoutCursor(query)
         );

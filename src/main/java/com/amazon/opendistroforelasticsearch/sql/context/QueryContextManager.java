@@ -30,19 +30,33 @@ public class QueryContextManager {
 
     private final Map<ContextId, QueryContext> contextById = new HashMap<>(); // TODO: concurrency control and expiration policy
 
+    public boolean isContextual(SqlRequest request) {
+        return isNewContext(request) || isExistingContext(request); // TODO: assume cursor exists upon specified without validation for now
+    }
+
+    /**
+     * Create query context if not any. Reuse only if found locally which is distributed by coordinator.
+     * @return
+     */
+    public QueryContext create() {
+        CursorQueryContext context = new CursorQueryContext();
+        return context;
+    }
+
     /**
      * Does query request have contextual field which indicates that parsing/translating work can be skipped.
      *
      * @param request   query request
      * @return          true if request has contextual field
      */
-    public boolean isExistingContext(SqlRequest request) {
+    private boolean isExistingContext(SqlRequest request) {
         return !request.cursor().isEmpty();
     }
 
-    public boolean isNewContext(SqlRequest request) {
+    private boolean isNewContext(SqlRequest request) {
         return request.fetchSize() > 0;
     }
+
 
     public QueryContext get(SqlRequest request, QueryAction action) {
         if (isExistingContext(request)) {

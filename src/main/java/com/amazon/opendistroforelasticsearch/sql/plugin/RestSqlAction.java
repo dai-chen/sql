@@ -78,7 +78,7 @@ public class RestSqlAction extends BaseRestHandler {
             sqlRequest = SqlRequestFactory.getSqlRequest(request);
             LOG.info("[{}] Incoming request {}: {}", sqlRequest.getId(), request.uri(), sqlRequest.getSql());
 
-            final QueryAction queryAction = new SearchDao(client).explain(sqlRequest.getSql());
+            final QueryAction queryAction = new SearchDao(client).explain(queryContextMgr, sqlRequest);
             queryAction.setSqlRequest(sqlRequest);
 
             if (request.path().endsWith("/_explain")) {
