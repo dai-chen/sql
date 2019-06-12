@@ -15,8 +15,14 @@
 
 package com.amazon.opendistroforelasticsearch.sql.esintgtest;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase.Index.ACCOUNT;
 import static com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase.Index.PEOPLE;
@@ -24,6 +30,7 @@ import static com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestC
 /**
  * Integration test for cursor support
  */
+@Ignore
 public class CursorIT extends SQLIntegTestCase {
 
     @Override
@@ -49,8 +56,6 @@ public class CursorIT extends SQLIntegTestCase {
 
     }
 
-    //TODO: jdbc, raw ...
-
     private void compareResultWithAndWithoutCursor(String query) {
         assertEquals(
             queryWithCursor(query),
@@ -58,12 +63,18 @@ public class CursorIT extends SQLIntegTestCase {
         );
     }
 
-    private JSONObject queryWithCursor(String query) {
+    private Set<Object> queryWithCursor(String query) {
         return null;
     }
 
-    private JSONObject queryWithoutCursor(String query) {
-        return null;
+    private Set<Object> queryWithoutCursor(String query) {
+        try {
+            JSONObject json = executeQuery(query);
+            JSONArray dataRows = json.getJSONArray("dataRows");
+            return new HashSet<>(dataRows.toList());
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
     }
 
 
