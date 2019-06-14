@@ -46,14 +46,15 @@ public class CursorIT extends SQLIntegTestCase {
         );
     }
 
+    @Ignore
     @Test
     public void groupBy() {
-
+        // Scroll doesn't support aggregation
     }
 
+    @Ignore
     @Test
     public void join() {
-
     }
 
     private void compareResultWithAndWithoutCursor(String query) {
