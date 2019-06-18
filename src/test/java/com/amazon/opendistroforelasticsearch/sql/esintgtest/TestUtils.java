@@ -23,12 +23,19 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.Response;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 public class TestUtils {
 
@@ -100,31 +107,69 @@ public class TestUtils {
                 "}";
     }
 
+    public static String getDogs2IndexMapping() {
+        return "{  \"dog\": {" +
+                " \"properties\": {\n" +
+                "          \"holdersName\": {\n" +
+                "            \"type\": \"keyword\"\n" +
+                "          }"+
+                "       }"+
+                "   }" +
+                "}";
+    }
+
+    public static String getPeople2IndexMapping() {
+        return "{  \"people\": {" +
+                " \"properties\": {\n" +
+                "          \"firstname\": {\n" +
+                "            \"type\": \"keyword\"\n" +
+                "          }"+
+                "       }"+
+                "   }" +
+                "}";
+    }
+
     public static String getGameOfThronesIndexMapping() {
         return "{  \"gotCharacters\": { " +
-                " \"properties\": {\n" +
-                " \"nickname\": {\n" +
-                "\"type\":\"text\", "+
-                "\"fielddata\":true"+
-                "},\n"+
-                " \"name\": {\n" +
-                "\"properties\": {\n" +
-                "\"firstname\": {\n" +
-                "\"type\": \"text\",\n" +
-                "  \"fielddata\": true\n" +
-                "},\n" +
-                "\"lastname\": {\n" +
-                "\"type\": \"text\",\n" +
-                "  \"fielddata\": true\n" +
-                "},\n" +
-                "\"ofHerName\": {\n" +
-                "\"type\": \"integer\"\n" +
-                "},\n" +
-                "\"ofHisName\": {\n" +
-                "\"type\": \"integer\"\n" +
-                "}\n" +
-                "}\n" +
-                "}"+
+                "    \"properties\": {\n" +
+                "      \"nickname\": {\n" +
+                "        \"type\":\"text\", "+
+                "        \"fielddata\":true"+
+                "      },\n"+
+                "      \"name\": {\n" +
+                "        \"properties\": {\n" +
+                "          \"firstname\": {\n" +
+                "            \"type\": \"text\",\n" +
+                "            \"fielddata\": true\n" +
+                "          },\n" +
+                "          \"lastname\": {\n" +
+                "            \"type\": \"text\",\n" +
+                "            \"fielddata\": true\n" +
+                "          },\n" +
+                "          \"ofHerName\": {\n" +
+                "            \"type\": \"integer\"\n" +
+                "          },\n" +
+                "          \"ofHisName\": {\n" +
+                "            \"type\": \"integer\"\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      \"house\": {\n" +
+                "        \"type\": \"text\",\n" +
+                "        \"fields\": {\n" +
+                "          \"keyword\": {\n" +
+                "            \"type\": \"keyword\"\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      \"gender\": {\n" +
+                "        \"type\": \"text\",\n" +
+                "        \"fields\": {\n" +
+                "          \"keyword\": {\n" +
+                "            \"type\": \"keyword\"\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }" +
                 "} } }";
     }
 
@@ -136,7 +181,7 @@ public class TestUtils {
                 "\t\t\"properties\":{\n" +
                 "\t\t\t\"odbc_time\":{\n" +
                 "\t\t\t\t\"type\":\"date\",\n" +
-                "\t\t\t\t\"format\": \"{'ts' ''yyyy-MM-dd HH:mm:ss.SSS''}\"\n" +
+                "\t\t\t\t\"format\": \"'{ts' ''yyyy-MM-dd HH:mm:ss.SSS'''}'\"\n" +
                 "\t\t\t},\n" +
                 "\t\t\t\"docCount\":{\n" +
                 "\t\t\t\t\"type\":\"text\"\n" +
@@ -298,10 +343,14 @@ public class TestUtils {
         String absJsonPath = getResourceFilePath(jsonPath);
 
         BulkRequest bulkRequest = new BulkRequest();
-        try (BufferedReader br = new BufferedReader(new FileReader(absJsonPath))) {
+        try (final InputStream stream =  new FileInputStream(absJsonPath);
+             final Reader streamReader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+             final BufferedReader br = new BufferedReader(streamReader)) {
+
             while (true) {
+
                 String actionLine = br.readLine();
-                if (actionLine == null || actionLine.trim().length() == 0) {
+                if (actionLine == null || actionLine.trim().isEmpty()) {
                     break;
                 }
                 String sourceLine = br.readLine();
@@ -327,7 +376,8 @@ public class TestUtils {
         BulkResponse bulkResponse = client.bulk(bulkRequest).actionGet();
 
         if (bulkResponse.hasFailures()) {
-            throw new Exception("Failed to load test data into index " + defaultIndex + ", " + bulkResponse.buildFailureMessage());
+            throw new Exception("Failed to load test data into index " + defaultIndex + ", " +
+                    bulkResponse.buildFailureMessage());
         }
         System.out.println(bulkResponse.getItems().length + " documents loaded.");
         // ensure the documents are searchable
@@ -340,6 +390,45 @@ public class TestUtils {
             return new File(relPath).getAbsolutePath();
         } else {
             return new File(projectRoot + "/" + relPath).getAbsolutePath();
+        }
+    }
+
+    public static String getResponseBody(Response response) throws IOException {
+        final StringBuilder sb = new StringBuilder();
+
+        try (final InputStream is = response.getEntity().getContent();
+             final BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+        }
+        return sb.toString();
+    }
+
+    public static String fileToString(final String filePathFromProjectRoot, final boolean removeNewLines)
+            throws IOException {
+
+        final String absolutePath = getResourceFilePath(filePathFromProjectRoot);
+
+        try (final InputStream stream = new FileInputStream(absolutePath);
+             final Reader streamReader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+             final BufferedReader br = new BufferedReader(streamReader)) {
+
+            final StringBuilder stringBuilder = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+
+                stringBuilder.append(line);
+                if (!removeNewLines) {
+                    stringBuilder.append(String.format(Locale.ROOT, "%n"));
+                }
+                line = br.readLine();
+            }
+
+            return stringBuilder.toString();
         }
     }
 }

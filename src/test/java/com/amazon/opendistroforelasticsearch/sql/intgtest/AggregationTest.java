@@ -31,17 +31,17 @@ import org.elasticsearch.search.aggregations.bucket.histogram.InternalHistogram;
 import org.elasticsearch.search.aggregations.bucket.nested.InternalNested;
 import org.elasticsearch.search.aggregations.bucket.nested.InternalReverseNested;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.metrics.avg.Avg;
-import org.elasticsearch.search.aggregations.metrics.geobounds.InternalGeoBounds;
-import org.elasticsearch.search.aggregations.metrics.max.Max;
-import org.elasticsearch.search.aggregations.metrics.min.Min;
-import org.elasticsearch.search.aggregations.metrics.percentiles.Percentiles;
-import org.elasticsearch.search.aggregations.metrics.stats.Stats;
-import org.elasticsearch.search.aggregations.metrics.stats.extended.ExtendedStats;
-import org.elasticsearch.search.aggregations.metrics.sum.InternalSum;
-import org.elasticsearch.search.aggregations.metrics.sum.Sum;
-import org.elasticsearch.search.aggregations.metrics.tophits.InternalTopHits;
-import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCount;
+import org.elasticsearch.search.aggregations.metrics.Avg;
+import org.elasticsearch.search.aggregations.metrics.InternalGeoBounds;
+import org.elasticsearch.search.aggregations.metrics.Max;
+import org.elasticsearch.search.aggregations.metrics.Min;
+import org.elasticsearch.search.aggregations.metrics.Percentiles;
+import org.elasticsearch.search.aggregations.metrics.Stats;
+import org.elasticsearch.search.aggregations.metrics.ExtendedStats;
+import org.elasticsearch.search.aggregations.metrics.InternalSum;
+import org.elasticsearch.search.aggregations.metrics.Sum;
+import org.elasticsearch.search.aggregations.metrics.InternalTopHits;
+import org.elasticsearch.search.aggregations.metrics.ValueCount;
 import org.junit.Assert;
 import org.junit.Test;
 import com.amazon.opendistroforelasticsearch.sql.plugin.SearchDao;
@@ -230,7 +230,7 @@ public class AggregationTest {
     public void postFilterTest() throws Exception {
         SqlElasticSearchRequestBuilder select = getSearchRequestBuilder(String.format("SELECT /*! POST_FILTER({\"term\":{\"gender\":\"m\"}}) */ COUNT(*) FROM %s/account GROUP BY gender", TEST_INDEX_ACCOUNT));
         SearchResponse res = (SearchResponse) select.get();
-        Assert.assertEquals(507, res.getHits().totalHits);
+        Assert.assertEquals(507, res.getHits().getTotalHits().value);
 
         Aggregations result = res.getAggregations();
         Terms gender = result.get("gender");
@@ -554,7 +554,7 @@ public class AggregationTest {
 			}
 		}
 
-		Assert.assertEquals(response.getHits().getTotalHits(), 1000);
+		Assert.assertEquals(response.getHits().getTotalHits().value, 1000);
 		Assert.assertEquals(response.getHits().getHits().length, 10);
 	}
 
@@ -581,7 +581,7 @@ public class AggregationTest {
 			}
 		}
 
-		Assert.assertEquals(response.getHits().getTotalHits(), 1000);
+		Assert.assertEquals(response.getHits().getTotalHits().value, 1000);
 		Assert.assertEquals(response.getHits().getHits().length, 10);
 	}
 
@@ -611,7 +611,7 @@ public class AggregationTest {
         Aggregations result = query(String.format("SELECT COUNT(*) FROM %s/nestedType GROUP BY nested(message.info)", TEST_INDEX_NESTED_TYPE));
         InternalNested nested = result.get("message.info@NESTED");
         Terms infos = nested.getAggregations().get("message.info");
-        Assert.assertEquals(3,infos.getBuckets().size());
+        Assert.assertEquals(4,infos.getBuckets().size());
         for(Terms.Bucket bucket : infos.getBuckets()) {
             String key = bucket.getKey().toString();
             long count = ((ValueCount) bucket.getAggregations().get("COUNT(*)")).getValue();
@@ -622,6 +622,9 @@ public class AggregationTest {
                 Assert.assertEquals(2, count);
             }
             else if(key.equalsIgnoreCase("b")) {
+                Assert.assertEquals(1, count);
+            }
+            else if(key.equalsIgnoreCase("zz")) {
                 Assert.assertEquals(1, count);
             }
             else {
@@ -683,7 +686,7 @@ public class AggregationTest {
         Aggregations result = query(String.format("SELECT sum(nested(message.dayOfWeek)) as sumDays FROM %s/nestedType", TEST_INDEX_NESTED_TYPE));
         InternalNested nested = result.get("message.dayOfWeek@NESTED");
         Sum sum = nested.getAggregations().get("sumDays");
-        Assert.assertEquals(13.0,sum.getValue(),0.0001);
+        Assert.assertEquals(19.0,sum.getValue(),0.0001);
 
     }
 
@@ -698,11 +701,11 @@ public class AggregationTest {
             if(key.equals("0") || key.equals("4")){
                 Assert.assertEquals(2,count);
             }
-            else if (key.equals("2")){
+            else if (key.equals("2") || key.equals("6")){
                 Assert.assertEquals(1,count);
             }
             else{
-                Assert.assertTrue("only 0 2 4 keys are allowed got:" + key,false);
+                Assert.assertTrue("only 0 2 4 6 keys are allowed got:" + key,false);
             }
         }
 

@@ -66,32 +66,12 @@ import static org.mockito.Mockito.when;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     QueryTest.class,
-    MethodQueryTest.class,
     AggregationTest.class,
-    JoinTests.class,
-    HashJoinBasicTest.class,
-    HashJoinMoreTest.class,
-    ExplainTest.class,
-    WktToGeoJsonConverterTests.class,
-    SqlParserTests.class,
-    ShowTest.class,
     CSVResultsExtractorTests.class,
-    SourceFieldTest.class,
-    SQLFunctionsTest.class,
-    UtilTests.class,
     MultiQueryTests.class,
-    DeleteTest.class,
-    HavingTest.class,
-    DateFormatTest.class,
-    JSONRequestTest.class,
-    NestedFieldQueryTest.class,
-    MathFunctionsTest.class,
-    DateFunctionsTest.class,
-    QueryFunctionsTest.class,
     PrettyFormatResponseTest.class,
     PreparedStatementTest.class,
-    MetaDataQueriesTest.class,
-    TermQueryExplainTest.class
+    MetaDataQueriesTest.class
 })
 public class MainTestSuite {
 
@@ -514,7 +494,7 @@ public class MainTestSuite {
                 "\t\t\"properties\":{\n" +
                 "\t\t\t\"odbc_time\":{\n" +
                 "\t\t\t\t\"type\":\"date\",\n" +
-                "\t\t\t\t\"format\": \"{'ts' ''yyyy-MM-dd HH:mm:ss.SSS''}\"\n" +
+                "\t\t\t\t\"format\": \"'{ts' ''yyyy-MM-dd HH:mm:ss.SSS'''}'\"\n" +
                 "\t\t\t},\n" +
                 "\t\t\t\"docCount\":{\n" +
                 "\t\t\t\t\"type\":\"text\"\n" +

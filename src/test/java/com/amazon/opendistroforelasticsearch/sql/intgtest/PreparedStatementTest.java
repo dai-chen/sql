@@ -16,16 +16,17 @@
 package com.amazon.opendistroforelasticsearch.sql.intgtest;
 
 import com.alibaba.druid.sql.parser.ParserException;
-import com.amazon.opendistroforelasticsearch.sql.plugin.SearchDao;
-import com.amazon.opendistroforelasticsearch.sql.request.SqlRequest;
-import com.amazon.opendistroforelasticsearch.sql.request.SqlRequestFactory;
 import com.amazon.opendistroforelasticsearch.sql.exception.SqlParseException;
+import com.amazon.opendistroforelasticsearch.sql.plugin.SearchDao;
 import com.amazon.opendistroforelasticsearch.sql.query.QueryAction;
 import com.amazon.opendistroforelasticsearch.sql.query.SqlElasticSearchRequestBuilder;
+import com.amazon.opendistroforelasticsearch.sql.request.SqlRequest;
+import com.amazon.opendistroforelasticsearch.sql.request.SqlRequestFactory;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.bytes.BytesArray;
-import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.xcontent.NamedXContentRegistry;
+import org.elasticsearch.http.HttpChannel;
+import org.elasticsearch.http.HttpRequest;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -33,11 +34,13 @@ import org.json.JSONObject;
 import org.junit.Test;
 
 import java.sql.SQLFeatureNotSupportedException;
-import java.util.HashMap;
 
+import static org.elasticsearch.rest.RestRequest.Method.POST;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class PreparedStatementTest {
 
@@ -76,7 +79,12 @@ public class PreparedStatementTest {
 
     private SearchHits query(String request) {
         try {
-            SqlRequest sqlRequest = SqlRequestFactory.getSqlRequest(new TestRestRequest(request));
+            final HttpRequest httpRequest = mock(HttpRequest.class);
+            when(httpRequest.uri()).thenReturn("uri");
+            when(httpRequest.method()).thenReturn(POST);
+            when(httpRequest.content()).thenReturn(new BytesArray(request));
+
+            SqlRequest sqlRequest = SqlRequestFactory.getSqlRequest(RestRequest.request(NamedXContentRegistry.EMPTY, httpRequest, mock(HttpChannel.class)));
 
             JSONObject jsonRequest = new JSONObject(request);
             String sql = sqlRequest.getSql();
@@ -91,35 +99,6 @@ public class PreparedStatementTest {
 
         } catch (SqlParseException | SQLFeatureNotSupportedException e) {
             throw new ParserException("Illegal sql expr in request: " + request, e);
-        }
-    }
-
-    static class TestRestRequest extends RestRequest {
-        private String payload;
-
-        TestRestRequest(String payload) {
-            super(NamedXContentRegistry.EMPTY, "", new HashMap<>());
-            this.payload = payload;
-        }
-
-        @Override
-        public Method method() {
-            return Method.POST;
-        }
-
-        @Override
-        public String uri() {
-            return "uri";
-        }
-
-        @Override
-        public boolean hasContent() {
-            return true;
-        }
-
-        @Override
-        public BytesReference innerContent() {
-            return new BytesArray(this.payload);
         }
     }
 }

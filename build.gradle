@@ -16,7 +16,7 @@
 buildscript {
 
     ext {
-        es_version = System.getProperty("es.version", "6.7.1")
+        es_version = System.getProperty("es.version", "7.0.1")
     }
     // This isn't applying from repositories.gradle so repeating it here
     repositories {
@@ -46,13 +46,19 @@ repositories {
 }
 
 ext {
-    opendistroVersion = '0.9.0'
+    opendistroVersion = '1.0.0'
     isSnapshot = "true" == System.getProperty("build.snapshot", "true")
 }
 
 version = "${opendistroVersion}.0" 
 
 apply plugin: 'elasticsearch.esplugin'
+apply plugin: 'jacoco'
+apply from: 'build-tools/sqlplugin-coverage.gradle'
+
+jacoco {
+    toolVersion = "0.8.3"
+}
 
 ext {
     projectSubstitutions = [:]
@@ -95,7 +101,7 @@ compileTestJava {
 }
 
 // TODO: Need to update integration test to use ElasticSearch test framework
-unitTest {
+test {
     include '**/*Test.class'
     exclude 'com/amazon/opendistroforelasticsearch/sql/intgtest/**'
     // Gradle runs unit test using a working directory other and project root
@@ -109,6 +115,13 @@ integTestRunner {
     // allows integration test classes to access test resource from project root path
     systemProperty('project.root', project.rootDir.absolutePath)
 }
+
+integTestCluster {
+    // use elasticsearch oss distribution for integration test.
+    distribution = "oss-zip"
+}
+
+check.dependsOn jacocoTestReport
 
 // TODO: fix code style in main and test source code
 checkstyleMain.ignoreFailures = true
@@ -194,7 +207,7 @@ afterEvaluate {
         url 'https://opendistro.github.io/elasticsearch/downloads'
         summary '''
          SQL plugin for OpenDistro for Elasticsearch. 
-         Reference documentation can be found at https://opendistro.github.io/elasticsearch/docs.
+         Reference documentation can be found at https://opendistro.github.io/for-elasticsearch-docs/.
     '''.stripIndent().replace('\n', ' ').trim()
     }
 
@@ -209,4 +222,9 @@ afterEvaluate {
         archiveName "${packageName}-${version}.deb"
         dependsOn 'assemble'
     }
+
+    task buildPackages(type: GradleBuild) {
+         tasks = ['build', 'buildRpm', 'buildDeb']
+    }
 }
+

@@ -443,11 +443,13 @@ public class AggregationIT extends SQLIntegTestCase {
         final String femaleBucketPrefix = String.format(Locale.ROOT, "/buckets/%d", femaleBucketId);
 
         Assert.assertThat(gender.query(maleBucketPrefix + "/key"), equalTo("m"));
-        Assert.assertThat(gender.query(maleBucketPrefix + "/topHits(size=3,age=desc)/hits/total"),equalTo(507));
+        Assert.assertThat(gender.query(maleBucketPrefix + "/topHits(size=3,age=desc)/hits/total/value"),equalTo(507));
+        Assert.assertThat(gender.query(maleBucketPrefix + "/topHits(size=3,age=desc)/hits/total/relation"),equalTo("eq"));
         Assert.assertThat(((JSONArray)gender.query(maleBucketPrefix + "/topHits(size=3,age=desc)/hits/hits")).length(),
                 equalTo(3));
         Assert.assertThat(gender.query(femaleBucketPrefix + "/key"), equalTo("f"));
-        Assert.assertThat(gender.query(femaleBucketPrefix + "/topHits(size=3,age=desc)/hits/total"), equalTo(493));
+        Assert.assertThat(gender.query(femaleBucketPrefix + "/topHits(size=3,age=desc)/hits/total/value"), equalTo(493));
+        Assert.assertThat(gender.query(femaleBucketPrefix + "/topHits(size=3,age=desc)/hits/total/relation"), equalTo("eq"));
         Assert.assertThat(((JSONArray)gender.query(femaleBucketPrefix + "/topHits(size=3,age=desc)/hits/hits")).length(),
                 equalTo(3));
     }
@@ -469,15 +471,19 @@ public class AggregationIT extends SQLIntegTestCase {
         final String femaleBucketPrefix = String.format(Locale.ROOT, "/buckets/%d", femaleBucketId);
 
         Assert.assertThat(gender.query(maleBucketPrefix + "/key"), equalTo("m"));
-        Assert.assertThat(gender.query(maleBucketPrefix + "/topHits(size=3,age=desc,include=age)/hits/total"),
+        Assert.assertThat(gender.query(maleBucketPrefix + "/topHits(size=3,age=desc,include=age)/hits/total/value"),
                 equalTo(507));
+        Assert.assertThat(gender.query(maleBucketPrefix + "/topHits(size=3,age=desc,include=age)/hits/total/relation"),
+                equalTo("eq"));
         Assert.assertThat(((JSONArray)gender.query(
                 maleBucketPrefix + "/topHits(size=3,age=desc,include=age)/hits/hits")).length(),
                 equalTo(3));
 
         Assert.assertThat(gender.query(femaleBucketPrefix + "/key"), equalTo("f"));
-        Assert.assertThat(gender.query(femaleBucketPrefix + "/topHits(size=3,age=desc,include=age)/hits/total"),
+        Assert.assertThat(gender.query(femaleBucketPrefix + "/topHits(size=3,age=desc,include=age)/hits/total/value"),
                 equalTo(493));
+        Assert.assertThat(gender.query(femaleBucketPrefix + "/topHits(size=3,age=desc,include=age)/hits/total/relation"),
+                equalTo("eq"));
         Assert.assertThat(((JSONArray)gender.query(
                 femaleBucketPrefix + "/topHits(size=3,age=desc,include=age)/hits/hits")).length(),
                 equalTo(3));
@@ -533,15 +539,19 @@ public class AggregationIT extends SQLIntegTestCase {
         final String femaleBucketPrefix = String.format(Locale.ROOT, "/buckets/%d", femaleBucketId);
 
         Assert.assertThat(gender.query(maleBucketPrefix + "/key"), equalTo("m"));
-        Assert.assertThat(gender.query(maleBucketPrefix + "/topHits(size=3,exclude=lastname,age=desc)/hits/total"),
+        Assert.assertThat(gender.query(maleBucketPrefix + "/topHits(size=3,exclude=lastname,age=desc)/hits/total/value"),
                 equalTo(507));
+        Assert.assertThat(gender.query(maleBucketPrefix + "/topHits(size=3,exclude=lastname,age=desc)/hits/total/relation"),
+                equalTo("eq"));
         Assert.assertThat(((JSONArray)gender.query(
                 maleBucketPrefix + "/topHits(size=3,exclude=lastname,age=desc)/hits/hits")).length(),
                 equalTo(3));
 
         Assert.assertThat(gender.query(femaleBucketPrefix + "/key"), equalTo("f"));
-        Assert.assertThat(gender.query(femaleBucketPrefix + "/topHits(size=3,exclude=lastname,age=desc)/hits/total"),
+        Assert.assertThat(gender.query(femaleBucketPrefix + "/topHits(size=3,exclude=lastname,age=desc)/hits/total/value"),
                 equalTo(493));
+        Assert.assertThat(gender.query(femaleBucketPrefix + "/topHits(size=3,exclude=lastname,age=desc)/hits/total/relation"),
+                equalTo("eq"));
         Assert.assertThat(((JSONArray)gender.query(
                 femaleBucketPrefix + "/topHits(size=3,exclude=lastname,age=desc)/hits/hits")).length(),
                 equalTo(3));
@@ -784,7 +794,7 @@ public class AggregationIT extends SQLIntegTestCase {
                                         TEST_INDEX_NESTED_TYPE);
         JSONObject result = executeQuery(query);
         JSONObject aggregation = getAggregation(result, "message.dayOfWeek@NESTED");
-        Assert.assertEquals(13.0, (double)aggregation.query("/sumDays/value"), 0.0001);
+        Assert.assertEquals(19.0, (double)aggregation.query("/sumDays/value"), 0.0001);
     }
 
     @Test
@@ -800,9 +810,10 @@ public class AggregationIT extends SQLIntegTestCase {
         expectedCountsByKey.put(0.0, 2);
         expectedCountsByKey.put(2.0, 1);
         expectedCountsByKey.put(4.0, 2);
+        expectedCountsByKey.put(6.0, 1);
 
         JSONArray buckets = (JSONArray)aggregation.query("/someAlias/buckets");
-        Assert.assertThat(buckets.length(), equalTo(3));
+        Assert.assertThat(buckets.length(), equalTo(4));
 
         buckets.forEach(obj -> {
             JSONObject bucket = (JSONObject)obj;

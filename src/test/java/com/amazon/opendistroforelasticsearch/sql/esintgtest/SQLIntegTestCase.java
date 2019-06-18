@@ -154,24 +154,12 @@ public abstract class SQLIntegTestCase extends ESIntegTestCase {
         return executeRequest(sqlRequest);
     }
 
-    private String executeRequest(final Request request) throws IOException {
+    protected String executeRequest(final Request request) throws IOException {
 
         RestClient restClient = ESIntegTestCase.getRestClient();
         Response response = restClient.performRequest(request);
         Assert.assertEquals(200, response.getStatusLine().getStatusCode());
-
-        final StringBuilder sb = new StringBuilder();
-
-        try (final InputStream is = response.getEntity().getContent();
-             final BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-        }
-
-        return sb.toString();
+        return TestUtils.getResponseBody(response);
     }
 
     protected JSONObject executeQueryWithGetRequest(final String sqlQuery) throws IOException {
@@ -181,7 +169,7 @@ public abstract class SQLIntegTestCase extends ESIntegTestCase {
         return new JSONObject(result);
     }
 
-    private String makeRequest(String query) {
+    protected String makeRequest(String query) {
         return String.format("{\n" +
                 "  \"query\": \"%s\"\n" +
                 "}", query);
@@ -195,14 +183,14 @@ public abstract class SQLIntegTestCase extends ESIntegTestCase {
 
     protected int getTotalHits(JSONObject response) {
         Assert.assertTrue(response.getJSONObject("hits").has("total"));
+        Assert.assertTrue(response.getJSONObject("hits").getJSONObject("total").has("value"));
 
-        return response.getJSONObject("hits").getInt("total");
+        return response.getJSONObject("hits").getJSONObject("total").getInt("value");
     }
 
     protected JSONObject getSource(JSONObject hit) {
         return hit.getJSONObject("_source");
     }
-
 
     /**
      * Enum for associating test index with relevant mapping and data.
@@ -224,10 +212,18 @@ public abstract class SQLIntegTestCase extends ESIntegTestCase {
                 "dog",
                 TestUtils.getDogIndexMapping(),
                 "src/test/resources/dogs.json"),
+        DOGS2(TestsConstants.TEST_INDEX_DOG2,
+                "dog",
+                TestUtils.getDogs2IndexMapping(),
+                "src/test/resources/dogs2.json"),
         PEOPLE(TestsConstants.TEST_INDEX_PEOPLE,
                 "people",
                 null,
                 "src/test/resources/peoples.json"),
+        PEOPLE2(TestsConstants.TEST_INDEX_PEOPLE2,
+                "people",
+                TestUtils.getPeople2IndexMapping(),
+                "src/test/resources/people2.json"),
         GAME_OF_THRONES(TestsConstants.TEST_INDEX_GAME_OF_THRONES,
                 "gotCharacters",
                 TestUtils.getGameOfThronesIndexMapping(),

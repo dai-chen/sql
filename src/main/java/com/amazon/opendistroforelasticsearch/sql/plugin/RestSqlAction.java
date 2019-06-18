@@ -16,13 +16,19 @@
 package com.amazon.opendistroforelasticsearch.sql.plugin;
 
 import com.alibaba.druid.sql.parser.ParserException;
+import com.amazon.opendistroforelasticsearch.sql.esdomain.LocalClusterState;
 import com.amazon.opendistroforelasticsearch.sql.exception.SqlParseException;
+import com.amazon.opendistroforelasticsearch.sql.exception.SQLFeatureDisabledException;
 import com.amazon.opendistroforelasticsearch.sql.executor.ActionRequestRestExecutorFactory;
 import com.amazon.opendistroforelasticsearch.sql.executor.RestExecutor;
 import com.amazon.opendistroforelasticsearch.sql.executor.format.ErrorMessage;
+import com.amazon.opendistroforelasticsearch.sql.metrics.MetricName;
+import com.amazon.opendistroforelasticsearch.sql.metrics.Metrics;
 import com.amazon.opendistroforelasticsearch.sql.query.QueryAction;
 import com.amazon.opendistroforelasticsearch.sql.request.SqlRequest;
 import com.amazon.opendistroforelasticsearch.sql.request.SqlRequestFactory;
+import com.amazon.opendistroforelasticsearch.sql.rewriter.matchtoterm.VerificationException;
+import com.amazon.opendistroforelasticsearch.sql.utils.LogUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.node.NodeClient;
@@ -38,26 +44,36 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static com.amazon.opendistroforelasticsearch.sql.plugin.SqlSettings.SQL_ENABLED;
 import static org.elasticsearch.rest.RestStatus.BAD_REQUEST;
 import static org.elasticsearch.rest.RestStatus.OK;
 import static org.elasticsearch.rest.RestStatus.SERVICE_UNAVAILABLE;
 
 public class RestSqlAction extends BaseRestHandler {
+
     private static final Logger LOG = LogManager.getLogger(RestSqlAction.class);
 
-    /** API endpoint path */
+    private final boolean allowExplicitIndex;
+
+    /**
+     * API endpoint path
+     */
     public static final String QUERY_API_ENDPOINT = "/_opendistro/_sql";
     public static final String EXPLAIN_API_ENDPOINT = QUERY_API_ENDPOINT + "/_explain";
 
-    public RestSqlAction(Settings settings, RestController restController) {
+    RestSqlAction(Settings settings, RestController restController) {
+
         super(settings);
         restController.registerHandler(RestRequest.Method.POST, QUERY_API_ENDPOINT, this);
         restController.registerHandler(RestRequest.Method.GET, QUERY_API_ENDPOINT, this);
         restController.registerHandler(RestRequest.Method.POST, EXPLAIN_API_ENDPOINT, this);
         restController.registerHandler(RestRequest.Method.GET, EXPLAIN_API_ENDPOINT, this);
+
+        this.allowExplicitIndex = MULTI_ALLOW_EXPLICIT_INDEX.get(settings);
     }
 
     @Override
@@ -67,10 +83,21 @@ public class RestSqlAction extends BaseRestHandler {
 
     @Override
     protected RestChannelConsumer prepareRequest(RestRequest request, NodeClient client) {
-        SqlRequest sqlRequest = SqlRequest.NULL;
+        Metrics.getInstance().getNumericalMetric(MetricName.REQ_TOTAL).increment();
+        Metrics.getInstance().getNumericalMetric(MetricName.REQ_COUNT_TOTAL).increment();
+
+        LogUtils.addRequestId();
+
         try {
-            sqlRequest = SqlRequestFactory.getSqlRequest(request);
-            LOG.info("[{}] Incoming request {}: {}", sqlRequest.getId(), request.uri(), sqlRequest.getSql());
+
+            if (!isSQLFeatureEnabled()) {
+                throw new SQLFeatureDisabledException(
+                        "Either opendistro.sql.enabled or rest.action.multi.allow_explicit_index setting is false"
+                );
+            }
+
+            final SqlRequest sqlRequest = SqlRequestFactory.getSqlRequest(request);
+            LOG.info("[{}] Incoming request {}: {}", LogUtils.getRequestId(), request.uri(), sqlRequest.getSql());
 
             final QueryAction queryAction = new SearchDao(client).explain(sqlRequest.getSql());
             queryAction.setSqlRequest(sqlRequest);
@@ -80,9 +107,10 @@ public class RestSqlAction extends BaseRestHandler {
                 return sendResponse(jsonExplanation, OK);
             } else {
                 Map<String, String> params = request.params();
-                RestExecutor restExecutor = ActionRequestRestExecutorFactory.createExecutor(params.get("format"), queryAction);
+                RestExecutor restExecutor = ActionRequestRestExecutorFactory.createExecutor(params.get("format"),
+                        queryAction);
                 //doing this hack because elasticsearch throws exception for un-consumed props
-                Map<String,String> additionalParams = new HashMap<>();
+                Map<String, String> additionalParams = new HashMap<>();
                 for (String paramName : responseParams()) {
                     if (request.hasParam(paramName)) {
                         additionalParams.put(paramName, request.param(paramName));
@@ -91,7 +119,12 @@ public class RestSqlAction extends BaseRestHandler {
                 return channel -> restExecutor.execute(client, additionalParams, queryAction, channel);
             }
         } catch (Exception e) {
-            LOG.error(String.format("[%s] Failed during query execution", sqlRequest.getId()), e);
+            if (isClientError(e)) {
+                Metrics.getInstance().getNumericalMetric(MetricName.FAILED_REQ_COUNT_CUS).increment();
+            } else {
+                Metrics.getInstance().getNumericalMetric(MetricName.FAILED_REQ_COUNT_SYS).increment();
+            }
+            LOG.error(String.format(Locale.ROOT, "[%s] Failed during query execution", LogUtils.getRequestId()), e);
             return reportError(e, isClientError(e) ? BAD_REQUEST : SERVICE_UNAVAILABLE);
         }
     }
@@ -104,12 +137,14 @@ public class RestSqlAction extends BaseRestHandler {
     }
 
     private boolean isClientError(Exception e) {
-        return e instanceof NullPointerException | // NPE is hard to differentiate but more likely caused by bad query
-               e instanceof SqlParseException |
-               e instanceof ParserException |
-               e instanceof SQLFeatureNotSupportedException |
-               e instanceof IllegalArgumentException |
-               e instanceof IndexNotFoundException;
+        return e instanceof NullPointerException || // NPE is hard to differentiate but more likely caused by bad query
+                e instanceof SqlParseException ||
+                e instanceof ParserException ||
+                e instanceof SQLFeatureNotSupportedException ||
+                e instanceof SQLFeatureDisabledException ||
+                e instanceof IllegalArgumentException ||
+                e instanceof IndexNotFoundException ||
+                e instanceof VerificationException;
     }
 
     private RestChannelConsumer reportError(Exception e, RestStatus status) {
@@ -118,5 +153,10 @@ public class RestSqlAction extends BaseRestHandler {
 
     private RestChannelConsumer sendResponse(String message, RestStatus status) {
         return channel -> channel.sendResponse(new BytesRestResponse(status, message));
+    }
+
+    private boolean isSQLFeatureEnabled() {
+        boolean isSqlEnabled = LocalClusterState.state().getSettingValue(SQL_ENABLED);
+        return allowExplicitIndex && isSqlEnabled;
     }
 }

@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -182,9 +183,9 @@ public class PrettyFormatResponseIT extends SQLIntegTestCase {
         assertContainsColumns(getSchema(response), fields);
         assertContainsData(getDataRows(response), fields);
 
-        // The nested test index being used contains 4 entries but one of them has an array of 2 message objects, so
-        // we check to see if the amount of data rows is 5 since that is the result after flattening
-        assertThat(getDataRows(response).length(), equalTo(5));
+        // The nested test index being used contains 5 entries but one of them has an array of 2 message objects, so
+        // we check to see if the amount of data rows is 6 since that is the result after flattening
+        assertThat(getDataRows(response).length(), equalTo(6));
     }
 
     @Test
@@ -459,6 +460,40 @@ public class PrettyFormatResponseIT extends SQLIntegTestCase {
         List<String> fields = Arrays.asList("b1.age");
         assertContainsColumns(getSchema(response), fields);
         assertContainsData(getDataRows(response), fields);
+    }
+
+    @Test
+    public void fieldOrder() throws IOException {
+
+        final String[] expectedFields = {"age", "firstname", "address", "gender", "email"};
+        final Object[] expectedValues = {32, "Amber", "880 Holmes Lane", "M", "amberduke@pyrami.com"};
+
+        testFieldOrder(expectedFields, expectedValues);
+    }
+
+    @Test
+    public void fieldOrderOther() throws IOException {
+
+        final String[] expectedFields = {"email", "firstname", "age", "gender", "address"};
+        final Object[] expectedValues = {"amberduke@pyrami.com", "Amber", 32, "M", "880 Holmes Lane"};
+
+        testFieldOrder(expectedFields, expectedValues);
+    }
+
+    private void testFieldOrder(final String[] expectedFields, final Object[] expectedValues) throws IOException {
+
+        final String fields = String.join(", ", expectedFields);
+        final String query = String.format(Locale.ROOT, "SELECT %s FROM %s " +
+                "WHERE email='amberduke@pyrami.com'", fields, TestsConstants.TEST_INDEX_ACCOUNT);
+        final JSONObject result = executeQuery(query);
+
+        for (int i = 0; i < expectedFields.length; ++i) {
+
+            final String fieldName = (String)result.query(String.format(Locale.ROOT, "/schema/%d/name", i));
+            assertThat(fieldName, equalTo(expectedFields[i]));
+            final Object fieldValue = result.query(String.format(Locale.ROOT, "/datarows/0/%d", i));
+            assertThat(fieldValue, equalTo(expectedValues[i]));
+        }
     }
 
     private JSONArray getSchema(JSONObject jdbcResponse) { return jdbcResponse.getJSONArray("schema"); }
