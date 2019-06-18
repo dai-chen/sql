@@ -19,6 +19,7 @@ import org.elasticsearch.action.admin.indices.mapping.get.GetFieldMappingsReques
 import org.elasticsearch.action.admin.indices.mapping.get.GetFieldMappingsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -273,6 +274,8 @@ public class SelectResultSet extends ResultSet {
             case "min":
             case "max":
                 return Schema.Type.DOUBLE;
+            case "script": // how to check the type of return value in a painless script
+                return Schema.Type.DATE;
             default:
                 throw new UnsupportedOperationException(
                         String.format("The following method is not supported in Schema: %s", field.getName()));
@@ -450,6 +453,11 @@ public class SelectResultSet extends ResultSet {
         for (SearchHit hit : searchHits) {
             Map<String, Object> rowSource = hit.getSourceAsMap();
             List<DataRows.Row> result = new ArrayList<>();
+
+            // Add values in 'fields' for return value in painless script
+            for (DocumentField field : hit.getFields().values()) {
+                rowSource.put(field.getName(), field.getValue());
+            }
             result.add(new DataRows.Row(rowSource));
 
             if (!isJoinQuery()) { // Row already flatten in source in join. And join doesn't support nested fields for now.
