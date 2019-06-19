@@ -102,6 +102,12 @@ public class Select extends Query {
 		this.orderBys.add(new Order(nestedPath, name, type));
 	}
 
+	public void addOrderBy(/*String nestedPath,*/ String script, String type) {
+		//if ("_score".equals(name)) {
+		//	isQuery = true;
+		//}
+		this.orderBys.add(new ScriptOrder("", script, type));
+	}
 
 	public void addField(Field field) {
 		if (field == null ) {
