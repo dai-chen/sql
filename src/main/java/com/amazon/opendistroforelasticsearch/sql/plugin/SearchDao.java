@@ -22,7 +22,6 @@ import java.util.Set;
 import com.amazon.opendistroforelasticsearch.sql.exception.SqlParseException;
 import com.amazon.opendistroforelasticsearch.sql.query.ESActionFactory;
 import com.amazon.opendistroforelasticsearch.sql.query.QueryAction;
-import com.amazon.opendistroforelasticsearch.sql.request.SqlRequest;
 import org.elasticsearch.client.Client;
 
 

@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -50,6 +51,7 @@ import java.util.Optional;
  */
 public class DefaultQueryAction extends QueryAction {
 
+    public static final int SCROLL_TIMEOUT = 60 * 1000;
     private final Select select;
     private SearchRequestBuilder request;
 
@@ -66,11 +68,47 @@ public class DefaultQueryAction extends QueryAction {
 
     @Override
     public SqlElasticSearchRequestBuilder explain() throws SqlParseException {
-        String cursorId = sqlRequest.cursor();
-        if (!cursorId.isEmpty()) {
-            return new SqlElasticSearchRequestBuilder(new SearchScrollRequestBuilder(client, SearchScrollAction.INSTANCE, cursorId).setScroll(new TimeValue(60 * 1000)));
-        }
+        Objects.requireNonNull(sqlRequest, "SqlRequest is required for ES request build");
 
+        String cursorId = sqlRequest.cursor();
+        if (cursorId.isEmpty()) {
+            buildESRequestBuilder();
+            scrollIfFetchSizePresent();
+            return new SqlElasticSearchRequestBuilder(request);
+        }
+        return createSqlRequestBuilderByCursorId(cursorId);
+    }
+
+    @Override
+    public Optional<List<String>> getFieldNames() {
+
+        return Optional.of(fieldNames);
+    }
+
+    /**
+     * Create request builder directly if cursor ID is present in the request.
+     */
+    private SqlElasticSearchRequestBuilder createSqlRequestBuilderByCursorId(String cursorId) {
+        return new SqlElasticSearchRequestBuilder(
+            new SearchScrollRequestBuilder(client, SearchScrollAction.INSTANCE, cursorId).
+                setScroll(new TimeValue(SCROLL_TIMEOUT)));
+    }
+
+    /**
+     * Enable Scroll if fetch size is present in the request.
+     */
+    private void scrollIfFetchSizePresent() {
+        int fetchSize = sqlRequest.fetchSize();
+        if (fetchSize > 0) {
+            if (!select.isOrderdSelect())
+                request.addSort(FieldSortBuilder.DOC_FIELD_NAME, SortOrder.ASC);
+            request.setSize(fetchSize).setScroll(new TimeValue(SCROLL_TIMEOUT));
+        } else {
+            request.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+        }
+    }
+
+    private void buildESRequestBuilder() throws SqlParseException {
         this.request = new SearchRequestBuilder(client, SearchAction.INSTANCE);
         setIndicesAndTypes();
 
@@ -80,27 +118,11 @@ public class DefaultQueryAction extends QueryAction {
         setSorts(select.getOrderBys());
         setLimit(select.getOffset(), select.getRowCount());
 
-        int fetchSize = sqlRequest.fetchSize();
-        if (fetchSize > 0) {
-            if (!select.isOrderdSelect())
-                request.addSort(FieldSortBuilder.DOC_FIELD_NAME, SortOrder.ASC);
-            request.setSize(fetchSize).setScroll(new TimeValue(60 * 1000)); // Configurable?
-        } else {
-            request.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
-        }
         updateRequestWithIndexAndRoutingOptions(select, request);
         updateRequestWithHighlight(select, request);
         updateRequestWithCollapse(select, request);
         updateRequestWithPostFilter(select, request);
         updateRequestWithInnerHits(select, request);
-
-        return new SqlElasticSearchRequestBuilder(request);
-    }
-
-    @Override
-    public Optional<List<String>> getFieldNames() {
-
-        return Optional.of(fieldNames);
     }
 
     /**
