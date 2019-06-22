@@ -30,10 +30,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -41,9 +38,11 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.Map;
 
 import static com.amazon.opendistroforelasticsearch.sql.plugin.RestSqlAction.EXPLAIN_API_ENDPOINT;
 import static com.amazon.opendistroforelasticsearch.sql.plugin.RestSqlAction.QUERY_API_ENDPOINT;
+import static java.util.Collections.emptyMap;
 
 @ESIntegTestCase.SuiteScopeTestCase
 @ESIntegTestCase.ClusterScope(scope=ESIntegTestCase.Scope.SUITE, numDataNodes=3, supportsDedicatedMasters=false, transportClientRatio=1)
@@ -93,13 +92,17 @@ public abstract class SQLIntegTestCase extends ESIntegTestCase {
     }
 
     protected Request getSqlRequest(String request, boolean explain) {
+       return getSqlRequest(request, explain, emptyMap());
+    }
+
+    protected Request getSqlRequest(String request, boolean explain, Map<String, String> params) {
 
         Request sqlRequest = new Request("POST", explain ? EXPLAIN_API_ENDPOINT : QUERY_API_ENDPOINT);
         sqlRequest.setJsonEntity(request);
         RequestOptions.Builder restOptionsBuilder = RequestOptions.DEFAULT.toBuilder();
         restOptionsBuilder.addHeader("Content-Type", "application/json");
         sqlRequest.setOptions(restOptionsBuilder);
-
+        params.forEach(sqlRequest::addParameter);
         return sqlRequest;
     }
 
@@ -135,22 +138,30 @@ public abstract class SQLIntegTestCase extends ESIntegTestCase {
     protected String executeQueryWithStringOutput(final String sqlQuery) throws IOException {
 
         final String requestString = makeRequest(sqlQuery);
-        return executeRequest(requestString, false);
+        return executeRequest(requestString, false, emptyMap());
     }
 
     protected JSONObject executeRequest(final String requestBody) throws IOException {
 
-        return new JSONObject(executeRequest(requestBody, false));
+        return executeRequest(requestBody, emptyMap());
+    }
+
+    protected JSONObject executeRequest(final String requestBody,
+                                        final Map<String, String> params) throws IOException {
+
+        return new JSONObject(executeRequest(requestBody, false, params));
     }
 
     protected String executeExplainRequest(final String requestBody) throws IOException {
 
-        return executeRequest(requestBody, true);
+        return executeRequest(requestBody, true, emptyMap());
     }
 
-    private String executeRequest(final String requestBody, final boolean isExplainQuery) throws IOException {
+    private String executeRequest(final String requestBody,
+                                  final boolean isExplainQuery,
+                                  final Map<String, String> params) throws IOException {
 
-        Request sqlRequest = getSqlRequest(requestBody, isExplainQuery);
+        Request sqlRequest = getSqlRequest(requestBody, isExplainQuery, params);
         return executeRequest(sqlRequest);
     }
 
