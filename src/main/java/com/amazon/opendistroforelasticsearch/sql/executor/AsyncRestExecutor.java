@@ -49,6 +49,8 @@ public class AsyncRestExecutor implements RestExecutor {
 
     private static final Logger LOG = LogManager.getLogger(AsyncRestExecutor.class);
 
+    private static final Logger SLOW_LOG = LogManager.getLogger("index.search.slowlog.sql");
+
     /** Treat all actions as blocking which means async all actions, ex. execute() in csv executor or pretty format executor */
     private static final Predicate<QueryAction> ALL_ACTION_IS_BLOCKING = anyAction -> true;
 
@@ -145,7 +147,7 @@ public class AsyncRestExecutor implements RestExecutor {
             Duration elapsed = Duration.ofNanos(System.nanoTime() - startTime);
             int slowLogThreshold = LocalClusterState.state().getSettingValue(QUERY_SLOWLOG);
             if (elapsed.getSeconds() >= slowLogThreshold) {
-                LOG.warn("[{}] Slow query: elapsed={} (ms)", LogUtils.getRequestId(), elapsed.toMillis());
+                SLOW_LOG.warn("[{}] Slow query: elapsed={} (ms)", LogUtils.getRequestId(), elapsed.toMillis());
             }
         }
     }
