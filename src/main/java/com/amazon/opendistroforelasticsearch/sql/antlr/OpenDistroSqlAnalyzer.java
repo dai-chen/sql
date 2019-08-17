@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 /**
@@ -18,17 +19,22 @@ import org.antlr.v4.runtime.tree.ParseTree;
  */
 public class OpenDistroSqlAnalyzer {
 
+    /** Original sql query */
+    private final String sql;
+
+    public OpenDistroSqlAnalyzer(String sql) {
+        this.sql = sql;
+    }
+
     /**
      * Generate parse tree for the query to perform syntax and semantic analysis.
      * Runtime exception with clear message is thrown for any verification error.
-     *
-     * @param sql   original query
      */
-    public void analyze(String sql) {
+    public void analyze() {
         analyzeSemantic(
             analyzeSyntax(
                 createParser(
-                    createLexer(sql))));
+                    createLexer())));
     }
 
     private OpenDistroSqlParser createParser(Lexer lexer) {
@@ -36,7 +42,7 @@ public class OpenDistroSqlAnalyzer {
                    new CommonTokenStream(lexer));
     }
 
-    private OpenDistroSqlLexer createLexer(String sql) {
+    private OpenDistroSqlLexer createLexer() {
          return new OpenDistroSqlLexer(
                     new CaseChangingCharStream(
                         CharStreams.fromString(sql), true));
@@ -45,9 +51,12 @@ public class OpenDistroSqlAnalyzer {
     private ParseTree analyzeSyntax(OpenDistroSqlParser parser) {
         parser.addErrorListener(new BaseErrorListener() {
             @Override
-            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+                                    int line, int charPositionInLine, String msg, RecognitionException e) {
+                Token offendingToken = (Token) offendingSymbol;
                 throw new SyntaxAnalysisException(
-                    "Failed to parse query due to syntax error by offending symbol [%s] at position [%d]: ", offendingSymbol, charPositionInLine);
+                    "Failed to parse query due to syntax error by offending symbol [%s] at: %s...",
+                        offendingToken.getText(), sql.substring(0, offendingToken.getStopIndex() + 1));
             }
         });
         return parser.root();

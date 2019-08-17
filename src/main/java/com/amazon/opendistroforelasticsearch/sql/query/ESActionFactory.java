@@ -164,7 +164,7 @@ public class ESActionFactory {
     }
 
     private static SQLExpr toSqlExpr(String sql) {
-        new OpenDistroSqlAnalyzer().analyze(sql);
+        new OpenDistroSqlAnalyzer(sql).analyze();
 
         SQLExprParser parser = new ElasticSqlExprParser(sql);
         SQLExpr expr = parser.expr();
