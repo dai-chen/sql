@@ -4,6 +4,7 @@ import com.amazon.opendistroforelasticsearch.sql.antlr.StringSimilarity;
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser;
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.QuerySpecificationContext;
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParserBaseVisitor;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,13 @@ import static com.amazon.opendistroforelasticsearch.sql.esdomain.LocalClusterSta
  */
 public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<Attribute> {
 
+    private final String sql;
+
     private final SymbolTable<String, FieldMappings> typesBySymbol = new SymbolTable<>();
+
+    public OpenDistroSemanticAnalyzer(String sql) {
+        this.sql = sql;
+    }
 
     @Override
     public Attribute visitQuerySpecification(QuerySpecificationContext ctx) {
@@ -72,7 +79,8 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<A
             Attribute argAttribute = visit(ctx.functionArgs());
             if (!argAttribute.isNumber()) {
                 throw new SemanticAnalysisException(
-                    "Function ABS can only work with number instead of %s. Usage: ABS(number)", argAttribute);
+                    "Function ABS can only work with number instead of %s at %s... Usage: ABS(number).",
+                        argAttribute, findInSql(ctx));
             }
             return argAttribute;
         }
@@ -88,7 +96,8 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<A
             Attribute rightAttr = visit(ctx.predicate(1));
             if (!leftAttr.isCompatible(rightAttr)) {
                 throw new SemanticAnalysisException(
-                    "Type of left side %s and right side %s are not compatible for operator ['%s'].", leftAttr, rightAttr, op);
+                    "Type of left side %s and right side %s are not compatible for operator ['%s'] at %s...",
+                        leftAttr, rightAttr, op, findInSql(ctx));
             }
             return leftAttr;
         }
@@ -103,8 +112,9 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<A
             return new Attribute("text");
         }
         throw new SemanticAnalysisException(
-            "Type of column [%s] and of argument must be string and number rather than %s and %s.",
-                getTextFrom(ctx.fullColumnName().uid()), colAttr, argAttr);
+            "Type of column [%s] and of argument must be string and number rather than %s and %s at %s... " +
+                "Usage: SUBSTRING(string, positive number).",
+                    getTextFrom(ctx.fullColumnName().uid()), colAttr, argAttr, findInSql(ctx));
     }
 
     @Override
@@ -132,5 +142,9 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<A
 
     private String getTextFrom(OpenDistroSqlParser.UidContext uid) {
         return uid.simpleId().ID().getText(); // NPE possible when ID() = null
+    }
+
+    private String findInSql(ParserRuleContext ctx) {
+        return sql.substring(0, ctx.getStop().getStopIndex() + 1);
     }
 }

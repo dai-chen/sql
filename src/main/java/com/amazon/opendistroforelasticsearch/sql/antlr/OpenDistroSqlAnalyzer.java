@@ -63,7 +63,7 @@ public class OpenDistroSqlAnalyzer {
     }
 
     private void analyzeSemantic(ParseTree tree) {
-        tree.accept(new OpenDistroSemanticAnalyzer());
+        tree.accept(new OpenDistroSemanticAnalyzer(sql));
     }
 
 }
