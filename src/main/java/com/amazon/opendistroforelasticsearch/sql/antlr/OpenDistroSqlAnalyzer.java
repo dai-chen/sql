@@ -4,7 +4,6 @@ import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlLexer
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser;
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.OpenDistroSemanticAnalyzer;
 import com.amazon.opendistroforelasticsearch.sql.antlr.syntax.CaseChangingCharStream;
-import com.amazon.opendistroforelasticsearch.sql.antlr.syntax.SyntaxAnalysisException;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -13,6 +12,8 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
+
+import static com.amazon.opendistroforelasticsearch.sql.antlr.SqlAnalysisExceptionBuilder.syntaxException;
 
 /**
  * Facade for ANTLR generated parser to avoid boilerplate code.
@@ -54,9 +55,7 @@ public class OpenDistroSqlAnalyzer {
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
                                     int line, int charPositionInLine, String msg, RecognitionException e) {
                 Token offendingToken = (Token) offendingSymbol;
-                throw new SyntaxAnalysisException(
-                    "Failed to parse query due to syntax error by offending symbol [%s] at: %s...",
-                        offendingToken.getText(), sql.substring(0, offendingToken.getStopIndex() + 1));
+                throw syntaxException("Failed to parse query due to syntax error.").at(sql, offendingToken).build();
             }
         });
         return parser.root();

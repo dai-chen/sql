@@ -7,4 +7,8 @@ public class SqlAnalysisException extends RuntimeException {
     public SqlAnalysisException(String template, Object... args) {
         super(StringUtils.format(template, args));
     }
+
+    public SqlAnalysisException(SqlAnalysisExceptionBuilder builder) {
+        super(builder.build());
+    }
 }

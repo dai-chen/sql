@@ -4,11 +4,11 @@ import com.amazon.opendistroforelasticsearch.sql.antlr.StringSimilarity;
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser;
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.QuerySpecificationContext;
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParserBaseVisitor;
-import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.List;
 import java.util.Map;
 
+import static com.amazon.opendistroforelasticsearch.sql.antlr.SqlAnalysisExceptionBuilder.semanticException;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.BinaryComparasionPredicateContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.DecimalLiteralContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.FullColumnNameContext;
@@ -51,7 +51,9 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<A
         String indexName = getTextFrom(ctx.fullId().uid(0));
         IndexMappings indexMappings = state().getFieldMappings(new String[]{indexName});
         if (indexMappings == null) { // ES API throws its own IndexNotFoundException before this
-            throw new SemanticAnalysisException("Index name or pattern [%s] doesn't match any existing index", indexName);
+            throw semanticException("Index name or pattern [%s] doesn't match any existing index.", indexName).
+                    at(sql, ctx).
+                    build();
         }
 
         FieldMappings mappings = indexMappings.firstMapping().firstMapping();
@@ -66,8 +68,11 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<A
         Map<String, Object> mappings = fieldMappings.mapping(fieldName);
         if (mappings == null) {
             List<String> suggestedWords = new StringSimilarity(fieldMappings.allNames()).similarTo(fieldName);
-            throw new SemanticAnalysisException(
-                "Field [%s] cannot be found. Did you mean [%s]?", fieldName, String.join(", ", suggestedWords));
+            throw semanticException(
+                "Field [%s] cannot be found.", fieldName).
+                at(sql, ctx).
+                suggestion("Did you mean [%s]?", String.join(", ", suggestedWords)).
+                build();
         }
         return new Attribute((String) mappings.get("type"));
     }
@@ -78,9 +83,11 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<A
         if (ctx.scalarFunctionName().functionNameBase().ABS() != null) {
             Attribute argAttribute = visit(ctx.functionArgs());
             if (!argAttribute.isNumber()) {
-                throw new SemanticAnalysisException(
-                    "Function ABS can only work with number instead of %s at %s... Usage: ABS(number).",
-                        argAttribute, findInSql(ctx));
+                throw semanticException(
+                    "Function ABS can only work with number instead of %s.", argAttribute).
+                    at(sql, ctx).
+                    suggestion("Usage: ABS(number).").
+                    build();
             }
             return argAttribute;
         }
@@ -95,9 +102,10 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<A
             Attribute leftAttr = visit(ctx.predicate(0));
             Attribute rightAttr = visit(ctx.predicate(1));
             if (!leftAttr.isCompatible(rightAttr)) {
-                throw new SemanticAnalysisException(
-                    "Type of left side %s and right side %s are not compatible for operator ['%s'] at %s...",
-                        leftAttr, rightAttr, op, findInSql(ctx));
+                throw semanticException(
+                    "Type of left side %s and right side %s are not compatible for operator ['%s'].", leftAttr, rightAttr, op).
+                    at(sql, ctx).
+                    build();
             }
             return leftAttr;
         }
@@ -111,10 +119,12 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<A
         if (colAttr.isString() && argAttr.isNumber()) {
             return new Attribute("text");
         }
-        throw new SemanticAnalysisException(
-            "Type of column [%s] and of argument must be string and number rather than %s and %s at %s... " +
-                "Usage: SUBSTRING(string, positive number).",
-                    getTextFrom(ctx.fullColumnName().uid()), colAttr, argAttr, findInSql(ctx));
+        throw semanticException(
+            "Type of column [%s] and of argument must be string and number rather than %s and %s.",
+                getTextFrom(ctx.fullColumnName().uid()), colAttr, argAttr).
+            at(sql, ctx).
+            suggestion("Usage: SUBSTRING(string, positive number).").
+            build();
     }
 
     @Override
@@ -144,7 +154,4 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<A
         return uid.simpleId().ID().getText(); // NPE possible when ID() = null
     }
 
-    private String findInSql(ParserRuleContext ctx) {
-        return sql.substring(0, ctx.getStop().getStopIndex() + 1);
-    }
 }
