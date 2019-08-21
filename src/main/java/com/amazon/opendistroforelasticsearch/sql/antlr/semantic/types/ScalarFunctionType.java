@@ -1,16 +1,16 @@
 package com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
-import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.BaseType.INT;
+import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.BaseType.INTEGER;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.BaseType.NUMBER;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.BaseType.STRING;
 
+/**
+ * Scalar function type
+ */
 public enum ScalarFunctionType implements TypeExpression {
 
     ABS(NUMBER, NUMBER),
-    SUBSTRING(STRING, STRING, INT); // positive?
+    SUBSTRING(STRING, STRING, INTEGER); // positive?
 
     private final Type outputType;
     private final Type[] inputTypes;
@@ -32,6 +32,6 @@ public enum ScalarFunctionType implements TypeExpression {
 
     @Override
     public String toString() {
-        return "(" + Arrays.stream(inputTypes).map(Type::toString).collect(Collectors.joining(", ")) + ") -> " + outputType;
+        return format(name());
     }
 }

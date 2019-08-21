@@ -1,7 +1,6 @@
 package com.amazon.opendistroforelasticsearch.sql.antlr.semantic;
 
 import com.amazon.opendistroforelasticsearch.sql.antlr.StringSimilarity;
-import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser;
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.QuerySpecificationContext;
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParserBaseVisitor;
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.scope.Environment;
@@ -10,16 +9,14 @@ import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.ScalarFunc
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.Type;
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.TypeExpression;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import static com.amazon.opendistroforelasticsearch.sql.antlr.SqlAnalysisExceptionBuilder.semanticException;
-import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.*;
-import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.AggregateWindowedFunctionContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.BinaryComparasionPredicateContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.DecimalLiteralContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.FromClauseContext;
@@ -94,7 +91,7 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<T
         Type realArgTypes = visit(ctx.functionArgs());
         if (!funcSpec.isCompatible(realArgTypes)) {
             throw semanticException(
-                "Function [%s] can only work with %s instead of [%s].",
+                "Function [%s] can only work with [%s] instead of [%s].",
                 ctx.scalarFunctionName().getText(), Arrays.toString(funcSpec.inputTypes()), realArgTypes
             ).at(sql, ctx).suggestion("Usage: %s.", funcSpec).build();
         }
@@ -104,11 +101,6 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<T
     @Override
     public Type visitFunctionNameBase(FunctionNameBaseContext ctx) {
         return visitFunctionName(ctx, ctx.getText());
-    }
-
-    @Override
-    public Type visitAggregateWindowedFunction(AggregateWindowedFunctionContext ctx) {
-        return visitFunctionName(ctx, ctx.MAX().getText());
     }
 
     private Type visitFunctionName(ParserRuleContext ctx, String funcName) {
@@ -122,11 +114,14 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<T
 
     @Override
     public Type visitFunctionArgs(FunctionArgsContext ctx) {
-        Type[] types = new Type[ctx.getChildCount()];
-        for (int i = 0; i < types.length; i++) {
-            types[i] = visit(ctx.getChild(i));
+        List<Type> types = new ArrayList<>();
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            Type type = visit(ctx.getChild(i));
+            if (type != null) {
+                types.add(type);
+            }
         }
-        return TypeExpression.of(types);
+        return TypeExpression.of(types.toArray(new Type[0]));
     }
 
     // Better semantic check example for overloading operator '='
@@ -143,21 +138,6 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<T
         }
         return leftType;
     }
-
-    /*
-    @Override
-    public Type visitSubstringFunctionCall(SubstringFunctionCallContext ctx) {
-        TypeExpression funcSpec = (TypeExpression) currentEnv.resolve("SUBSTRING");
-        Type realArgTypes = visit(ctx.);
-        if (!funcSpec.isCompatible(realArgTypes)) {
-            throw semanticException(
-                "Function [%s] can only work with [%s] instead of [%s].",
-                ctx.scalarFunctionName().getText(), funcSpec.inputTypes(), realArgTypes
-            ).at(sql, ctx).suggestion("Usage: %s.", funcSpec).build();
-        }
-        return funcSpec.outputType();
-    }
-    */
 
     @Override
     public Type visitFromClause(FromClauseContext ctx) {

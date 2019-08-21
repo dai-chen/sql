@@ -1,10 +1,11 @@
 package com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.joining;
 
 /**
- * Type expression
+ * Type expression for function, operator etc.
  */
 public interface TypeExpression extends Type {
 
@@ -12,6 +13,9 @@ public interface TypeExpression extends Type {
 
     Type outputType();
 
+    /**
+     * Create temporary type expression for compatibility check which doesn't have output type
+     */
     static TypeExpression of(Type... types) {
         return new TypeExpression() {
             @Override
@@ -21,45 +25,25 @@ public interface TypeExpression extends Type {
 
             @Override
             public Type outputType() {
-                //throw new UnsupportedOperationException(
-                //    "Temporary type expression for compatibility check doesn't have output type");
                 return null;
             }
 
             @Override
             public String toString() {
-                return "(" + Arrays.stream(inputTypes()).map(Type::toString).collect(Collectors.joining(", ")) + ")" +
-                    (outputType() != null ? " -> " + outputType() : "");
+                return Arrays.toString(inputTypes());
             }
         };
     }
 
-    /*
-    default Type outputType() {
-        Type[] types = types();
-        if (types.length < 2) {
-            throw new IllegalStateException(StringUtils.format(
-                "Type expression [%s] has only [%s] type", this, types.length));
-        }
-        return types[types.length - 1];
+    /** toString is not allowed to be overridden as default method */
+    default String format(String name) {
+        return name +
+            "(" +
+                Arrays.stream(inputTypes()).
+                       map(Type::toString).
+                       collect(joining(", ")) +
+            ") -> " + outputType();
     }
-    */
-
-    /*
-    default boolean isCompatible(Type... otherInputTypes) {
-        return isCompatible(new TypeExpression() {
-            @Override
-            public Type[] inputTypes() {
-                return otherInputTypes;
-            }
-
-            @Override
-            public Type outputType() {
-                return null;
-            }
-        });
-    }
-     */
 
     @Override
     default boolean isCompatible(Type other) {
