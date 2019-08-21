@@ -38,7 +38,8 @@ public class SqlAnalysisExceptionBuilder {
     }
 
     public SqlAnalysisExceptionBuilder at(String sql, Token token) {
-        this.location = StringUtils.format("Offending token is at '%s...'.", sql.substring(0, token.getStopIndex() + 1));
+        this.location = StringUtils.format("Offending token is [%s] at '%s...'.",
+            token.getText(), sql.substring(0, token.getStopIndex() + 1));
         return this;
     }
 
