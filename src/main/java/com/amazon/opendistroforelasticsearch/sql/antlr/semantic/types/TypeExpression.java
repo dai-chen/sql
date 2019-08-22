@@ -1,5 +1,7 @@
 package com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types;
 
+import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.scope.Namespace;
+
 import java.util.Arrays;
 
 import static java.util.stream.Collectors.joining;
@@ -8,6 +10,8 @@ import static java.util.stream.Collectors.joining;
  * Type expression for function, operator etc.
  */
 public interface TypeExpression extends Type {
+
+    Namespace getNamespace();
 
     Type[] inputTypes();
 
@@ -18,6 +22,16 @@ public interface TypeExpression extends Type {
      */
     static TypeExpression of(Type... types) {
         return new TypeExpression() {
+            @Override
+            public String getName() {
+                return "Temp";
+            }
+
+            @Override
+            public Namespace getNamespace() {
+                return null;
+            }
+
             @Override
             public Type[] inputTypes() {
                 return types;

@@ -8,6 +8,11 @@ public enum CompositeType implements Type {
     NESTED;
 
     @Override
+    public String getName() {
+        return name();
+    }
+
+    @Override
     public boolean isCompatible(Type other) {
         return this == other;
     }

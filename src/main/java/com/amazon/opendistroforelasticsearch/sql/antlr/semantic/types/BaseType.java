@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
 /**
- * Base type for data types in Elasticsearch
+ * Base data types
  */
 public enum BaseType implements Type {
     UNKNOWN,
@@ -42,6 +42,7 @@ public enum BaseType implements Type {
     private BaseType parent;
     private final BaseType[] subTypes;
 
+
     BaseType(BaseType... subTypes) {
         this.subTypes = subTypes;
         for (BaseType subType : subTypes) {
@@ -52,6 +53,11 @@ public enum BaseType implements Type {
     public static Type typeIn(Map<String, Object> mapping) {
         String typeStr = ((String) mapping.get("type")).toUpperCase();
         return ALL_BASE_TYPES.getOrDefault(typeStr, UNKNOWN);
+    }
+
+    @Override
+    public String getName() {
+        return name();
     }
 
     @Override

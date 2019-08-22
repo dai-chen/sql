@@ -1,5 +1,7 @@
 package com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types;
 
+import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.scope.Namespace;
+
 import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.BaseType.INTEGER;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.BaseType.NUMBER;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.BaseType.STRING;
@@ -21,6 +23,11 @@ public enum ScalarFunctionType implements TypeExpression {
     }
 
     @Override
+    public Namespace getNamespace() {
+        return Namespace.FUNCTION_NAME;
+    }
+
+    @Override
     public Type[] inputTypes() {
         return inputTypes;
     }
@@ -33,5 +40,10 @@ public enum ScalarFunctionType implements TypeExpression {
     @Override
     public String toString() {
         return format(name());
+    }
+
+    @Override
+    public String getName() {
+        return name();
     }
 }

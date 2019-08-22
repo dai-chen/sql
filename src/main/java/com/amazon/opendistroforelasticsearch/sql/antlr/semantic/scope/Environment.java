@@ -1,37 +1,41 @@
 package com.amazon.opendistroforelasticsearch.sql.antlr.semantic.scope;
 
+import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.Type;
+
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
-public class Environment<Symbol, Value> {
+public class Environment {
 
     private final Environment parent;
 
-    private final Map<Symbol, Value> symbolTable = new HashMap<>();
-
+    private final SymbolTable symbolTable;
 
     public Environment(Environment parent) {
         this.parent = parent;
+        this.symbolTable = new SymbolTable();
     }
 
-    public void define(Symbol symbol, Value value) {
-        symbolTable.put(symbol, value);
+    public void define(Symbol symbol, Type type) {
+        symbolTable.put(symbol, type);
     }
 
-    public Optional<Value> resolve(Symbol symbol) {
-        Value value = null;
+    public Optional<Type> resolve(Symbol symbol) {
+        Optional<Type> type = Optional.empty();
         for (Environment cur = this; cur != null; cur = cur.parent) {
-            value = symbolTable.get(symbol);
-            if (value != null) {
+            type = cur.symbolTable.lookup(symbol);
+            if (type.isPresent()) {
                 break;
             }
         }
-        return Optional.ofNullable(value);
+        return type;
     }
 
-    public Collection<Symbol> allSymbols() {
-        return symbolTable.keySet();
+    public Collection<String> allSymbolsIn(Namespace namespace) {
+        return symbolTable.lookupAll(namespace);
+    }
+
+    public Environment getParent() {
+        return parent;
     }
 }
