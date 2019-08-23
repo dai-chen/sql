@@ -1,29 +1,13 @@
 package com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types;
 
-import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.scope.Namespace;
+import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.BaseType.TYPE_ERROR;
 
-public enum OperatorType implements TypeExpression {
-    EQUAL("=");
+public class OperatorType implements Type {
 
     private final String name;
 
-    OperatorType(String name) {
+    public OperatorType(String name) {
         this.name = name;
-    }
-
-    @Override
-    public Namespace getNamespace() {
-        return Namespace.OPERATOR_NAME;
-    }
-
-    @Override
-    public Type[] inputTypes() {
-        return null;
-    }
-
-    @Override
-    public Type outputType() {
-        return BaseType.BOOLEAN;
     }
 
     @Override
@@ -32,11 +16,16 @@ public enum OperatorType implements TypeExpression {
     }
 
     @Override
-    public boolean isCompatible(Type other) {
-        if (!(other instanceof TypeExpression)) {
-            return false;
+    public Type apply(Type... actualTypes) {
+        if (actualTypes.length != 2) {
+            return TYPE_ERROR;
         }
-        return ((TypeExpression) other).inputTypes()[0] == ((TypeExpression) other).inputTypes()[1];
+
+        Type isLeftCompatibleWithRight = actualTypes[0].apply(actualTypes[1]);
+        if (isLeftCompatibleWithRight == TYPE_ERROR) {
+            return actualTypes[1].apply(actualTypes[0]);
+        }
+        return TYPE_ERROR;
     }
 
 }

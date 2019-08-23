@@ -4,6 +4,6 @@ public interface Type {
 
     String getName();
 
-    boolean isCompatible(Type other);
+    Type apply(Type... actualTypes);
 
 }

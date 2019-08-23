@@ -2,9 +2,7 @@ package com.amazon.opendistroforelasticsearch.sql.antlr.semantic;
 
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.QuerySpecificationContext;
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParserBaseVisitor;
-import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.ScalarFunctionType;
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.Type;
-import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.TypeExpression;
 import com.amazon.opendistroforelasticsearch.sql.esdomain.LocalClusterState;
 
 import java.util.ArrayList;
@@ -15,7 +13,6 @@ import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroS
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.DecimalLiteralContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.FromClauseContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.FullColumnNameContext;
-import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.FunctionArgsContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.FunctionNameBaseContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.ScalarFunctionCallContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.StringLiteralContext;
@@ -72,9 +69,15 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<T
     // This check should be able to accomplish in grammar
     @Override
     public Type visitScalarFunctionCall(ScalarFunctionCallContext ctx) {
-        TypeExpression funcType = (TypeExpression) visit(ctx.scalarFunctionName());
-        TypeExpression actualArgTypes = (TypeExpression) visit(ctx.functionArgs());
-        return analyzer.visitFunctionCall(funcType, actualArgTypes);
+        Type funcType = visit(ctx.scalarFunctionName());
+        List<Type> actualArgTypes = new ArrayList<>();
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            Type type = visit(ctx.getChild(i));
+            if (type != null) {
+                actualArgTypes.add(type);
+            }
+        }
+        return analyzer.visitFunctionCall(funcType, actualArgTypes.toArray(new Type[0]));
     }
 
     @Override
@@ -87,23 +90,11 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<T
         return analyzer.visitOperatorName(ctx.getText());
     }
 
-    @Override
-    public Type visitFunctionArgs(FunctionArgsContext ctx) {
-        List<Type> types = new ArrayList<>();
-        for (int i = 0; i < ctx.getChildCount(); i++) {
-            Type type = visit(ctx.getChild(i));
-            if (type != null) {
-                types.add(type);
-            }
-        }
-        return TypeExpression.of(types.toArray(new Type[0]));
-    }
-
     // Better semantic check example for overloading operator '='
     @Override
     public Type visitBinaryComparasionPredicate(BinaryComparasionPredicateContext ctx) {
-        TypeExpression opType = (TypeExpression) visit(ctx.comparisonOperator());
-        TypeExpression actualArgTypes = TypeExpression.of(visit(ctx.predicate(0)), visit(ctx.predicate(1)));
+        Type opType = visit(ctx.comparisonOperator());
+        Type[] actualArgTypes = { visit(ctx.predicate(0)), visit(ctx.predicate(1)) };
         return analyzer.visitFunctionCall(opType, actualArgTypes);
     }
 

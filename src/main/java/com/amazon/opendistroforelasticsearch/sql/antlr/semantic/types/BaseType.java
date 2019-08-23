@@ -8,6 +8,7 @@ import java.util.Map;
  * Base data types
  */
 public enum BaseType implements Type {
+    TYPE_ERROR,
     UNKNOWN,
 
     SHORT, LONG,
@@ -61,6 +62,13 @@ public enum BaseType implements Type {
     }
 
     @Override
+    public Type apply(Type... actualTypes) {
+        if (actualTypes.length != 1) {
+            return TYPE_ERROR;
+        }
+        return isCompatible(actualTypes[0]) ? actualTypes[0] : TYPE_ERROR;
+    }
+
     public boolean isCompatible(Type other) {
         // Skip compatibility check if type is unknown
         if (this == UNKNOWN || other == UNKNOWN) {
@@ -71,55 +79,12 @@ public enum BaseType implements Type {
             return false;
         }
 
-        // Two way
-        //BaseType lca = findLCA(ES_TYPE, this, (BaseType) other);
-        //return lca == this || lca == other;
-
         // One way compatibility
-        return isParentTypeOf((BaseType) other);
-    }
-
-    public boolean isParentTypeOf(BaseType other) {
-        BaseType cur = other;
+        BaseType cur = (BaseType) other;
         while (cur != null && cur != this) {
             cur = cur.parent;
         }
         return cur != null;
     }
 
-    /**
-     * Find lowest common ancestor in the tree for types
-     */
-    private BaseType findLCA(BaseType root, BaseType type1, BaseType type2) {
-        if (root == null) {
-            return null;
-        }
-        if (type1 == type2) {
-            return type1;
-        }
-        if (root == type1 || root == type2) {
-            return root;
-        }
-
-        BaseType lcaOrEitherType = null;
-        for (BaseType subTypeTree : root.subTypes) {
-            BaseType temp = findLCA(subTypeTree, type1, type2);
-            if (temp == null) {
-                continue;
-            }
-
-            if (lcaOrEitherType == null) {
-                lcaOrEitherType = temp;
-            } else if (lcaOrEitherType != temp) {
-                lcaOrEitherType = root;
-                break;
-            }
-        }
-        return lcaOrEitherType;
-    }
-
-    @Override
-    public String toString() {
-        return name();
-    }
 }

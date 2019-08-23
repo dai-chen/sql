@@ -12,7 +12,7 @@ import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.Bas
 import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.BaseType.STRING;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.BaseType.TEXT;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.BaseType.UNKNOWN;
-import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.ScalarFunctionType.ABS;
+import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.ScalarFunctionTypeExpression.ABS;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -51,17 +51,17 @@ public class TypeCompatibilityTest {
 
     @Test
     public void functionOfSameBaseTypeShouldBeCompatible() {
-        assertTrue(ABS.isCompatible(TypeExpression.of(NUMBER)));
+        assertTrue(ABS.isCompatible(TypeExpression1.of(NUMBER)));
     }
 
     @Test
     public void functionOfParentBaseTypeShouldBeCompatibleWithFunctionOfSubBaseType() {
-        assertTrue(ABS.isCompatible(TypeExpression.of(LONG)));
+        assertTrue(ABS.isCompatible(TypeExpression1.of(LONG)));
     }
 
     @Test
     public void functionOfSubBaseTypeShouldNotBeCompatibleWithFunctionOfParentBaseType() {
-        assertFalse(ABS.isCompatible(TypeExpression.of(ES_TYPE)));
+        assertFalse(ABS.isCompatible(TypeExpression1.of(ES_TYPE)));
     }
 
 }
