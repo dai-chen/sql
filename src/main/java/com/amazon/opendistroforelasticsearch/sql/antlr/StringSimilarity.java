@@ -25,7 +25,7 @@ public class StringSimilarity {
      * @return       one or more most similar strings
      */
     public List<String> similarTo(String target) {
-        float max = 0;
+        float max = -1;
         String result = target; // get only one for now
         for (String name : candidates) {
             float dist = algorithm.getDistance(target, name);

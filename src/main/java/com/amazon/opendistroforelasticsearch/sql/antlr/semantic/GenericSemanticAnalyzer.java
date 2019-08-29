@@ -4,6 +4,7 @@ import com.amazon.opendistroforelasticsearch.sql.antlr.StringSimilarity;
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.scope.Environment;
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.scope.Namespace;
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.scope.Symbol;
+import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.AggregateFunctionType;
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.BaseType;
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.OperatorType;
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.ScalarFunctionTypeExpression;
@@ -39,10 +40,10 @@ public class GenericSemanticAnalyzer {
         return null;
     }
 
-    public Type visitQuery(Runnable visit) {
+    public Type visitQuery(Runnable visitDeep) {
         //environment = new Environment(environment);
 
-        visit.run();
+        visitDeep.run();
 
         //environment = environment.getParent();
         return null;
@@ -52,6 +53,19 @@ public class GenericSemanticAnalyzer {
         environment = new Environment(environment);
 
         for (ScalarFunctionTypeExpression type : ScalarFunctionTypeExpression.values()) {
+            environment.define(new Symbol(Namespace.FUNCTION_NAME, type.getName()), type);
+        }
+
+        visitDeep.run();
+
+        //environment = environment.getParent();
+        return null;
+    }
+
+    public Type visitSelectClause(Runnable visitDeep) {
+        environment = new Environment(environment);
+
+        for (AggregateFunctionType type : AggregateFunctionType.values()) {
             environment.define(new Symbol(Namespace.FUNCTION_NAME, type.getName()), type);
         }
 
@@ -91,7 +105,7 @@ public class GenericSemanticAnalyzer {
         Optional<Type> type = environment.resolve(symbol);
         if (!type.isPresent()) {
             List<String> suggestedWords = new StringSimilarity(environment.allSymbolsIn(symbol.getNamespace())).similarTo(symbol.getName());
-            throw semanticException("%s cannot be found.", symbol).
+            throw semanticException("%s cannot be found or used here.", symbol).
                 /*at(sql, ctx).*/suggestion("Did you mean [%s]?", String.join(", ", suggestedWords)).build();
         }
         return type.get();

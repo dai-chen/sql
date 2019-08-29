@@ -1,16 +1,18 @@
 package com.amazon.opendistroforelasticsearch.sql.antlr.semantic;
 
-import com.amazon.opendistroforelasticsearch.sql.antlr.StringSimilarity;
+import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser;
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.QuerySpecificationContext;
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParserBaseVisitor;
+import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.scope.Symbol;
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.Type;
 import com.amazon.opendistroforelasticsearch.sql.esdomain.LocalClusterState;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.amazon.opendistroforelasticsearch.sql.antlr.SqlAnalysisExceptionBuilder.semanticException;
+import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.*;
+import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.AggregateFunctionCallContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.BinaryComparasionPredicateContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.ComparisonOperatorContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.DecimalLiteralContext;
@@ -21,6 +23,7 @@ import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroS
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.StringLiteralContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.TableNameContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.UidContext;
+import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.scope.Namespace.FUNCTION_NAME;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.BaseType.TYPE_ERROR;
 
 /**
@@ -90,6 +93,19 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<T
             ).at(sql, ctx).suggestion("Usage: %s.", funcType).build();
         }
         return result;
+    }
+
+    @Override
+    public Type visitSelectElements(SelectElementsContext ctx) {
+        return analyzer.visitSelectClause(() -> {
+            super.visitSelectElements(ctx);
+        });
+    }
+
+    @Override
+    public Type visitAggregateFunctionCall(AggregateFunctionCallContext ctx) {
+        Type type = analyzer.resolve(new Symbol(FUNCTION_NAME, ctx.getStart().getText()));
+        return super.visitAggregateFunctionCall(ctx);
     }
 
     @Override

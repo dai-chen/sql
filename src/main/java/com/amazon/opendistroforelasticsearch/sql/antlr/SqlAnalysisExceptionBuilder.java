@@ -44,7 +44,7 @@ public class SqlAnalysisExceptionBuilder {
     }
 
     public SqlAnalysisExceptionBuilder at(String sql, ParserRuleContext ctx) {
-        return at(sql, ctx.getStop());
+        return at(sql, ctx.getStart());
     }
 
     public SqlAnalysisExceptionBuilder suggestion(String suggestion, Object... args) {
