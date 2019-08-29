@@ -87,4 +87,8 @@ public enum BaseType implements Type {
         return cur != null;
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

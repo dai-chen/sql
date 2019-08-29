@@ -1,13 +1,16 @@
 package com.amazon.opendistroforelasticsearch.sql.antlr.semantic;
 
+import com.amazon.opendistroforelasticsearch.sql.antlr.StringSimilarity;
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.QuerySpecificationContext;
 import com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParserBaseVisitor;
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.Type;
 import com.amazon.opendistroforelasticsearch.sql.esdomain.LocalClusterState;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import static com.amazon.opendistroforelasticsearch.sql.antlr.SqlAnalysisExceptionBuilder.semanticException;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.BinaryComparasionPredicateContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.ComparisonOperatorContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.DecimalLiteralContext;
@@ -18,6 +21,7 @@ import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroS
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.StringLiteralContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.TableNameContext;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.parser.OpenDistroSqlParser.UidContext;
+import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.BaseType.TYPE_ERROR;
 
 /**
  *  Semantic analysis
@@ -71,13 +75,21 @@ public class OpenDistroSemanticAnalyzer extends OpenDistroSqlParserBaseVisitor<T
     public Type visitScalarFunctionCall(ScalarFunctionCallContext ctx) {
         Type funcType = visit(ctx.scalarFunctionName());
         List<Type> actualArgTypes = new ArrayList<>();
-        for (int i = 0; i < ctx.getChildCount(); i++) {
+        for (int i = 1; i < ctx.getChildCount(); i++) {
             Type type = visit(ctx.getChild(i));
             if (type != null) {
                 actualArgTypes.add(type);
             }
         }
-        return analyzer.visitFunctionCall(funcType, actualArgTypes.toArray(new Type[0]));
+
+        Type result = analyzer.visitFunctionCall(funcType, actualArgTypes.toArray(new Type[0]));
+        if (result == TYPE_ERROR) {
+            throw semanticException(
+                "[%s] can not work with %s.",
+                funcType.getName(), actualArgTypes
+            ).at(sql, ctx).suggestion("Usage: %s.", funcType).build();
+        }
+        return result;
     }
 
     @Override

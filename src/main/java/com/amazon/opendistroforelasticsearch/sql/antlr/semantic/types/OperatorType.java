@@ -28,4 +28,8 @@ public class OperatorType implements Type {
         return TYPE_ERROR;
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

@@ -10,6 +10,7 @@ import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.ScalarFunc
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.Type;
 import com.amazon.opendistroforelasticsearch.sql.esdomain.LocalClusterState;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,14 +67,7 @@ public class GenericSemanticAnalyzer {
      ******************************************************************************/
 
     public Type visitFunctionCall(Type constructorType, Type... actualArgTypes) {
-        Type result = constructorType.apply(actualArgTypes);
-        if (result == TYPE_ERROR) {
-            throw semanticException(
-                "[%s] can not work with [%s].",
-                constructorType.getName(), actualArgTypes
-            )./*at(sql, ctx).*/suggestion("Usage: %s.", constructorType).build();
-        }
-        return result;
+        return constructorType.apply(actualArgTypes);
     }
 
 
