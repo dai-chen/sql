@@ -121,7 +121,7 @@ public class NestedLoopsElasticExecutor extends ElasticJoinExecutor {
     private int combineResultsFromMultiResponses(List<SearchHit> combinedResults, int totalLimit,
                                                  int currentCombinedResults, SearchHit[] hits, int currentIndex,
                                                  MultiSearchRequest multiSearchRequest) {
-        MultiSearchResponse.Item[] responses = new ESClient(client).multiSearch(multiSearchRequest);
+        MultiSearchResponse.Item[] responses = ((ESClient) client).multiSearchWithRetry(multiSearchRequest);
         String t1Alias = nestedLoopsRequest.getFirstTable().getAlias();
         String t2Alias = nestedLoopsRequest.getSecondTable().getAlias();
 

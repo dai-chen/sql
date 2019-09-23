@@ -17,6 +17,7 @@ package com.amazon.opendistroforelasticsearch.sql.plugin;
 
 import com.alibaba.druid.sql.parser.ParserException;
 import com.amazon.opendistroforelasticsearch.sql.antlr.SqlAnalysisException;
+import com.amazon.opendistroforelasticsearch.sql.esdomain.ESClient;
 import com.amazon.opendistroforelasticsearch.sql.esdomain.LocalClusterState;
 import com.amazon.opendistroforelasticsearch.sql.exception.SQLFeatureDisabledException;
 import com.amazon.opendistroforelasticsearch.sql.exception.SqlParseException;
@@ -94,6 +95,7 @@ public class RestSqlAction extends BaseRestHandler {
 
         LogUtils.addRequestId();
 
+        final ESClient esClient = new ESClient(client);
         try {
             if (!isSQLFeatureEnabled()) {
                 throw new SQLFeatureDisabledException(
@@ -104,8 +106,8 @@ public class RestSqlAction extends BaseRestHandler {
             final SqlRequest sqlRequest = SqlRequestFactory.getSqlRequest(request);
             LOG.info("[{}] Incoming request {}: {}", LogUtils.getRequestId(), request.uri(), sqlRequest.getSql());
 
-            final QueryAction queryAction = explainRequest(client, sqlRequest);
-            return channel -> executeSqlRequest(request, queryAction, client, channel);
+            final QueryAction queryAction = explainRequest(esClient, sqlRequest);
+            return channel -> executeSqlRequest(request, queryAction, esClient, channel);
         } catch (Exception e) {
             logAndPublishMetrics(e);
             return channel -> reportError(channel, e, isClientError(e) ? BAD_REQUEST : SERVICE_UNAVAILABLE);

@@ -21,7 +21,9 @@ import org.elasticsearch.action.search.MultiSearchRequest;
 import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.node.NodeClient;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.threadpool.ThreadPool;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +39,7 @@ import static org.mockito.Mockito.when;
 public class ESClientTest {
 
     @Mock
-    protected Client client;
+    protected NodeClient client;
 
     @Before
     public void init() {
@@ -64,8 +66,8 @@ public class ESClientTest {
 
     @Test
     public void multiSearchRetryOneTime() {
-        ESClient esClient = new ESClient(client);
-        MultiSearchResponse.Item[] res = esClient.multiSearch(new MultiSearchRequest().add(new SearchRequest()).add(new SearchRequest()));
+        ESClient esClient = new ESClient(Settings.EMPTY, mock(ThreadPool.class), client);
+        MultiSearchResponse.Item[] res = esClient.multiSearchWithRetry(new MultiSearchRequest().add(new SearchRequest()).add(new SearchRequest()));
         Assert.assertEquals(res.length, 2);
         Assert.assertFalse(res[0].isFailure());
         Assert.assertFalse(res[1].isFailure());
