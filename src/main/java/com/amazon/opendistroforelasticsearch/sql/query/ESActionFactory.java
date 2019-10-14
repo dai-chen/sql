@@ -16,12 +16,17 @@
 package com.amazon.opendistroforelasticsearch.sql.query;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
+import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
 import com.alibaba.druid.sql.ast.expr.SQLQueryExpr;
 import com.alibaba.druid.sql.ast.statement.SQLDeleteStatement;
+import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLJoinTableSource;
+import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
 import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.alibaba.druid.sql.dialect.mysql.parser.MySqlStatementParser;
+import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlASTVisitorAdapter;
 import com.alibaba.druid.sql.parser.ParserException;
 import com.alibaba.druid.sql.parser.SQLExprParser;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
@@ -74,6 +79,7 @@ public class ESActionFactory {
         switch (getFirstWord(sql)) {
             case "SELECT":
                 SQLQueryExpr sqlExpr = (SQLQueryExpr) toSqlExpr(sql);
+                sqlExpr.accept(new UnquoteIdentifierRewriter());
 
                 RewriteRuleExecutor<SQLQueryExpr> ruleExecutor = RewriteRuleExecutor.<SQLQueryExpr>builder()
                         .withRule(new SQLExprParentSetterRule())
@@ -175,5 +181,37 @@ public class ESActionFactory {
         }
 
         return expr;
+    }
+
+    /** Unquote identifier (table and field name) as well as their alias */
+    private static class UnquoteIdentifierRewriter extends MySqlASTVisitorAdapter {
+
+        @Override
+        public void endVisit(SQLSelectItem item) {
+            item.setAlias(unquote(item.getAlias()));
+        }
+
+        @Override
+        public void endVisit(SQLExprTableSource table) {
+            table.setAlias(unquote(table.getAlias()));
+        }
+
+        @Override
+        public void endVisit(SQLPropertyExpr expr) {
+            expr.setName(unquote(expr.getName()));
+        }
+
+        @Override
+        public void endVisit(SQLIdentifierExpr expr) {
+            expr.setName(unquote(expr.getName()));
+        }
+
+        // Move this to static StringUtils?
+        private String unquote(String str) {
+            if (str != null && str.startsWith("`") && str.endsWith("`")) {
+                return str.substring(1, str.length() - 1);
+            }
+            return str;
+        }
     }
 }
