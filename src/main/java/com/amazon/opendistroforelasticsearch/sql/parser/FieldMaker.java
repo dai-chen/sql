@@ -242,7 +242,12 @@ public class FieldMaker {
             String aliasPrefix = tableAlias + ".";
             if (name.startsWith(aliasPrefix)) {
                 newFieldName = name.replaceFirst(aliasPrefix, "");
-                field = new Field(newFieldName, alias);
+
+                if ("*".equals(newFieldName)) {
+                    field = Field.STAR;
+                } else {
+                    field = new Field(newFieldName, alias);
+                }
             }
         }
 

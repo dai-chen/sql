@@ -94,6 +94,9 @@ public class SqlParser {
         select.getFrom().addAll(findFrom(query.getFrom()));
 
         select.setWhere(whereParser.findWhere());
+        if (select.getWhere() != null) {
+            removeAliasPrefix(select.getWhere(), query.getFrom().getAlias());
+        }
 
         select.fillSubQueries();
 
@@ -562,7 +565,9 @@ public class SqlParser {
         if (where instanceof Condition) {
             Condition cond = (Condition) where;
             String aliasPrefix = alias + ".";
-            cond.setName(cond.getName().replaceFirst(aliasPrefix, ""));
+            if (cond.getName() != null) {
+                cond.setName(cond.getName().replaceFirst(aliasPrefix, ""));
+            }
             return;
         }
         for (Where innerWhere : where.getWheres()) {

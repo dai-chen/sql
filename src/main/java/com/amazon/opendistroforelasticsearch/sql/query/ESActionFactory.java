@@ -45,6 +45,7 @@ import com.amazon.opendistroforelasticsearch.sql.rewriter.matchtoterm.TermFieldR
 import com.amazon.opendistroforelasticsearch.sql.rewriter.matchtoterm.TermFieldRewriter.TermRewriterFilter;
 import com.amazon.opendistroforelasticsearch.sql.rewriter.nestedfield.NestedFieldRewriter;
 import com.amazon.opendistroforelasticsearch.sql.rewriter.parent.SQLExprParentSetterRule;
+import com.amazon.opendistroforelasticsearch.sql.rewriter.preprocess.QueryPreprocessingRule;
 import com.amazon.opendistroforelasticsearch.sql.rewriter.subquery.SubQueryRewriteRule;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.search.SearchHit;
@@ -75,7 +76,8 @@ public class ESActionFactory {
             case "SELECT":
                 SQLQueryExpr sqlExpr = (SQLQueryExpr) toSqlExpr(sql);
 
-                RewriteRuleExecutor<SQLQueryExpr> ruleExecutor = RewriteRuleExecutor.<SQLQueryExpr>builder()
+                RewriteRuleExecutor<SQLQueryExpr> ruleExecutor = RewriteRuleExecutor.builder()
+                        .withRule(new QueryPreprocessingRule())
                         .withRule(new SQLExprParentSetterRule())
                         .withRule(new SubQueryRewriteRule())
                         .build();

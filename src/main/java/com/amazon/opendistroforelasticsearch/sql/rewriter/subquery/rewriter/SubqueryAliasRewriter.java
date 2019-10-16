@@ -75,6 +75,11 @@ public class SubqueryAliasRewriter extends MySqlASTVisitorAdapter {
     }
 
     @Override
+    public boolean visit(SQLExprTableSource x) {
+        return false;
+    }
+
+    @Override
     public boolean visit(SQLIdentifierExpr expr) {
         if (!tableScope.isEmpty() && (inSelect(expr) || inWhere(expr) || inSubquery(expr))) {
             rewrite(tableScope.peek(), expr);
