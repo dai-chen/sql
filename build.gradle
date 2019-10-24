@@ -150,6 +150,23 @@ configurations {
     }
 }
 
+sourceSets {
+    docTest {
+        java.srcDir file('src/doctest/java')
+        resources.srcDir file('src/doctest/resources')
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+}
+
+task docTest(type: Test) {
+    description = 'Runs the sanity tests to generate documentation.'
+    //group = 'verification'
+    testClassesDirs = sourceSets.docTest.output.classesDirs
+    classpath = sourceSets.docTest.runtimeClasspath
+    mustRunAfter test
+}
+
 check.dependsOn jacocoTestReport
 
 // TODO: fix code style in main and test source code
