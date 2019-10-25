@@ -15,10 +15,7 @@
 
 package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
-import org.junit.runner.Description;
-import org.junit.runner.Result;
-import org.junit.runner.notification.RunListener;
-import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.Before;
 
 public abstract class DocTest {
 
@@ -29,6 +26,9 @@ public abstract class DocTest {
      */
     public abstract String syntax();
 
+    @Before
+    public void setUp() {
+        System.out.println(syntax());
+    }
+
 }
-
-
