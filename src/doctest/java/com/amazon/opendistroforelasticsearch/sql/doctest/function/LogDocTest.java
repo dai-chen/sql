@@ -18,18 +18,21 @@ package com.amazon.opendistroforelasticsearch.sql.doctest.function;
 import com.amazon.opendistroforelasticsearch.sql.doctest.core.Summary;
 import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
 import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.function.ScalarFunction.LOG;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.function.ScalarFunction.LOG10;
 import static com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.function.ScalarFunction.LOG2;
 
+@Ignore
 @Summary(
     name = "LOG",
     description = "Logarithm is the inverse function to exponentiation"
 )
 public class LogDocTest extends DocTest {
 
+    /*
     @Override
     public String syntax() {
         return StringUtils.format(
@@ -37,6 +40,7 @@ public class LogDocTest extends DocTest {
             "And LOG2 and LOG10 is also provided for convenience: %s or %s.",
             LOG.usage(), LOG2.usage(), LOG10.usage());
     }
+    */
 
     @Test
     public void test() {

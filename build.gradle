@@ -154,7 +154,7 @@ sourceSets {
     docTest {
         java.srcDir file('src/doctest/java')
         resources.srcDir file('src/doctest/resources')
-        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        compileClasspath += sourceSets.main.output + sourceSets.test.output + configurations.testRuntimeClasspath
         runtimeClasspath += output + compileClasspath
     }
     fuzzer {
@@ -170,6 +170,8 @@ task docTest(type: Test) {
     //group = 'verification'
     testClassesDirs = sourceSets.docTest.output.classesDirs
     classpath = sourceSets.docTest.runtimeClasspath
+    systemProperty 'tests.security.manager', 'false'
+    systemProperty('project.root', project.rootDir.absolutePath)
     mustRunAfter test
 }
 

@@ -15,20 +15,68 @@
 
 package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
-import org.junit.Before;
+import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfig;
+import com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase;
+import com.amazon.opendistroforelasticsearch.sql.esintgtest.TestUtils;
+import org.junit.Rule;
+import org.junit.rules.MethodRule;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.Statement;
 
-public abstract class DocTest {
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.SqlRequest.UrlParam;
+import static com.amazon.opendistroforelasticsearch.sql.plugin.RestSqlAction.QUERY_API_ENDPOINT;
 
-    /**
-     * Provide syntax in more flexible way than annotation. Because value in java annotation must be constant.
-     *
-     * @return syntax
-     */
-    public abstract String syntax();
+/**
+ *
+ */
+public abstract class DocTest extends SQLIntegTestCase {
 
-    @Before
-    public void setUp() {
-        System.out.println(syntax());
+    private static final String ROOT = "src/doctest/resources/"; // TODO: configure for docTest sourceSet
+
+    //@Rule
+    //public DocTestRule rule = new DocTestRule();
+
+    private Document document;
+
+    @Override
+    protected void init() throws Exception {
+        DocTestConfig config = getClass().getAnnotation(DocTestConfig.class);
+        for (String data : config.testData()) {
+            TestUtils.loadBulk(client(), ROOT + data, "accounts");
+        }
+
+        document = new RstDocument(
+            TestUtils.getResourceFilePath(ROOT + config.template()),
+            TestUtils.getResourceFilePath(ROOT + config.document())
+        );
     }
 
+    protected void get(String sql) {
+        SqlRequest request = new SqlRequest("GET", QUERY_API_ENDPOINT, "", new UrlParam("sql", sql));
+
+        //document.addExample();
+
+        request.send(getRestClient());
+    }
+
+    protected void post(String sql, String... keyValues) {
+        String body = String.format("{\n" + "  \"query\": \"%s\"\n" + "}", sql);
+        SqlRequest request = new SqlRequest("POST", QUERY_API_ENDPOINT, body);
+        request.send(getRestClient());
+    }
+
+}
+
+class DocTestRule implements MethodRule {
+
+    @Override
+    public Statement apply(Statement base, FrameworkMethod method, Object target) {
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                System.out.println("=====" + method.getName());
+                method.invokeExplosively(target);
+            }
+        };
+    }
 }
