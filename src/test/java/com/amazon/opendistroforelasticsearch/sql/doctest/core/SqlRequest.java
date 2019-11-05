@@ -18,7 +18,6 @@ package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 
 import java.io.IOException;
@@ -31,9 +30,9 @@ public class SqlRequest {
         this.request = makeRequest(method, endpoint, body, params);
     }
 
-    Response send(RestClient client) {
+    SqlResponse send(RestClient client) {
         try {
-            return client.performRequest(request);
+            return new SqlResponse(client.performRequest(request));
         } catch (IOException e) {
             throw new IllegalStateException(StringUtils.format(
                 "Exception occurred during sending request %s", request), e);

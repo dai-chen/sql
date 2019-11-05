@@ -150,39 +150,6 @@ configurations {
     }
 }
 
-sourceSets {
-    docTest {
-        java.srcDir file('src/doctest/java')
-        resources.srcDir file('src/doctest/resources')
-        compileClasspath += sourceSets.main.output + sourceSets.test.output + configurations.testRuntimeClasspath
-        runtimeClasspath += output + compileClasspath
-    }
-    fuzzer {
-        java.srcDir file('src/fuzzer/java')
-        resources.srcDir file('src/fuzzer/resources')
-        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
-        runtimeClasspath += output + compileClasspath
-    }
-}
-
-task docTest(type: Test) {
-    description = 'Runs the sanity tests to generate documentation.'
-    //group = 'verification'
-    testClassesDirs = sourceSets.docTest.output.classesDirs
-    classpath = sourceSets.docTest.runtimeClasspath
-    systemProperty 'tests.security.manager', 'false'
-    systemProperty('project.root', project.rootDir.absolutePath)
-    mustRunAfter test
-}
-
-task fuzzing(type: Test) {
-    description = 'Fuzz grammar to generate test cases.'
-    //group = 'verification'
-    testClassesDirs = sourceSets.fuzzer.output.classesDirs
-    classpath = sourceSets.fuzzer.runtimeClasspath
-    mustRunAfter test
-}
-
 check.dependsOn jacocoTestReport
 
 // TODO: fix code style in main and test source code

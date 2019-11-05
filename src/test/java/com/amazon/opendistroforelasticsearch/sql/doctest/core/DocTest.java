@@ -18,12 +18,11 @@ package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfig;
 import com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase;
 import com.amazon.opendistroforelasticsearch.sql.esintgtest.TestUtils;
-import org.junit.Rule;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
-import java.nio.file.Paths;
+import java.util.Objects;
 
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.SqlRequest.UrlParam;
 import static com.amazon.opendistroforelasticsearch.sql.plugin.RestSqlAction.QUERY_API_ENDPOINT;
@@ -33,7 +32,7 @@ import static com.amazon.opendistroforelasticsearch.sql.plugin.RestSqlAction.QUE
  */
 public abstract class DocTest extends SQLIntegTestCase {
 
-    private static final String ROOT = "src/doctest/resources/"; // TODO: configure for docTest sourceSet
+    private static final String ROOT = "src/test/resources/doctest/"; // TODO: configure for docTest sourceSet
 
     //@Rule
     //public DocTestRule rule = new DocTestRule();
@@ -64,9 +63,13 @@ public abstract class DocTest extends SQLIntegTestCase {
     }
 
     protected void post(String sql, String... keyValues) {
+        Objects.requireNonNull(document);
+
         String body = String.format("{\n" + "  \"query\": \"%s\"\n" + "}", sql);
         SqlRequest request = new SqlRequest("POST", QUERY_API_ENDPOINT, body);
-        request.send(getRestClient());
+        SqlResponse response = request.send(getRestClient());
+
+        document.addExample("test", request.toString());
     }
 
 }

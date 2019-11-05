@@ -25,7 +25,7 @@ import org.junit.Test;
     testData = {"testdata/accounts.json"},
     document = "docs/config/endpoint.rst"
 )
-public class Endpoint extends DocTest {
+public class EndpointIT extends DocTest {
 
     @Ignore
     @Test

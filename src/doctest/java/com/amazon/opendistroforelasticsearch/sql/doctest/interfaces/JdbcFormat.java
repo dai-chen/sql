@@ -15,27 +15,18 @@
 
 package com.amazon.opendistroforelasticsearch.sql.doctest.interfaces;
 
-import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfig;
-import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
-import org.junit.Ignore;
+import com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase;
 import org.junit.Test;
 
-@DocTestConfig(
-    template = "templates/config/endpoint.rst",
-    testData = {"testdata/accounts.json"},
-    document = "docs/config/endpoint.rst"
-)
-public class Endpoint extends DocTest {
+public class JdbcFormat extends SQLIntegTestCase {
 
-    @Ignore
-    @Test
-    public void useRequestParameterToAccessSQLPlugin() {
-        get("SELECT * FROM accounts");
+    @Override
+    protected void init() throws Exception {
+        loadIndex(Index.ACCOUNT);
     }
 
     @Test
-    public void useRequestBodyToAccessSQLPlugin() {
-        post("SELECT * FROM accounts");
+    public void test() throws Exception {
+        executeQuery("SELECT * FROM elasticsearch-sql_test_index_account LIMIT 1");
     }
-
 }

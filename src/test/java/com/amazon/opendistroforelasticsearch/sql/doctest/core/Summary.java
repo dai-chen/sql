@@ -13,7 +13,20 @@
  *   permissions and limitations under the License.
  */
 
-package com.amazon.opendistroforelasticsearch.sql.fuzzer;
+package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
-public class Prefuzzer {
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+@Retention(RUNTIME)
+@Target(value = TYPE)
+public @interface Summary {
+
+    String name();
+
+    String description() default "";
+
 }
