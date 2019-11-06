@@ -17,6 +17,8 @@ package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
 public interface Document {
 
+    void copyFrom(String templatePath);
+
     void addExample(String description, String example);
 
 }

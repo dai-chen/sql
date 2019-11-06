@@ -15,33 +15,47 @@
 
 package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
+import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+
+import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.nio.file.StandardOpenOption.APPEND;
 
 public class RstDocument implements Document {
 
-    private PrintWriter docWriter;
+    private final Path document;
 
-    RstDocument(String templatePath, String documentPath) throws IOException {
+    RstDocument(String documentPath) {
+        document = Paths.get(documentPath);
+    }
+
+    @Override
+    public void copyFrom(String templatePath) {
         Path template = Paths.get(templatePath);
-        Path document = Paths.get(documentPath);
-        docWriter = new PrintWriter(Files.newBufferedWriter(
-            Files.copy(template,
-                       //Files.createFile(document),
-                       document,
-                       StandardCopyOption.REPLACE_EXISTING))
-        );
+        try {
+            Files.copy(template, document, REPLACE_EXISTING, COPY_ATTRIBUTES);
+        } catch (IOException e) {
+            throw new IllegalStateException(StringUtils.format(
+                "Failed to copy from template [%s] to document file [%s]", template, document), e);
+        }
     }
 
     @Override
     public void addExample(String description, String example) {
-        docWriter.println(description + "::");
-        docWriter.println();
-        docWriter.println("\t" + example);
+        try (PrintWriter docWriter = new PrintWriter(Files.newBufferedWriter(document, APPEND))) {
+            docWriter.println(description + "::");
+            docWriter.println();
+            docWriter.println("\t" + example);
+        } catch (IOException e) {
+            throw new IllegalStateException(StringUtils.format(
+                "Failed to open document file [%s]", document), e);
+        }
     }
 
 }
