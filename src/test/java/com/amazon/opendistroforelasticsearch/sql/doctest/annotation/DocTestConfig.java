@@ -21,6 +21,9 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * Configuration for initializing doctest.
+ */
 @Retention(RUNTIME)
 @Target(value = TYPE)
 public @interface DocTestConfig {
@@ -29,6 +32,6 @@ public @interface DocTestConfig {
 
     String[] testData();
 
-    String document();
+    String document() default "";
 
 }

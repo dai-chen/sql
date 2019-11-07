@@ -16,51 +16,50 @@
 package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
 import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
+import com.google.common.base.Strings;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
-import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardOpenOption.APPEND;
 
+/**
+ * ReStructure Text
+ */
 public class RstDocument implements Document {
 
-    private final Path document;
+    private final Path documentPath;
 
-    RstDocument(String documentPath) {
-        document = Paths.get(documentPath);
+    RstDocument(Path documentPath) {
+        this.documentPath = documentPath;
     }
 
     @Override
-    public void copyFrom(String templatePath) {
-        Path template = Paths.get(templatePath);
-        try {
-            Files.copy(template, document, REPLACE_EXISTING, COPY_ATTRIBUTES);
+    public void add(Section section) {
+        try (PrintWriter docWriter = new PrintWriter(Files.newBufferedWriter(documentPath, APPEND))) {
+            docWriter.println();
+            docWriter.println(section.title);
+            docWriter.println(Strings.repeat("=", section.title.length()));
+            docWriter.println();
+            docWriter.println(section.description + "::");
+
+            for (Example example : section.examples) {
+                docWriter.println();
+                docWriter.println(indent(example.query));
+                docWriter.println();
+                docWriter.println(example.response);
+                docWriter.println();
+            }
         } catch (IOException e) {
             throw new IllegalStateException(StringUtils.format(
-                "Failed to copy from template [%s] to document file [%s]", template, document), e);
+                "Failed to open document file [%s]", documentPath), e);
         }
     }
 
-    @Override
-    public void add(Example example) {
-        try (PrintWriter docWriter = new PrintWriter(Files.newBufferedWriter(document, APPEND))) {
-            docWriter.println();
-            docWriter.println();
-            docWriter.println(example.description + "::");
-            docWriter.println();
-            docWriter.println(example.query);
-            docWriter.println();
-            docWriter.println(example.response);
-            docWriter.println();
-        } catch (IOException e) {
-            throw new IllegalStateException(StringUtils.format(
-                "Failed to open document file [%s]", document), e);
-        }
+    private String indent(String original) {
+        return "\t" + original.replaceAll("\\n", "\n\t");
     }
 
 }

@@ -16,27 +16,30 @@
 package com.amazon.opendistroforelasticsearch.sql.doctest.interfaces;
 
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfig;
-import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Example;
+import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Section;
 import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
 import org.junit.Ignore;
-import org.junit.Test;
 
 @DocTestConfig(
-    template = "templates/config/endpoint.rst",
-    testData = {"testdata/accounts.json"},
-    document = "docs/config/endpoint.rst"
+    template = "config/endpoint.rst",
+    testData = {"testdata/accounts.json"}
 )
 public class EndpointIT extends DocTest {
 
     @Ignore
-    @Test
-    public void useRequestParameterToAccessSQLPlugin() {
+    @Section(
+        title = "GET Request",
+        description = "You can post request with your query in request body"
+    )
+    public void testUseRequestParameterToAccessSQLPlugin() {
         get("SELECT * FROM accounts");
     }
 
-    @Test
-    @Example(description = "You can post request with your query in request body")
-    public void useRequestBodyToAccessSQLPlugin() {
+    @Section(
+        title = "GET Request",
+        description = "You can post request with your query in request body"
+    )
+    public void testUseRequestBodyToAccessSQLPlugin() {
         post("SELECT * FROM accounts");
     }
 

@@ -1,3 +1,4 @@
+.. highlight:: sh
 
 ========
 Endpoint
@@ -9,3 +10,4 @@ Endpoint
    :local:
 
 To use SQL plugin, you can use a request parameter or the request body (recommended).
+

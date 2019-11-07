@@ -15,14 +15,20 @@
 
 package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
+/**
+ * Document for different format and markup
+ */
 public interface Document {
 
-    void copyFrom(String templatePath);
+    void add(Section section);
 
-    void add(Example example);
+    class Section {
+        String title;
+        String description;
+        Example[] examples;
+    }
 
     class Example {
-        String description;
         String query;
         String response;
         String explain;

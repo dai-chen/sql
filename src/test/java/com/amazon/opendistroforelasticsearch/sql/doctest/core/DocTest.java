@@ -16,53 +16,46 @@
 package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfig;
-import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Example;
+import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Section;
 import com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase;
 import com.amazon.opendistroforelasticsearch.sql.esintgtest.TestUtils;
-import org.junit.Rule;
-import org.junit.rules.MethodRule;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.Statement;
+import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
+import org.elasticsearch.test.ESIntegTestCase.ClusterScope;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.SqlRequest.UrlParam;
 import static com.amazon.opendistroforelasticsearch.sql.plugin.RestSqlAction.EXPLAIN_API_ENDPOINT;
 import static com.amazon.opendistroforelasticsearch.sql.plugin.RestSqlAction.QUERY_API_ENDPOINT;
+import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static org.elasticsearch.test.ESIntegTestCase.Scope;
 
 /**
- *
+ * Documentation test base class
  */
+@ClusterScope(scope= Scope.SUITE, numDataNodes=1, supportsDedicatedMasters=false, transportClientRatio=1)
 public abstract class DocTest extends SQLIntegTestCase {
 
     private static final String ROOT = "src/test/resources/doctest/"; // TODO: configure for docTest sourceSet
 
-    //@Rule
-    //public DocTestRule rule = new DocTestRule();
-
     @Override
     protected void init() throws Exception {
         DocTestConfig config = getClass().getAnnotation(DocTestConfig.class);
-        for (String data : config.testData()) {
-            String indexName = "accounts";
-            TestUtils.loadBulk(client(), ROOT + data, indexName);
-            ensureGreen(indexName);
-        }
-
-        String templatePath = TestUtils.getResourceFilePath(ROOT + config.template());
-        RstDocument document = new RstDocument(documentPath());
-        document.copyFrom(templatePath);
+        loadTestData(config);
+        copyTemplateToDocument(config);
     }
 
     protected void get(String sql) {
         SqlRequest request = new SqlRequest("GET", QUERY_API_ENDPOINT, "", new UrlParam("sql", sql));
-
-        //document.addExample();
-
         request.send(getRestClient());
     }
 
-    protected void post(String sql, String... keyValues) {
+    protected void post(String sql, String... keyValues) { // TODO: pass down
         String body = String.format("{\n" + "  \"query\": \"%s\"\n" + "}", sql);
         SqlRequest queryReq = new SqlRequest("POST", QUERY_API_ENDPOINT, body, new UrlParam("format", "jdbc"));
         SqlResponse queryResp = queryReq.send(getRestClient());
@@ -70,40 +63,71 @@ public abstract class DocTest extends SQLIntegTestCase {
         SqlRequest explainReq = new SqlRequest("POST", EXPLAIN_API_ENDPOINT, body);
         SqlResponse explainResp = explainReq.send(getRestClient());
 
-        StackTraceElement element = Thread.currentThread().getStackTrace()[2]; // First 2 are Thread itself and DocTest
-        String description;
-        try {
-            Method clazz = Class.forName(element.getClassName()).getDeclaredMethod(element.getMethodName());
-            description = clazz.getAnnotation(Example.class).description();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+        DocTestConfig config = getClass().getAnnotation(DocTestConfig.class);
+        Section sectionAnnotation = section();
 
-        //document.addExample("test", request.toString());
-        RstDocument document = new RstDocument(documentPath());
+        RstDocument document = new RstDocument(documentPath(config));
+        Document.Section section = new Document.Section();
+        section.title = sectionAnnotation.title();
+        section.description = sectionAnnotation.description();
         Document.Example example = new Document.Example();
-        example.description = description;
         example.query = queryReq.toString();
         example.response = queryResp.toString();
         //example.explain = explainResp.toString();
-        document.add(example);
+        section.examples = new Document.Example[]{ example };
+        document.add(section);
     }
 
-    private String documentPath() {
-        return TestUtils.getResourceFilePath(ROOT + getClass().getAnnotation(DocTestConfig.class).document());
+    private void loadTestData(DocTestConfig config) {
+        for (String data : config.testData()) {
+            String indexName = "accounts"; // TODO: parse index name
+            try {
+                TestUtils.loadBulk(client(), ROOT + data, indexName);
+            } catch (Exception e) {
+                throw new IllegalStateException("Failed to load test data from", e);
+            }
+            ensureGreen(indexName);
+        }
     }
 
-    private static class DocTestRule implements MethodRule {
+    private void copyTemplateToDocument(DocTestConfig config) {
+        Path templatePath = templatePath(config);
+        Path documentPath = documentPath(config);
+        try {
+            Files.createDirectories(documentPath.getParent());
+            Files.copy(templatePath, documentPath, REPLACE_EXISTING, COPY_ATTRIBUTES);
+        } catch (IOException e) {
+            throw new IllegalStateException(StringUtils.format(
+                "Failed to copy from template [%s] to document file [%s]", templatePath, documentPath), e);
+        }
+    }
 
-        @Override
-        public Statement apply(Statement base, FrameworkMethod method, Object target) {
-            return new Statement() {
-                @Override
-                public void evaluate() throws Throwable {
-                    System.out.println("=====" + method.getName());
-                    method.invokeExplosively(target);
+    private Path templatePath(DocTestConfig config) {
+        return Paths.get(TestUtils.getResourceFilePath(ROOT + "templates/" + config.template()));
+    }
+
+    private Path documentPath(DocTestConfig config) {
+        String relativePath = config.document();
+        if (relativePath.isEmpty()) {
+            relativePath = "docs/user/" + config.template();
+        }
+        return Paths.get(TestUtils.getResourceFilePath(relativePath));
+    }
+
+    private Section section() {
+        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+        try {
+            String currentClassName = DocTest.class.getName();
+            for (int i = 1; i < elements.length; i++) { // First level is Thread itself
+                StackTraceElement element = elements[i];
+                if (!element.getClassName().equals(currentClassName)) {
+                    Method clazz = Class.forName(element.getClassName()).getDeclaredMethod(element.getMethodName());
+                    return clazz.getAnnotation(Section.class);
                 }
-            };
+            }
+            return null; // Impossible
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to find custom annotation on caller method", e);
         }
     }
 

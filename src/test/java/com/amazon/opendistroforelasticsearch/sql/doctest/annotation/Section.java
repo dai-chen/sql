@@ -23,7 +23,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(value = METHOD)
-public @interface Example {
+public @interface Section {
+
+    String title();
 
     String description();
 
