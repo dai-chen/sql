@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.nio.file.StandardOpenOption.APPEND;
 
@@ -39,7 +41,6 @@ public class RstDocument implements Document {
     @Override
     public void add(Section section) {
         try (PrintWriter docWriter = new PrintWriter(Files.newBufferedWriter(documentPath, APPEND))) {
-            docWriter.println();
             docWriter.println(section.title);
             docWriter.println(Strings.repeat("=", section.title.length()));
             docWriter.println();

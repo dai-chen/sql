@@ -9,13 +9,33 @@ Endpoint
 .. contents::
    :local:
 
-To use SQL plugin, you can use a request parameter or the request body (recommended).
-
+To use SQL plugin, you can use a request parameter or request body by HTTP GET and POST. POST request is recommended because it is more flexible and allows for more parameters passed to plugin.
 
 GET Request
 ===========
 
-You can post request with your query in request body::
+You can send HTTP GET request with your query embedded in URL::
+
+	GET /_opendistro/_sql?format=jdbc&sql=SELECT * FROM accounts
+	
+
++-----------------------+------------------+---------------+-------------+----------------+-----------------+--------------+--------------------------+----------------------+-----------------+------------+
+|  account_number (long)|  firstname (text)|  gender (text)|  city (text)|  balance (long)|  employer (text)|  state (text)|              email (text)|        address (text)|  lastname (text)|  age (long)|
++=======================+==================+===============+=============+================+=================+==============+==========================+======================+=================+============+
+|                     13|           Nanette|              F|        Nogal|           32838|          Quility|            VA|  nanettebates@quility.com|    789 Madison Street|            Bates|          28|
++-----------------------+------------------+---------------+-------------+----------------+-----------------+--------------+--------------------------+----------------------+-----------------+------------+
+|                      1|             Amber|              M|       Brogan|           39225|           Pyrami|            IL|      amberduke@pyrami.com|       880 Holmes Lane|             Duke|          32|
++-----------------------+------------------+---------------+-------------+----------------+-----------------+--------------+--------------------------+----------------------+-----------------+------------+
+|                      6|            Hattie|              M|        Dante|            5686|           Netagy|            TN|     hattiebond@netagy.com|    671 Bristol Street|             Bond|          36|
++-----------------------+------------------+---------------+-------------+----------------+-----------------+--------------+--------------------------+----------------------+-----------------+------------+
+|                     18|              Dale|              M|        Orick|            4180|            Boink|            MD|       daleadams@boink.com|  467 Hutchinson Court|            Adams|          33|
++-----------------------+------------------+---------------+-------------+----------------+-----------------+--------------+--------------------------+----------------------+-----------------+------------+
+
+
+POST Request
+============
+
+You can also send HTTP POST request with your query in request body::
 
 	POST /_opendistro/_sql?format=jdbc
 	{

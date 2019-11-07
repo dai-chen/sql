@@ -28,10 +28,22 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(value = TYPE)
 public @interface DocTestConfig {
 
+    /**
+     * Path of the template
+     * @return path
+     */
     String template();
 
+    /**
+     * Path of the test data used.
+     * @return path
+     */
     String[] testData();
 
+    /**
+     * Path of the target document.
+     * @return path
+     */
     String document() default "";
 
 }

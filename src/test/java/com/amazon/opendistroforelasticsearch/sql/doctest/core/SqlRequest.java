@@ -25,9 +25,14 @@ import org.elasticsearch.client.RestClient;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 
+/**
+ * Request for SQL plugin
+ */
 public class SqlRequest {
 
+    /** Native Elasticsearch request object */
     private final Request request;
 
     public SqlRequest(String method, String endpoint, String body, UrlParam... params) {
@@ -85,10 +90,10 @@ public class SqlRequest {
             append(request.getEndpoint());
 
         if (!request.getParameters().isEmpty()) {
-            str.append("?");
-            request.getParameters().forEach(
-                (k, v) -> str.append(k).append("=").append(v)
-            );
+            str.append("?").
+                append(request.getParameters().entrySet().stream().
+                               map(e -> e.getKey() + "=" + e.getValue()).
+                               collect(Collectors.joining("&")));
         }
 
         str.append('\n').

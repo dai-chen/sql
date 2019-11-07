@@ -18,7 +18,7 @@ package com.amazon.opendistroforelasticsearch.sql.doctest.interfaces;
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfig;
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Section;
 import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
-import org.junit.Ignore;
+import com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat;
 
 @DocTestConfig(
     template = "config/endpoint.rst",
@@ -26,18 +26,23 @@ import org.junit.Ignore;
 )
 public class EndpointIT extends DocTest {
 
-    @Ignore
     @Section(
+        order = 1,
         title = "GET Request",
-        description = "You can post request with your query in request body"
+        description = "You can send HTTP GET request with your query embedded in URL",
+        request = RequestFormat.CURL,
+        isExplainNeeded = false
     )
     public void testUseRequestParameterToAccessSQLPlugin() {
         get("SELECT * FROM accounts");
     }
 
     @Section(
-        title = "GET Request",
-        description = "You can post request with your query in request body"
+        order = 2,
+        title = "POST Request",
+        description = "You can also send HTTP POST request with your query in request body",
+        request = RequestFormat.CURL,
+        isExplainNeeded = false
     )
     public void testUseRequestBodyToAccessSQLPlugin() {
         post("SELECT * FROM accounts");

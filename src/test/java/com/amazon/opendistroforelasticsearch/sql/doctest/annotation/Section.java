@@ -15,9 +15,14 @@
 
 package com.amazon.opendistroforelasticsearch.sql.doctest.annotation;
 
+import com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat;
+import com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.*;
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.*;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -25,11 +30,15 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(value = METHOD)
 public @interface Section {
 
+    int order() default 0;
+
     String title();
 
     String description();
 
-    boolean isResponseNeeded() default true;
+    RequestFormat request() default KIBANA;
+
+    ResponseFormat response() default TABLE;
 
     boolean isExplainNeeded() default true;
 

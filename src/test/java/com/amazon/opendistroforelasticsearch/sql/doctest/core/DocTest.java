@@ -51,31 +51,15 @@ public abstract class DocTest extends SQLIntegTestCase {
     }
 
     protected void get(String sql) {
-        SqlRequest request = new SqlRequest("GET", QUERY_API_ENDPOINT, "", new UrlParam("sql", sql));
-        request.send(getRestClient());
+        SqlRequest request = new SqlRequest("GET", QUERY_API_ENDPOINT, "",
+            new UrlParam("sql", sql), new UrlParam("format", "jdbc"));
+        generateDocByQuery(sql, request);
     }
 
     protected void post(String sql, String... keyValues) { // TODO: pass down
-        String body = String.format("{\n" + "  \"query\": \"%s\"\n" + "}", sql);
-        SqlRequest queryReq = new SqlRequest("POST", QUERY_API_ENDPOINT, body, new UrlParam("format", "jdbc"));
-        SqlResponse queryResp = queryReq.send(getRestClient());
-
-        SqlRequest explainReq = new SqlRequest("POST", EXPLAIN_API_ENDPOINT, body);
-        SqlResponse explainResp = explainReq.send(getRestClient());
-
-        DocTestConfig config = getClass().getAnnotation(DocTestConfig.class);
-        Section sectionAnnotation = section();
-
-        RstDocument document = new RstDocument(documentPath(config));
-        Document.Section section = new Document.Section();
-        section.title = sectionAnnotation.title();
-        section.description = sectionAnnotation.description();
-        Document.Example example = new Document.Example();
-        example.query = queryReq.toString();
-        example.response = queryResp.toString();
-        //example.explain = explainResp.toString();
-        section.examples = new Document.Example[]{ example };
-        document.add(section);
+        String body = createBody(sql);
+        SqlRequest request = new SqlRequest("POST", QUERY_API_ENDPOINT, body, new UrlParam("format", "jdbc"));
+        generateDocByQuery(sql, request);
     }
 
     private void loadTestData(DocTestConfig config) {
@@ -114,6 +98,32 @@ public abstract class DocTest extends SQLIntegTestCase {
         return Paths.get(TestUtils.getResourceFilePath(relativePath));
     }
 
+    private String createBody(String sql) {
+        return String.format("{\n" + "  \"query\": \"%s\"\n" + "}", sql);
+    }
+
+    private void generateDocByQuery(String sql, SqlRequest queryReq)  {
+        DocTestConfig config = getClass().getAnnotation(DocTestConfig.class);
+        Section sectionAnnotation = section();
+        RstDocument document = new RstDocument(documentPath(config));
+        Document.Section section = new Document.Section();
+
+        section.title = sectionAnnotation.title();
+        section.description = sectionAnnotation.description();
+
+        SqlResponse queryResp = queryReq.send(getRestClient());
+        Document.Example example = new Document.Example();
+        example.query = queryReq.toString();
+        example.response = queryResp.toString();
+        section.examples = new Document.Example[]{ example };
+
+        if (sectionAnnotation.isExplainNeeded()) {
+            SqlRequest explainReq = new SqlRequest("POST", EXPLAIN_API_ENDPOINT, createBody(sql));
+            SqlResponse explainResp = explainReq.send(getRestClient());
+        }
+        document.add(section);
+    }
+
     private Section section() {
         StackTraceElement[] elements = Thread.currentThread().getStackTrace();
         try {
@@ -125,11 +135,10 @@ public abstract class DocTest extends SQLIntegTestCase {
                     return clazz.getAnnotation(Section.class);
                 }
             }
-            return null; // Impossible
+            throw new IllegalStateException("Failed to find caller other than current class");
         } catch (Exception e) {
             throw new IllegalStateException("Failed to find custom annotation on caller method", e);
         }
     }
 
 }
-
