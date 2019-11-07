@@ -16,12 +16,15 @@
 package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfig;
+import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Example;
 import com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase;
 import com.amazon.opendistroforelasticsearch.sql.esintgtest.TestUtils;
 import org.junit.Rule;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
+
+import java.lang.reflect.Method;
 
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.SqlRequest.UrlParam;
 import static com.amazon.opendistroforelasticsearch.sql.plugin.RestSqlAction.EXPLAIN_API_ENDPOINT;
@@ -61,15 +64,29 @@ public abstract class DocTest extends SQLIntegTestCase {
 
     protected void post(String sql, String... keyValues) {
         String body = String.format("{\n" + "  \"query\": \"%s\"\n" + "}", sql);
-        SqlRequest queryReq = new SqlRequest("POST", QUERY_API_ENDPOINT, body);
+        SqlRequest queryReq = new SqlRequest("POST", QUERY_API_ENDPOINT, body, new UrlParam("format", "jdbc"));
         SqlResponse queryResp = queryReq.send(getRestClient());
 
-        SqlRequest explainReq = new SqlRequest("POST", EXPLAIN_API_ENDPOINT, sql);
-        SqlResponse explainResp = queryReq.send(getRestClient());
+        SqlRequest explainReq = new SqlRequest("POST", EXPLAIN_API_ENDPOINT, body);
+        SqlResponse explainResp = explainReq.send(getRestClient());
+
+        StackTraceElement element = Thread.currentThread().getStackTrace()[2]; // First 2 are Thread itself and DocTest
+        String description;
+        try {
+            Method clazz = Class.forName(element.getClassName()).getDeclaredMethod(element.getMethodName());
+            description = clazz.getAnnotation(Example.class).description();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
 
         //document.addExample("test", request.toString());
         RstDocument document = new RstDocument(documentPath());
-        document.addExample("Test", "test");
+        Document.Example example = new Document.Example();
+        example.description = description;
+        example.query = queryReq.toString();
+        example.response = queryResp.toString();
+        //example.explain = explainResp.toString();
+        document.add(example);
     }
 
     private String documentPath() {

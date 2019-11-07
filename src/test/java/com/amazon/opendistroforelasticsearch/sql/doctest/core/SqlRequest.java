@@ -16,11 +16,15 @@
 package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
 import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class SqlRequest {
 
@@ -35,7 +39,7 @@ public class SqlRequest {
             return new SqlResponse(client.performRequest(request));
         } catch (IOException e) {
             throw new IllegalStateException(StringUtils.format(
-                "Exception occurred during sending request %s", request), e);
+                "Exception occurred during sending request %s", this), e);
         }
     }
 
@@ -52,9 +56,20 @@ public class SqlRequest {
         return request;
     }
 
+    private String body() {
+        String body;
+        try {
+            InputStream content = request.getEntity().getContent();
+            body = CharStreams.toString(new InputStreamReader(content, Charsets.UTF_8));
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to parse body from request", e);
+        }
+        return body;
+    }
+
     static class UrlParam {
-        String key;
-        String value;
+        private String key;
+        private String value;
 
         UrlParam(String key, String value) {
             this.key = key;
@@ -77,7 +92,8 @@ public class SqlRequest {
         }
 
         str.append('\n').
-            append(request.getEntity());
+            append(body());
         return str.toString();
     }
+
 }

@@ -16,6 +16,7 @@
 package com.amazon.opendistroforelasticsearch.sql.doctest.interfaces;
 
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfig;
+import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Example;
 import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -34,6 +35,7 @@ public class EndpointIT extends DocTest {
     }
 
     @Test
+    @Example(description = "You can post request with your query in request body")
     public void useRequestBodyToAccessSQLPlugin() {
         post("SELECT * FROM accounts");
     }

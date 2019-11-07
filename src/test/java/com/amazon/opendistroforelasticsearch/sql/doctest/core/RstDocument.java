@@ -47,11 +47,16 @@ public class RstDocument implements Document {
     }
 
     @Override
-    public void addExample(String description, String example) {
+    public void add(Example example) {
         try (PrintWriter docWriter = new PrintWriter(Files.newBufferedWriter(document, APPEND))) {
-            docWriter.println(description + "::");
             docWriter.println();
-            docWriter.println("\t" + example);
+            docWriter.println();
+            docWriter.println(example.description + "::");
+            docWriter.println();
+            docWriter.println(example.query);
+            docWriter.println();
+            docWriter.println(example.response);
+            docWriter.println();
         } catch (IOException e) {
             throw new IllegalStateException(StringUtils.format(
                 "Failed to open document file [%s]", document), e);

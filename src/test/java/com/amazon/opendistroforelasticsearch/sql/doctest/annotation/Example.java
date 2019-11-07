@@ -13,19 +13,22 @@
  *   permissions and limitations under the License.
  */
 
-package com.amazon.opendistroforelasticsearch.sql.doctest.core;
+package com.amazon.opendistroforelasticsearch.sql.doctest.annotation;
 
-public interface Document {
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-    void copyFrom(String templatePath);
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-    void add(Example example);
+@Retention(RUNTIME)
+@Target(value = METHOD)
+public @interface Example {
 
-    class Example {
-        String description;
-        String query;
-        String response;
-        String explain;
-    }
+    String description();
+
+    boolean isResponseNeeded() default true;
+
+    boolean isExplainNeeded() default true;
 
 }
