@@ -83,6 +83,17 @@ public class SqlRequest {
             this.key = key;
             this.value = value;
         }
+
+        UrlParam(String keyValue) {
+            int equality = keyValue.indexOf('=');
+            if (equality == -1) {
+                throw new IllegalArgumentException(String.format(
+                    "Key value pair is in bad format [%s]", keyValue));
+            }
+
+            this.key = keyValue.substring(0, equality);
+            this.value = keyValue.substring(equality + 1);
+        }
     }
 
 }

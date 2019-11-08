@@ -22,6 +22,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+/**
+ * Response formatter
+ */
 public enum ResponseFormat {
 
     NONE {
@@ -30,7 +33,13 @@ public enum ResponseFormat {
             throw new UnsupportedOperationException();
         }
     },
-    RAW {
+    ORIGINAL {
+        @Override
+        public String format(String body) {
+            return body;
+        }
+    },
+    PRETTY_JSON {
         @Override
         public String format(String body) {
             try {

@@ -18,11 +18,13 @@ package com.amazon.opendistroforelasticsearch.sql.doctest.interfaces;
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfig;
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Section;
 import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
-import com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat;
-import com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat;
+
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.CURL;
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.NONE;
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.TABLE;
 
 @DocTestConfig(
-    template = "config/endpoint.rst",
+    template = "interfaces/endpoint.rst",
     testData = {"testdata/accounts.json"}
 )
 public class EndpointIT extends DocTest {
@@ -30,11 +32,11 @@ public class EndpointIT extends DocTest {
     @Section(
         title = "GET Request",
         description = "You can send HTTP GET request with your query embedded in URL",
-        request = RequestFormat.CURL,
-        response = ResponseFormat.TABLE,
+        request = CURL,
+        response = TABLE,
         isExplainNeeded = false
     )
-    public void section1() {
+    public void test1() {
         get("SELECT * FROM accounts");
     }
 
@@ -42,10 +44,10 @@ public class EndpointIT extends DocTest {
         title = "POST Request",
         description = "You can also send HTTP POST request with your query in request body " +
             "and explain it to Elasticsearch domain specific language (DSL) in JSON",
-        request = RequestFormat.CURL,
-        response = ResponseFormat.NONE
+        request = CURL,
+        response = NONE
     )
-    public void section2() {
+    public void test2() {
         post("SELECT * FROM accounts");
     }
 

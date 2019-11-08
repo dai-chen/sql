@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.SqlRequest.UrlParam;
 import static com.amazon.opendistroforelasticsearch.sql.plugin.RestSqlAction.EXPLAIN_API_ENDPOINT;
@@ -40,7 +41,7 @@ import static org.elasticsearch.test.ESIntegTestCase.Scope;
 /**
  * Documentation test base class
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING) // TODO Doesnt work!?
 @ClusterScope(scope= Scope.SUITE, numDataNodes=1, supportsDedicatedMasters=false, transportClientRatio=1)
 public abstract class DocTest extends SQLIntegTestCase {
 
@@ -55,13 +56,21 @@ public abstract class DocTest extends SQLIntegTestCase {
 
     protected void get(String sql) {
         SqlRequest request = new SqlRequest("GET", QUERY_API_ENDPOINT, "",
-            new UrlParam("sql", sql), new UrlParam("format", "jdbc"));
+                                            new UrlParam("sql", sql),
+                                            new UrlParam("format", "jdbc"));
         generateDocByQuery(sql, request);
     }
 
     protected void post(String sql, String... keyValues) { // TODO: pass down
+        UrlParam[] params;
+        if (keyValues.length == 0) {
+            params = new UrlParam[]{ new UrlParam("format", "jdbc") };
+        } else {
+            params = Arrays.stream(keyValues).map(UrlParam::new).toArray(UrlParam[]::new);
+        }
+
         String body = createBody(sql);
-        SqlRequest request = new SqlRequest("POST", QUERY_API_ENDPOINT, body, new UrlParam("format", "jdbc"));
+        SqlRequest request = new SqlRequest("POST", QUERY_API_ENDPOINT, body, params);
         generateDocByQuery(sql, request);
     }
 
@@ -124,7 +133,7 @@ public abstract class DocTest extends SQLIntegTestCase {
         if (sectionAnnotation.isExplainNeeded()) {
             SqlRequest explainReq = new SqlRequest("POST", EXPLAIN_API_ENDPOINT, createBody(sql));
             SqlResponse explainResp = explainReq.send(getRestClient());
-            example.explain = ResponseFormat.RAW.format(explainResp.body());
+            example.explain = ResponseFormat.ORIGINAL.format(explainResp.body());
         }
 
         section.examples = new Document.Example[]{ example };

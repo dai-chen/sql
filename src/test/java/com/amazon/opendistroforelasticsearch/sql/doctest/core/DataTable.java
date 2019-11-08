@@ -23,6 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Data table that represent data in table with header.
+ */
 class DataTable {
 
     private final int[] maxWidths;

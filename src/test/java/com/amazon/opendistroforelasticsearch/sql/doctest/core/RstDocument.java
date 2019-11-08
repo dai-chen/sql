@@ -50,7 +50,11 @@ public class RstDocument implements Document {
                 docWriter.println();
 
                 if (example.response != null) {
-                    docWriter.println(example.response);
+                    if (isTable(example.response)) {
+                        docWriter.println(example.response);
+                    } else {
+                        docWriter.println(indent(example.response));
+                    }
                     docWriter.println();
                 }
 
@@ -63,6 +67,10 @@ public class RstDocument implements Document {
             throw new IllegalStateException(StringUtils.format(
                 "Failed to open document file [%s]", documentPath), e);
         }
+    }
+
+    private boolean isTable(String response) {
+        return response.startsWith("+-");
     }
 
     private String indent(String original) {

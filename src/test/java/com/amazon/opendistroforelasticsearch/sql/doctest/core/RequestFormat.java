@@ -32,7 +32,7 @@ public enum RequestFormat {
             StringBuilder str = new StringBuilder();
             str.append(">> curl -H 'Content-Type: application/json' ").
                 append(StringUtils.format("-X %s ", request.getMethod())).
-                append(StringUtils.format("http://localhost:9200/%s ", request.getEndpoint()));
+                append(StringUtils.format("localhost:9200%s", request.getEndpoint()));
 
             if (!request.getParameters().isEmpty()) {
                 str.append("?").
