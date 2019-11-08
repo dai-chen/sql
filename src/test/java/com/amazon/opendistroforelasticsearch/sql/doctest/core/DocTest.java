@@ -21,6 +21,7 @@ import com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase;
 import com.amazon.opendistroforelasticsearch.sql.esintgtest.TestUtils;
 import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
 import org.elasticsearch.test.ESIntegTestCase.ClusterScope;
+import org.junit.FixMethodOrder;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -38,6 +39,7 @@ import static org.elasticsearch.test.ESIntegTestCase.Scope;
 /**
  * Documentation test base class
  */
+@FixMethodOrder
 @ClusterScope(scope= Scope.SUITE, numDataNodes=1, supportsDedicatedMasters=false, transportClientRatio=1)
 public abstract class DocTest extends SQLIntegTestCase {
 
@@ -113,8 +115,10 @@ public abstract class DocTest extends SQLIntegTestCase {
 
         SqlResponse queryResp = queryReq.send(getRestClient());
         Document.Example example = new Document.Example();
-        example.query = queryReq.toString();
-        example.response = queryResp.toString();
+        example.query = sectionAnnotation.request().format(queryReq.request());
+        if (sectionAnnotation.response() != ResponseFormat.NONE) {
+            example.response = sectionAnnotation.response().format(queryResp.body());
+        }
         section.examples = new Document.Example[]{ example };
 
         if (sectionAnnotation.isExplainNeeded()) {

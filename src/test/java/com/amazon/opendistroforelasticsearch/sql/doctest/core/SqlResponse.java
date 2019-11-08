@@ -16,43 +16,25 @@
 package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
 import com.amazon.opendistroforelasticsearch.sql.esintgtest.TestUtils;
-import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
 import org.elasticsearch.client.Response;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
-public class SqlResponse {
+/**
+ * Response from SQL plugin
+ */
+class SqlResponse {
 
+    /** Native Elasticsearch response */
     private final Response response;
 
-    public SqlResponse(Response response) {
+    SqlResponse(Response response) {
         this.response = response;
     }
 
-    @Override
-    public String toString() {
-        JSONObject body = body();
-        JSONArray schema = body.getJSONArray("schema");
-        JSONArray rows = body.getJSONArray("datarows");
-
-        Object[] header = new Object[schema.length()];
-        for (int i = 0; i < header.length; i++) {
-            JSONObject nameType = schema.getJSONObject(i);
-            header[i] = StringUtils.format("%s (%s)", nameType.get("name"), nameType.get("type"));
-        }
-
-        DataTable table = new DataTable(header);
-        for (Object row : rows) {
-            table.addRow(((JSONArray) row).toList().toArray());
-        }
-        return table.toString();
-    }
-
-    private JSONObject body() {
+    String body() {
         try {
-            return new JSONObject(TestUtils.getResponseBody(response));
+            return TestUtils.getResponseBody(response);
         } catch (IOException e) {
             throw new IllegalStateException("Failed to read response body", e);
         }

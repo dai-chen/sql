@@ -19,6 +19,7 @@ import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfi
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Section;
 import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
 import com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat;
+import com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat;
 
 @DocTestConfig(
     template = "config/endpoint.rst",
@@ -27,10 +28,10 @@ import com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat;
 public class EndpointIT extends DocTest {
 
     @Section(
-        order = 1,
         title = "GET Request",
         description = "You can send HTTP GET request with your query embedded in URL",
         request = RequestFormat.CURL,
+        response = ResponseFormat.NONE,
         isExplainNeeded = false
     )
     public void testUseRequestParameterToAccessSQLPlugin() {
@@ -38,10 +39,10 @@ public class EndpointIT extends DocTest {
     }
 
     @Section(
-        order = 2,
         title = "POST Request",
         description = "You can also send HTTP POST request with your query in request body",
         request = RequestFormat.CURL,
+        response = ResponseFormat.NONE,
         isExplainNeeded = false
     )
     public void testUseRequestBodyToAccessSQLPlugin() {

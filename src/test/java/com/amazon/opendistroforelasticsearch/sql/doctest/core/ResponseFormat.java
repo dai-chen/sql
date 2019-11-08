@@ -15,8 +15,57 @@
 
 package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
+import com.amazon.opendistroforelasticsearch.sql.utils.JsonPrettyFormatter;
+import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
 public enum ResponseFormat {
 
-    NONE, RAW, TABLE;
+    NONE {
+        @Override
+        public String format(String body) {
+            throw new UnsupportedOperationException();
+        }
+    },
+    RAW {
+        @Override
+        public String format(String body) {
+            try {
+                return JsonPrettyFormatter.format(body);
+            } catch (IOException e) {
+                throw new IllegalStateException(
+                    StringUtils.format("Failed to pretty format response: %s", body), e);
+            }
+        }
+    },
+    TABLE {
+        @Override
+        public String format(String str) {
+            JSONObject body = new JSONObject(str);
+            if (body.isNull("schema")) {
+                throw new IllegalStateException("Only JDBC response can be formatted to table");
+            }
+
+            JSONArray schema = body.getJSONArray("schema");
+            JSONArray rows = body.getJSONArray("datarows");
+
+            Object[] header = new Object[schema.length()];
+            for (int i = 0; i < header.length; i++) {
+                JSONObject nameType = schema.getJSONObject(i);
+                header[i] = StringUtils.format("%s (%s)", nameType.get("name"), nameType.get("type"));
+            }
+
+            DataTable table = new DataTable(header);
+            for (Object row : rows) {
+                table.addRow(((JSONArray) row).toList().toArray());
+            }
+            return table.toString();
+        }
+    };
+
+    public abstract String format(String body);
 
 }

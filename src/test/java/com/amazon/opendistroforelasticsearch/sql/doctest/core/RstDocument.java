@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 import static java.nio.file.StandardOpenOption.APPEND;
 
@@ -50,8 +48,11 @@ public class RstDocument implements Document {
                 docWriter.println();
                 docWriter.println(indent(example.query));
                 docWriter.println();
-                docWriter.println(example.response);
-                docWriter.println();
+
+                if (example.response != null) {
+                    docWriter.println(example.response);
+                    docWriter.println();
+                }
             }
         } catch (IOException e) {
             throw new IllegalStateException(StringUtils.format(

@@ -25,10 +25,9 @@ import org.elasticsearch.client.RestClient;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.stream.Collectors;
 
 /**
- * Request for SQL plugin
+ * Request to SQL plugin
  */
 public class SqlRequest {
 
@@ -46,6 +45,10 @@ public class SqlRequest {
             throw new IllegalStateException(StringUtils.format(
                 "Exception occurred during sending request %s", this), e);
         }
+    }
+
+    Request request() {
+        return request;
     }
 
     private Request makeRequest(String method, String endpoint, String body, UrlParam[] params) {
@@ -80,25 +83,6 @@ public class SqlRequest {
             this.key = key;
             this.value = value;
         }
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder str = new StringBuilder();
-        str.append(request.getMethod()).
-            append(" ").
-            append(request.getEndpoint());
-
-        if (!request.getParameters().isEmpty()) {
-            str.append("?").
-                append(request.getParameters().entrySet().stream().
-                               map(e -> e.getKey() + "=" + e.getValue()).
-                               collect(Collectors.joining("&")));
-        }
-
-        str.append('\n').
-            append(body());
-        return str.toString();
     }
 
 }
