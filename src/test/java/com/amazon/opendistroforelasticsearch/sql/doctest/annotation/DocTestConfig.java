@@ -38,7 +38,7 @@ public @interface DocTestConfig {
      * Path of the test data used.
      * @return path
      */
-    String[] testData();
+    String[] testData() default {};
 
     /**
      * Path of the target document.

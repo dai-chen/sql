@@ -46,22 +46,25 @@ public class RstDocument implements Document {
 
             for (Example example : section.examples) {
                 docWriter.println();
-                docWriter.println(indent(example.query));
-                docWriter.println();
 
-                if (example.response != null) {
-                    if (isTable(example.response)) {
-                        docWriter.println(example.response);
-                    } else {
-                        docWriter.println(indent(example.response));
+                if (example.query != null) {
+                    docWriter.println(indent(example.query));
+                    docWriter.println();
+                }
+
+                if (example.explainQuery != null) {
+                    docWriter.println(indent(example.explainQuery));
+                    if (example.explainResult != null) {
+                        docWriter.println(indent(example.explainResult));
                     }
                     docWriter.println();
                 }
 
-                if (example.explain != null) {
-                    docWriter.println(indent(example.explain));
+                if (example.result != null) {
+                    docWriter.println(indent(example.result));
                     docWriter.println();
                 }
+
             }
         } catch (IOException e) {
             throw new IllegalStateException(StringUtils.format(
@@ -69,12 +72,15 @@ public class RstDocument implements Document {
         }
     }
 
-    private boolean isTable(String response) {
-        return response.startsWith("+-");
+    private String indent(String text) {
+        if (isTable(text)) {
+            return text;
+        }
+        return "\t" + text.replaceAll("\\n", "\n\t");
     }
 
-    private String indent(String original) {
-        return "\t" + original.replaceAll("\\n", "\n\t");
+    private boolean isTable(String text) {
+        return text.startsWith("+-");
     }
 
 }

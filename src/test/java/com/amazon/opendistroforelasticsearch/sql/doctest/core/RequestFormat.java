@@ -26,6 +26,12 @@ import java.io.InputStreamReader;
 import java.util.stream.Collectors;
 
 public enum RequestFormat {
+    NO_REQUEST {
+        @Override
+        public String format(Request request) {
+            throw new UnsupportedOperationException();
+        }
+    },
     CURL {
         @Override
         public String format(Request request) {

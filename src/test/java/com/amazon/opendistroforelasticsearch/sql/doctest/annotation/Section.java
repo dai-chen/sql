@@ -21,8 +21,9 @@ import com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.*;
-import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.*;
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.KIBANA;
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.PRETTY_JSON;
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.TABLE;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -40,6 +41,8 @@ public @interface Section {
 
     ResponseFormat response() default TABLE;
 
-    boolean isExplainNeeded() default true;
+    RequestFormat explainRequest() default KIBANA;
+
+    ResponseFormat explainResponse() default PRETTY_JSON;
 
 }

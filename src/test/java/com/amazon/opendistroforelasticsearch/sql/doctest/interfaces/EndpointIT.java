@@ -20,7 +20,8 @@ import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Section;
 import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
 
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.CURL;
-import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.NONE;
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.NO_REQUEST;
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.NO_RESPONSE;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.TABLE;
 
 @DocTestConfig(
@@ -33,8 +34,8 @@ public class EndpointIT extends DocTest {
         title = "GET Request",
         description = "You can send HTTP GET request with your query embedded in URL",
         request = CURL,
-        response = TABLE,
-        isExplainNeeded = false
+        response = NO_RESPONSE,
+        explainRequest = NO_REQUEST
     )
     public void test1() {
         get("SELECT * FROM accounts");
@@ -45,10 +46,23 @@ public class EndpointIT extends DocTest {
         description = "You can also send HTTP POST request with your query in request body " +
             "and explain it to Elasticsearch domain specific language (DSL) in JSON",
         request = CURL,
-        response = NONE
+        response = NO_RESPONSE,
+        explainRequest = NO_REQUEST
     )
     public void test2() {
         post("SELECT * FROM accounts");
+    }
+
+    @Section(
+        title = "Explain Query",
+        description =
+            "You can check out the translation of your query by explain endpoint. " +
+            "The explain output is Elasticsearch domain specific language (DSL) in JSON format",
+        request = NO_REQUEST,
+        explainRequest = CURL
+    )
+    public void test3() {
+        post("SELECT firstname, lastname FROM accounts WHERE balance > 10000");
     }
 
 }

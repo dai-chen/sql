@@ -27,7 +27,7 @@ import java.io.IOException;
  */
 public enum ResponseFormat {
 
-    NONE {
+    NO_RESPONSE {
         @Override
         public String format(String body) {
             throw new UnsupportedOperationException();

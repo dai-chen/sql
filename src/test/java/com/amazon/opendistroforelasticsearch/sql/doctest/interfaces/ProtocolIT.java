@@ -19,6 +19,7 @@ import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfi
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Section;
 import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
 
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.NO_REQUEST;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.ORIGINAL;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.PRETTY_JSON;
 
@@ -32,7 +33,7 @@ public class ProtocolIT extends DocTest {
         title = "DSL Format",
         description = "By default the plugin returns original response from Elasticsearch engine in JSON",
         response = PRETTY_JSON,
-        isExplainNeeded = false
+        explainRequest = NO_REQUEST
     )
     public void test1() {
         post("SELECT firstname, lastname, age, city FROM accounts LIMIT 2"); //TODO how to pass default format
@@ -42,7 +43,7 @@ public class ProtocolIT extends DocTest {
         title = "JDBC Format",
         description = "JDBC format is provided for JDBC driver or client side that needs schema and data formatted in table",
         response = PRETTY_JSON,
-        isExplainNeeded = false
+        explainRequest = NO_REQUEST
     )
     public void test2() {
         post("SELECT firstname, lastname, age, city FROM accounts LIMIT 2", "format=jdbc");
@@ -52,7 +53,7 @@ public class ProtocolIT extends DocTest {
         title = "CSV Format",
         description = "And you can also use CSV format to download result set in csv format",
         response = ORIGINAL,
-        isExplainNeeded = false
+        explainRequest = NO_REQUEST
     )
     public void test3() {
         post("SELECT firstname, lastname, age, city FROM accounts", "format=csv");
@@ -62,7 +63,7 @@ public class ProtocolIT extends DocTest {
         title = "RAW Format",
         description = "Additionally you can also use RAW format to pipe the result with other command line tool",
         response = ORIGINAL,
-        isExplainNeeded = false
+        explainRequest = NO_REQUEST
     )
     public void test4() {
         post("SELECT firstname, lastname, age, city FROM accounts", "format=raw");

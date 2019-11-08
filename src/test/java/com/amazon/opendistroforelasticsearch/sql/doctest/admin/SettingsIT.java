@@ -13,26 +13,16 @@
  *   permissions and limitations under the License.
  */
 
-package com.amazon.opendistroforelasticsearch.sql.doctest.core;
+package com.amazon.opendistroforelasticsearch.sql.doctest.admin;
 
-/**
- * Document for different format and markup
- */
-public interface Document {
+import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfig;
+import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
 
-    void add(Section section);
+@DocTestConfig(
+    template = "admin/settings.rst"
+)
+public class SettingsIT extends DocTest {
 
-    class Section {
-        String title;
-        String description;
-        Example[] examples;
-    }
 
-    class Example {
-        String query;
-        String result;
-        String explainQuery;
-        String explainResult;
-    }
 
 }

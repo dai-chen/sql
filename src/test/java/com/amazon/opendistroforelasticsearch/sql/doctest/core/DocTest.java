@@ -31,6 +31,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.NO_REQUEST;
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.NO_RESPONSE;
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.ORIGINAL;
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.PRETTY_JSON;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.SqlRequest.UrlParam;
 import static com.amazon.opendistroforelasticsearch.sql.plugin.RestSqlAction.EXPLAIN_API_ENDPOINT;
 import static com.amazon.opendistroforelasticsearch.sql.plugin.RestSqlAction.QUERY_API_ENDPOINT;
@@ -117,23 +121,28 @@ public abstract class DocTest extends SQLIntegTestCase {
     private void generateDocByQuery(String sql, SqlRequest queryReq)  {
         DocTestConfig config = getClass().getAnnotation(DocTestConfig.class);
         Section sectionAnnotation = section();
+
         RstDocument document = new RstDocument(documentPath(config));
         Document.Section section = new Document.Section();
-
         section.title = sectionAnnotation.title();
         section.description = sectionAnnotation.description();
 
-        SqlResponse queryResp = queryReq.send(getRestClient());
         Document.Example example = new Document.Example();
-        example.query = sectionAnnotation.request().format(queryReq.request());
-        if (sectionAnnotation.response() != ResponseFormat.NONE) {
-            example.response = sectionAnnotation.response().format(queryResp.body());
+        if (sectionAnnotation.request() != NO_REQUEST) {
+            example.query = sectionAnnotation.request().format(queryReq.request());
+            if (sectionAnnotation.response() != NO_RESPONSE) {
+                SqlResponse queryResp = queryReq.send(getRestClient());
+                example.result = sectionAnnotation.response().format(queryResp.body());
+            }
         }
 
-        if (sectionAnnotation.isExplainNeeded()) {
+        if (sectionAnnotation.explainRequest() != NO_REQUEST) {
             SqlRequest explainReq = new SqlRequest("POST", EXPLAIN_API_ENDPOINT, createBody(sql));
-            SqlResponse explainResp = explainReq.send(getRestClient());
-            example.explain = ResponseFormat.ORIGINAL.format(explainResp.body());
+            example.explainQuery = sectionAnnotation.explainRequest().format(explainReq.request());
+            if (sectionAnnotation.explainResponse() != NO_RESPONSE) {
+                SqlResponse explainResp = explainReq.send(getRestClient());
+                example.explainResult = sectionAnnotation.explainResponse().format(explainResp.body());
+            }
         }
 
         section.examples = new Document.Example[]{ example };
