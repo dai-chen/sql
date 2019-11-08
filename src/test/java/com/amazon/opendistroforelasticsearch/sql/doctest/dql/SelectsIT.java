@@ -33,4 +33,36 @@ public class SelectsIT extends DocTest {
         post("SELECT balance, firstname, lastname FROM accounts");
     }
 
+    @Section(
+        title = "Alias",
+        description = ""
+    )
+    public void test2() {
+        post("SELECT balance, firstname, lastname FROM accounts");
+    }
+
+    @Section(
+        title = "Where",
+        description = "WHERE clause can filter out the result set based on conditions"
+    )
+    public void test3() {
+        post("SELECT balance, firstname, lastname FROM accounts WHERE balance > 10000");
+    }
+
+    @Section(
+        title = "Group By",
+        description = "GROUP BY clause can be used to aggregate result of WHERE on some field(s)"
+    )
+    public void test4() {
+        post("SELECT state, AVG(balance) FROM accounts GROUP BY state");
+    }
+
+    @Section(
+        title = "Having",
+        description = "HAVING clause can help filter the result of GROUP BY"
+    )
+    public void test5() {
+        post("SELECT state, AVG(balance) AS avg FROM accounts GROUP BY state HAVING avg > 10000");
+    }
+
 }
