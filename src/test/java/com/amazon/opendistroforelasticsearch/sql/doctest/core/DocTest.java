@@ -22,6 +22,7 @@ import com.amazon.opendistroforelasticsearch.sql.esintgtest.TestUtils;
 import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
 import org.elasticsearch.test.ESIntegTestCase.ClusterScope;
 import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -39,7 +40,7 @@ import static org.elasticsearch.test.ESIntegTestCase.Scope;
 /**
  * Documentation test base class
  */
-@FixMethodOrder
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @ClusterScope(scope= Scope.SUITE, numDataNodes=1, supportsDedicatedMasters=false, transportClientRatio=1)
 public abstract class DocTest extends SQLIntegTestCase {
 
@@ -119,12 +120,14 @@ public abstract class DocTest extends SQLIntegTestCase {
         if (sectionAnnotation.response() != ResponseFormat.NONE) {
             example.response = sectionAnnotation.response().format(queryResp.body());
         }
-        section.examples = new Document.Example[]{ example };
 
         if (sectionAnnotation.isExplainNeeded()) {
             SqlRequest explainReq = new SqlRequest("POST", EXPLAIN_API_ENDPOINT, createBody(sql));
             SqlResponse explainResp = explainReq.send(getRestClient());
+            example.explain = ResponseFormat.RAW.format(explainResp.body());
         }
+
+        section.examples = new Document.Example[]{ example };
         document.add(section);
     }
 

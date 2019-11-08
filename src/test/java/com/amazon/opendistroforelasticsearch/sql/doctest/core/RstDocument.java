@@ -53,6 +53,11 @@ public class RstDocument implements Document {
                     docWriter.println(example.response);
                     docWriter.println();
                 }
+
+                if (example.explain != null) {
+                    docWriter.println(indent(example.explain));
+                    docWriter.println();
+                }
             }
         } catch (IOException e) {
             throw new IllegalStateException(StringUtils.format(

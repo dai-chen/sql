@@ -31,21 +31,21 @@ public class EndpointIT extends DocTest {
         title = "GET Request",
         description = "You can send HTTP GET request with your query embedded in URL",
         request = RequestFormat.CURL,
-        response = ResponseFormat.NONE,
+        response = ResponseFormat.TABLE,
         isExplainNeeded = false
     )
-    public void testUseRequestParameterToAccessSQLPlugin() {
+    public void section1() {
         get("SELECT * FROM accounts");
     }
 
     @Section(
         title = "POST Request",
-        description = "You can also send HTTP POST request with your query in request body",
+        description = "You can also send HTTP POST request with your query in request body " +
+            "and explain it to Elasticsearch domain specific language (DSL) in JSON",
         request = RequestFormat.CURL,
-        response = ResponseFormat.NONE,
-        isExplainNeeded = false
+        response = ResponseFormat.NONE
     )
-    public void testUseRequestBodyToAccessSQLPlugin() {
+    public void section2() {
         post("SELECT * FROM accounts");
     }
 
