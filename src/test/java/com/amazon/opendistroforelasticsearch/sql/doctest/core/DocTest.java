@@ -31,10 +31,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.KIBANA;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.NO_REQUEST;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.NO_RESPONSE;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.ORIGINAL;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.PRETTY_JSON;
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.TABLE;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.SqlRequest.UrlParam;
 import static com.amazon.opendistroforelasticsearch.sql.plugin.RestSqlAction.EXPLAIN_API_ENDPOINT;
 import static com.amazon.opendistroforelasticsearch.sql.plugin.RestSqlAction.QUERY_API_ENDPOINT;
@@ -113,6 +115,54 @@ public abstract class DocTest extends SQLIntegTestCase {
         }
         return Paths.get(TestUtils.getResourceFilePath(relativePath));
     }
+
+    // -----------------------------------------------------------------
+    // Internal DSL
+
+    protected void section(String title, Document.Example... examples) {
+        DocTestConfig config = getClass().getAnnotation(DocTestConfig.class);
+        Document.Section section = new Document.Section();
+        section.title = title;
+        section.examples = examples;
+
+        RstDocument document = new RstDocument(documentPath(config));
+        document.add(section);
+    }
+
+    protected Document.Example example(String description, SqlRequest[] request) {
+        Document.Example example = new Document.Example();
+        example.description = description;
+        example.query = KIBANA.format(request[0].request());
+        example.result = TABLE.format(request[0].send(getRestClient()).body());
+        example.explainQuery = KIBANA.format(request[1].request());
+        example.explainResult = PRETTY_JSON.format(request[1].send(getRestClient()).body());
+        return example;
+    }
+
+    protected String title(String title) {
+        return title;
+    }
+
+    protected String description(String... sentences) {
+        return String.join(" ", sentences);
+    }
+
+    protected SqlRequest[] query(String sql, String... keyValues) {
+        UrlParam[] params;
+        if (keyValues.length == 0) {
+            params = new UrlParam[]{ new UrlParam("format", "jdbc") };
+        } else {
+            params = Arrays.stream(keyValues).map(UrlParam::new).toArray(UrlParam[]::new);
+        }
+
+        String body = createBody(sql);
+        return new SqlRequest[]{
+            new SqlRequest("POST", QUERY_API_ENDPOINT, body, params),
+            new SqlRequest("POST", EXPLAIN_API_ENDPOINT, body)
+        };
+    }
+
+    // -----------------------------------------------------------------
 
     private String createBody(String sql) {
         return String.format("{\n" + "  \"query\": \"%s\"\n" + "}", sql);

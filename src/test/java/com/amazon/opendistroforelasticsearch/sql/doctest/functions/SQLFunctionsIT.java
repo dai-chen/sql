@@ -13,27 +13,9 @@
  *   permissions and limitations under the License.
  */
 
-package com.amazon.opendistroforelasticsearch.sql.doctest.core;
+package com.amazon.opendistroforelasticsearch.sql.doctest.functions;
 
-/**
- * Document for different format and markup
- */
-public interface Document {
+import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
 
-    void add(Section section);
-
-    class Section {
-        String title;
-        String description;
-        Example[] examples;
-    }
-
-    class Example {
-        String description;
-        String query;
-        String result;
-        String explainQuery;
-        String explainResult;
-    }
-
+public class SQLFunctionsIT extends DocTest {
 }

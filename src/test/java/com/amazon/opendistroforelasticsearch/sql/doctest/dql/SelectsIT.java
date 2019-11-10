@@ -18,6 +18,7 @@ package com.amazon.opendistroforelasticsearch.sql.doctest.dql;
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfig;
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Section;
 import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
+import org.junit.Test;
 
 @DocTestConfig(
     template = "dql/selects.rst",
@@ -25,20 +26,23 @@ import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
 )
 public class SelectsIT extends DocTest {
 
-    @Section(
-        title = "Select Basics",
-        description = "SELECT and FROM clause are basic part of query to specify which fields from which index to fetch"
-    )
+    @Test
     public void test1() {
-        post("SELECT balance, firstname, lastname FROM accounts");
-    }
-
-    @Section(
-        title = "Alias",
-        description = ""
-    )
-    public void test2() {
-        post("SELECT balance, firstname, lastname FROM accounts");
+        section(
+            title("Select"),
+            example(
+                description("SELECT and FROM clause are basic part of query to specify which fields from which index to fetch"),
+                query("SELECT balance, firstname, lastname FROM accounts")
+            ),
+            example(
+                description(
+                    "Optional you can alias index or field name for clarity and rename.",
+                    "In SQL standard, full table name can be used if table alias not present. Otherwise use table alias.",
+                    "In both cases, table name and table alias are optional."
+                ),
+                query("SELECT a.balance AS bal, a.firstname AS first, a.lastname AS last FROM accounts a")
+            )
+        );
     }
 
     @Section(

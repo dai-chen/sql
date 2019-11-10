@@ -42,9 +42,15 @@ public class RstDocument implements Document {
             docWriter.println(section.title);
             docWriter.println(Strings.repeat("=", section.title.length()));
             docWriter.println();
-            docWriter.println(section.description + "::");
+
+            if (section.description != null) {
+                docWriter.println(section.description + "::");
+            }
 
             for (Example example : section.examples) {
+                if (example.description != null) {
+                    docWriter.println(example.description + "::");
+                }
                 docWriter.println();
 
                 if (example.query != null) {

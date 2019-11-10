@@ -22,7 +22,6 @@ import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.CURL;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.NO_REQUEST;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.NO_RESPONSE;
-import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.TABLE;
 
 @DocTestConfig(
     template = "interfaces/endpoint.rst",
