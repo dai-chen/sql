@@ -4,12 +4,6 @@
 SQL Functions
 =============
 
-.. rubric:: Table of contents
-
-.. contents::
-   :local:
-
-
 Introduction
 ============
 
@@ -18,18 +12,28 @@ In SQL standard, many useful functions are provided and built in database implem
 ABS
 ===
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT ABS(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -49,6 +53,7 @@ Explain::
 	}
 
 Result set::
+
 	+----------------+
 	|  ABS_1 (double)|
 	+================+
@@ -59,18 +64,28 @@ Result set::
 ASCII
 =====
 
-Syntax: [(STRING T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(STRING T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT ASCII('abc') FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -90,6 +105,7 @@ Explain::
 	}
 
 Result set::
+
 	+-------------------+
 	|  ASCII_1 (integer)|
 	+===================+
@@ -100,18 +116,28 @@ Result set::
 ATAN
 ====
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT ATAN(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -131,6 +157,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|     ATAN_1 (double)|
 	+====================+
@@ -141,18 +168,28 @@ Result set::
 ATAN2
 =====
 
-Syntax: [(NUMBER T, NUMBER) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T, NUMBER) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT ATAN2(10, 10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -172,6 +209,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|    ATAN2_1 (double)|
 	+====================+
@@ -182,18 +220,28 @@ Result set::
 CBRT
 ====
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT CBRT(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -213,6 +261,7 @@ Explain::
 	}
 
 Result set::
+
 	+-------------------+
 	|    CBRT_1 (double)|
 	+===================+
@@ -223,18 +272,28 @@ Result set::
 CEIL
 ====
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT CEIL(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -254,6 +313,7 @@ Explain::
 	}
 
 Result set::
+
 	+-----------------+
 	|  CEIL_1 (double)|
 	+=================+
@@ -264,34 +324,54 @@ Result set::
 CONCAT
 ======
 
-Syntax: []
+Description
+-----------
 
-Examples
---------
+
+
+Syntax
+------
+
+[]
 
 CONCAT_WS
 =========
 
-Syntax: []
+Description
+-----------
 
-Examples
---------
+
+
+Syntax
+------
+
+[]
 
 COS
 ===
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT COS(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -311,6 +391,7 @@ Explain::
 	}
 
 Result set::
+
 	+---------------------+
 	|       COS_1 (double)|
 	+=====================+
@@ -321,18 +402,28 @@ Result set::
 COSH
 ====
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT COSH(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -352,6 +443,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|     COSH_1 (double)|
 	+====================+
@@ -362,18 +454,28 @@ Result set::
 COT
 ===
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT COT(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -393,6 +495,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|      COT_1 (double)|
 	+====================+
@@ -403,26 +506,41 @@ Result set::
 DATE_FORMAT
 ===========
 
-Syntax: []
+Description
+-----------
 
-Examples
---------
+
+
+Syntax
+------
+
+[]
 
 DEGREES
 =======
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT DEGREES(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -442,6 +560,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|  DEGREES_1 (double)|
 	+====================+
@@ -452,18 +571,28 @@ Result set::
 E
 =
 
-Syntax: [() -> DOUBLE]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[() -> DOUBLE]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT E() FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -483,6 +612,7 @@ Explain::
 	}
 
 Result set::
+
 	+-------------------+
 	|       E_1 (double)|
 	+===================+
@@ -493,18 +623,28 @@ Result set::
 EXP
 ===
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT EXP(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -524,6 +664,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|      EXP_1 (double)|
 	+====================+
@@ -534,18 +675,28 @@ Result set::
 EXPM1
 =====
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT EXPM1(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -565,6 +716,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|    EXPM1_1 (double)|
 	+====================+
@@ -575,18 +727,28 @@ Result set::
 FLOOR
 =====
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT FLOOR(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -606,6 +768,7 @@ Explain::
 	}
 
 Result set::
+
 	+------------------+
 	|  FLOOR_1 (double)|
 	+==================+
@@ -616,18 +779,28 @@ Result set::
 LENGTH
 ======
 
-Syntax: [(STRING) -> INTEGER]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(STRING) -> INTEGER]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT LENGTH('abc') FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -647,6 +820,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|  LENGTH_1 (integer)|
 	+====================+
@@ -657,18 +831,28 @@ Result set::
 LOCATE
 ======
 
-Syntax: [(STRING, STRING, INTEGER) -> INTEGER, (STRING, STRING) -> INTEGER]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(STRING, STRING, INTEGER) -> INTEGER, (STRING, STRING) -> INTEGER]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT LOCATE('abc', 'abc', 10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -688,6 +872,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|  LOCATE_1 (integer)|
 	+====================+
@@ -696,12 +881,14 @@ Result set::
 	
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT LOCATE('abc', 'abc') FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -721,6 +908,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|  LOCATE_1 (integer)|
 	+====================+
@@ -731,18 +919,28 @@ Result set::
 LOG
 ===
 
-Syntax: [(NUMBER T) -> T, (NUMBER T, NUMBER) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T, (NUMBER T, NUMBER) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT LOG(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -762,6 +960,7 @@ Explain::
 	}
 
 Result set::
+
 	+-------------------+
 	|     LOG_1 (double)|
 	+===================+
@@ -770,12 +969,14 @@ Result set::
 	
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT LOG(10, 10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -795,6 +996,7 @@ Explain::
 	}
 
 Result set::
+
 	+----------------+
 	|  LOG_1 (double)|
 	+================+
@@ -805,18 +1007,28 @@ Result set::
 LOG2
 ====
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT LOG2(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -836,6 +1048,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|     LOG2_1 (double)|
 	+====================+
@@ -846,18 +1059,28 @@ Result set::
 LOG10
 =====
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT LOG10(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -877,6 +1100,7 @@ Explain::
 	}
 
 Result set::
+
 	+------------------+
 	|  LOG10_1 (double)|
 	+==================+
@@ -887,18 +1111,28 @@ Result set::
 LN
 ==
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT LN(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -918,6 +1152,7 @@ Explain::
 	}
 
 Result set::
+
 	+-------------------+
 	|      LN_1 (double)|
 	+===================+
@@ -928,26 +1163,41 @@ Result set::
 LOWER
 =====
 
-Syntax: []
+Description
+-----------
 
-Examples
---------
+
+
+Syntax
+------
+
+[]
 
 LTRIM
 =====
 
-Syntax: [(STRING T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(STRING T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT LTRIM('abc') FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -967,6 +1217,7 @@ Explain::
 	}
 
 Result set::
+
 	+----------------+
 	|  LTRIM_1 (text)|
 	+================+
@@ -977,18 +1228,28 @@ Result set::
 PI
 ==
 
-Syntax: [() -> DOUBLE]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[() -> DOUBLE]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT PI() FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -1008,6 +1269,7 @@ Explain::
 	}
 
 Result set::
+
 	+-------------------+
 	|      PI_1 (double)|
 	+===================+
@@ -1018,34 +1280,54 @@ Result set::
 POW
 ===
 
-Syntax: []
+Description
+-----------
 
-Examples
---------
+
+
+Syntax
+------
+
+[]
 
 POWER
 =====
 
-Syntax: []
+Description
+-----------
 
-Examples
---------
+
+
+Syntax
+------
+
+[]
 
 RADIANS
 =======
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT RADIANS(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -1065,6 +1347,7 @@ Explain::
 	}
 
 Result set::
+
 	+---------------------+
 	|   RADIANS_1 (double)|
 	+=====================+
@@ -1075,18 +1358,28 @@ Result set::
 REPLACE
 =======
 
-Syntax: [(STRING T, STRING, STRING) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(STRING T, STRING, STRING) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT REPLACE('abc', 'abc', 'abc') FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -1106,6 +1399,7 @@ Explain::
 	}
 
 Result set::
+
 	+------------------+
 	|  REPLACE_1 (text)|
 	+==================+
@@ -1116,18 +1410,28 @@ Result set::
 RINT
 ====
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT RINT(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -1147,6 +1451,7 @@ Explain::
 	}
 
 Result set::
+
 	+-----------------+
 	|  RINT_1 (double)|
 	+=================+
@@ -1157,18 +1462,28 @@ Result set::
 ROUND
 =====
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT ROUND(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -1188,6 +1503,7 @@ Explain::
 	}
 
 Result set::
+
 	+------------------+
 	|  ROUND_1 (double)|
 	+==================+
@@ -1198,18 +1514,28 @@ Result set::
 RTRIM
 =====
 
-Syntax: [(STRING T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(STRING T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT RTRIM('abc') FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -1229,6 +1555,7 @@ Explain::
 	}
 
 Result set::
+
 	+----------------+
 	|  RTRIM_1 (text)|
 	+================+
@@ -1239,18 +1566,28 @@ Result set::
 SIGN
 ====
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT SIGN(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -1270,6 +1607,7 @@ Explain::
 	}
 
 Result set::
+
 	+-----------------+
 	|  SIGN_1 (double)|
 	+=================+
@@ -1280,18 +1618,28 @@ Result set::
 SIGNUM
 ======
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT SIGNUM(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -1311,6 +1659,7 @@ Explain::
 	}
 
 Result set::
+
 	+-------------------+
 	|  SIGNUM_1 (double)|
 	+===================+
@@ -1321,18 +1670,28 @@ Result set::
 SIN
 ===
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT SIN(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -1352,6 +1711,7 @@ Explain::
 	}
 
 Result set::
+
 	+---------------------+
 	|       SIN_1 (double)|
 	+=====================+
@@ -1362,18 +1722,28 @@ Result set::
 SINH
 ====
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT SINH(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -1393,6 +1763,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|     SINH_1 (double)|
 	+====================+
@@ -1403,18 +1774,28 @@ Result set::
 SQRT
 ====
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT SQRT(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -1434,6 +1815,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|     SQRT_1 (double)|
 	+====================+
@@ -1444,18 +1826,28 @@ Result set::
 SUBSTRING
 =========
 
-Syntax: [(STRING T, INTEGER, INTEGER) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(STRING T, INTEGER, INTEGER) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT SUBSTRING('abc', 10, 10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -1475,6 +1867,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|  SUBSTRING_1 (text)|
 	+====================+
@@ -1483,18 +1876,28 @@ Result set::
 TAN
 ===
 
-Syntax: [(NUMBER T) -> T]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(NUMBER T) -> T]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT TAN(10) FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -1514,6 +1917,7 @@ Explain::
 	}
 
 Result set::
+
 	+--------------------+
 	|      TAN_1 (double)|
 	+====================+
@@ -1524,26 +1928,41 @@ Result set::
 UPPER
 =====
 
-Syntax: []
+Description
+-----------
 
-Examples
---------
+
+
+Syntax
+------
+
+[]
 
 YEAR
 ====
 
-Syntax: [(DATE) -> INTEGER]
+Description
+-----------
+
+
+
+Syntax
+------
+
+[(DATE) -> INTEGER]
 
 Examples
 --------
 
 SQL query::
+
 	POST /_opendistro/_sql?format=jdbc
 	{
 	  "query": "SELECT YEAR('2019-11-09') FROM accounts LIMIT 1"
 	}
 
 Explain::
+
 	{
 	  "from" : 0,
 	  "size" : 1,
@@ -1563,6 +1982,7 @@ Explain::
 	}
 
 Result set::
+
 	+---------------+
 	|  YEAR_1 (text)|
 	+===============+

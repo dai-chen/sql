@@ -41,7 +41,7 @@ public class RstDocument implements Document {
 
     @Override
     public Document section(String title) {
-        return println(
+        return print(
             title,
             Strings.repeat("=", title.length())
         );
@@ -49,7 +49,7 @@ public class RstDocument implements Document {
 
     @Override
     public Document subSection(String title) {
-        return println(
+        return print(
             title,
             Strings.repeat("-", title.length())
         );
@@ -81,11 +81,21 @@ public class RstDocument implements Document {
         docWriter.close();
     }
 
-    private Document println(String... lines) {
+    /** Print each line with a blank line at last */
+    private Document print(String... lines) {
         for (String line : lines) {
             docWriter.println(line);
         }
         docWriter.println();
+        return this;
+    }
+
+    /** Print each line with a blank line followed */
+    private Document println(String... lines) {
+        for (String line : lines) {
+            docWriter.println(line);
+            docWriter.println();
+        }
         return this;
     }
 

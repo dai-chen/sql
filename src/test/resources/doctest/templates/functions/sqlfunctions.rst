@@ -4,12 +4,6 @@
 SQL Functions
 =============
 
-.. rubric:: Table of contents
-
-.. contents::
-   :local:
-
-
 Introduction
 ============
 

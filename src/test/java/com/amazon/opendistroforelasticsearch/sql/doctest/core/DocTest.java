@@ -120,21 +120,29 @@ public abstract class DocTest extends SQLIntegTestCase {
     // Internal DSL
 
     protected void section(String title, String description, Document.Example... examples) {
+        section(title, description, "", examples);
+    }
+
+    protected void section(String title, String description, String syntax, Document.Example... examples) {
         DocTestConfig config = getClass().getAnnotation(DocTestConfig.class);
-        Document.Section section = new Document.Section();
-        section.title = title;
-        section.examples = examples;
-
         try (RstDocument document = new RstDocument(documentPath(config))) {
-            document.section(section.title).
-                     paragraph(description).
-                     subSection("Examples");
+            document.section(title).
+                     subSection("Description").
+                     paragraph(description);
 
-            for (Document.Example example : section.examples) {
-                document.codeBlock("SQL query", example.query).
-                         codeBlock("Explain", example.explainResult).
-                         codeBlock("Result set", example.result);
-            }
+                if (!syntax.isEmpty()) {
+                    document.subSection("Syntax").
+                             paragraph(syntax);
+                }
+
+                if (examples.length > 0) {
+                    document.subSection("Examples");
+                    for (Document.Example example : examples) {
+                        document.codeBlock("SQL query", example.query).
+                                 codeBlock("Explain", example.explainResult).
+                                 codeBlock("Result set", example.result);
+                    }
+                }
         }
     }
 
@@ -153,6 +161,10 @@ public abstract class DocTest extends SQLIntegTestCase {
     }
 
     protected String description(String... sentences) {
+        return String.join(" ", sentences);
+    }
+
+    protected String syntax(String... sentences) {
         return String.join(" ", sentences);
     }
 

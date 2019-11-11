@@ -67,7 +67,8 @@ public class SQLFunctionsIT extends DocTest {
 
         section(
             title(function.getName()),
-            description("Syntax: " + Arrays.toString(specs)),
+            description(""),
+            syntax(Arrays.toString(specs)),
             examples
         );
     }
