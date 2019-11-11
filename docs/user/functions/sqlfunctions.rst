@@ -24,7 +24,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -81,7 +81,7 @@ Specifications: (STRING T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type STRING as string.
+1. The function accepts an argument of type STRING as string.
 
 
 Examples
@@ -138,7 +138,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -195,7 +195,7 @@ Specifications: (NUMBER T, NUMBER) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number and an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number and an argument of type NUMBER as number.
 
 
 Examples
@@ -252,7 +252,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -309,7 +309,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -400,7 +400,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -457,7 +457,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -514,7 +514,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -588,7 +588,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -645,7 +645,7 @@ Specifications: () -> DOUBLE
 
 Semantics:
 
- 1. The function accepts .
+1. The function accepts .
 
 
 Examples
@@ -702,7 +702,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -759,7 +759,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -816,7 +816,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -873,7 +873,7 @@ Specifications: (STRING) -> INTEGER
 
 Semantics:
 
- 1. The function accepts an argument of type STRING as string.
+1. The function accepts an argument of type STRING as string.
 
 
 Examples
@@ -930,8 +930,8 @@ Specifications: (STRING, STRING, INTEGER) -> INTEGER, (STRING, STRING) -> INTEGE
 
 Semantics:
 
- 1. The function accepts an argument of type STRING as string and an argument of type STRING as string and an argument of type INTEGER as integer.
- 2. The function accepts an argument of type STRING as string and an argument of type STRING as string.
+1. The function accepts an argument of type STRING as string and an argument of type STRING as string and an argument of type INTEGER as integer.
+2. The function accepts an argument of type STRING as string and an argument of type STRING as string.
 
 
 Examples
@@ -1024,8 +1024,8 @@ Specifications: (NUMBER T) -> T, (NUMBER T, NUMBER) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
- 2. The function accepts an argument of type NUMBER as number and an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
+2. The function accepts an argument of type NUMBER as number and an argument of type NUMBER as number.
 
 
 Examples
@@ -1118,7 +1118,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -1175,7 +1175,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -1232,7 +1232,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -1306,7 +1306,7 @@ Specifications: (STRING T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type STRING as string.
+1. The function accepts an argument of type STRING as string.
 
 
 Examples
@@ -1363,7 +1363,7 @@ Specifications: () -> DOUBLE
 
 Semantics:
 
- 1. The function accepts .
+1. The function accepts .
 
 
 Examples
@@ -1454,7 +1454,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -1511,7 +1511,7 @@ Specifications: (STRING T, STRING, STRING) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type STRING as string and an argument of type STRING as string and an argument of type STRING as string.
+1. The function accepts an argument of type STRING as string and an argument of type STRING as string and an argument of type STRING as string.
 
 
 Examples
@@ -1568,7 +1568,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -1625,7 +1625,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -1682,7 +1682,7 @@ Specifications: (STRING T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type STRING as string.
+1. The function accepts an argument of type STRING as string.
 
 
 Examples
@@ -1739,7 +1739,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -1796,7 +1796,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -1853,7 +1853,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -1910,7 +1910,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -1967,7 +1967,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -2024,7 +2024,7 @@ Specifications: (STRING T, INTEGER, INTEGER) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type STRING as string and an argument of type INTEGER as start position and an argument of type INTEGER as length.
+1. The function accepts an argument of type STRING as string and an argument of type INTEGER as start position and an argument of type INTEGER as length.
 
 
 Examples
@@ -2079,7 +2079,7 @@ Specifications: (NUMBER T) -> T
 
 Semantics:
 
- 1. The function accepts an argument of type NUMBER as number.
+1. The function accepts an argument of type NUMBER as number.
 
 
 Examples
@@ -2153,7 +2153,7 @@ Specifications: (DATE) -> INTEGER
 
 Semantics:
 
- 1. The function accepts an argument of type DATE as date.
+1. The function accepts an argument of type DATE as date.
 
 
 Examples

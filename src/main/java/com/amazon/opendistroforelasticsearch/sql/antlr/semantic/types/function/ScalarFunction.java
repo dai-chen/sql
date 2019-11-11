@@ -142,7 +142,7 @@ public enum ScalarFunction implements TypeExpression {
              append("Semantics:\n\n");
 
         for (int i = 0; i < specifications.length; i++) {
-            help.append(StringUtils.format(" %s. ", i + 1)).
+            help.append(StringUtils.format("%s. ", i + 1)).
                  append(StringUtils.format(
                     "The function accepts %s.",
                     StreamSupport.stream(specifications[i].spliterator(), false).
