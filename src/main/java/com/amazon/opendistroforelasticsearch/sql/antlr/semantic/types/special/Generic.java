@@ -78,6 +78,10 @@ public class Generic implements Type {
                       );
     }
 
+    public Type binding() {
+        return binding;
+    }
+
     @Override
     public String getName() {
         return this.name.name();

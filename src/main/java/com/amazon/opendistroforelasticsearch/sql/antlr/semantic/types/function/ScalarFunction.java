@@ -32,7 +32,7 @@ public enum ScalarFunction implements TypeExpression {
 
     ABS(func(T(NUMBER)).to(T)), // translate to Java: <T extends Number> T ABS(T)
     ASCII(func(T(STRING)).to(T)),
-    ASIN(func(T(NUMBER)).to(T)),
+    //ASIN(func(T(NUMBER)).to(T)),
     ATAN(func(T(NUMBER)).to(T)),
     ATAN2(func(T(NUMBER), NUMBER).to(T)),
     CBRT(func(T(NUMBER)).to(T)),
@@ -43,8 +43,8 @@ public enum ScalarFunction implements TypeExpression {
     COSH(func(T(NUMBER)).to(T)),
     COT(func(T(NUMBER)).to(T)),
     DATE_FORMAT(
-        func(DATE, STRING).to(STRING),
-        func(DATE, STRING, STRING).to(STRING)
+        //func(DATE, STRING).to(STRING),
+        //func(DATE, STRING, STRING).to(STRING)
     ),
     DEGREES(func(T(NUMBER)).to(T)),
     E(func().to(DOUBLE)),
@@ -65,17 +65,17 @@ public enum ScalarFunction implements TypeExpression {
     LOG10(func(T(NUMBER)).to(T)),
     LN(func(T(NUMBER)).to(T)),
     LOWER(
-        func(T(STRING)).to(T),
-        func(T(STRING), STRING).to(T)
+        //func(T(STRING)).to(T)
+        //func(T(STRING), STRING).to(T)
     ),
     LTRIM(func(T(STRING)).to(T)),
     PI(func().to(DOUBLE)),
     POW, POWER(
-        func(T(NUMBER)).to(T),
-        func(T(NUMBER), NUMBER).to(T)
+        //func(T(NUMBER)).to(T),
+        //func(T(NUMBER), NUMBER).to(T)
     ),
     RADIANS(func(T(NUMBER)).to(T)),
-    RANDOM(func(T(NUMBER)).to(T)),
+    //RANDOM(func(T(NUMBER)).to(T)),
     REPLACE(func(T(STRING), STRING, STRING).to(T)),
     RINT(func(T(NUMBER)).to(T)),
     ROUND(func(T(NUMBER)).to(T)),
@@ -88,8 +88,8 @@ public enum ScalarFunction implements TypeExpression {
     SUBSTRING(func(T(STRING), INTEGER, INTEGER).to(T)),
     TAN(func(T(NUMBER)).to(T)),
     UPPER(
-        func(T(STRING)).to(T),
-        func(T(STRING), STRING).to(T)
+        //func(T(STRING)).to(T)
+        //func(T(STRING), STRING).to(T)
     ),
     YEAR(func(DATE).to(INTEGER));
 

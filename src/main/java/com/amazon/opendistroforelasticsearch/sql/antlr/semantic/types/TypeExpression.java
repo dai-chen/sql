@@ -19,6 +19,7 @@ import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.special.Ge
 import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -73,7 +74,7 @@ public interface TypeExpression extends Type {
      * A specification is combination of a construct function and arg types
      * for a type expression (represent a constructor)
      */
-    class TypeExpressionSpec {
+    class TypeExpressionSpec implements Iterable<Type> {
         Type[] argTypes;
         Function<Type[], Type> constructFunc;
 
@@ -112,6 +113,11 @@ public interface TypeExpression extends Type {
                 }
             }
             return true;
+        }
+
+        @Override
+        public Iterator<Type> iterator() {
+            return Arrays.asList(argTypes).iterator();
         }
 
         @Override

@@ -55,7 +55,7 @@ public enum ResponseFormat {
         public String format(String str) {
             JSONObject body = new JSONObject(str);
             if (body.isNull("schema")) {
-                throw new IllegalStateException("Only JDBC response can be formatted to table");
+                throw new IllegalStateException("Only JDBC response can be formatted to table: " + str);
             }
 
             JSONArray schema = body.getJSONArray("schema");

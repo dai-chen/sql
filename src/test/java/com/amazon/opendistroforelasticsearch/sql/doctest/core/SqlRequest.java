@@ -16,15 +16,13 @@
 package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
 import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
-import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.KIBANA;
 
 /**
  * Request to SQL plugin
@@ -43,7 +41,7 @@ public class SqlRequest {
             return new SqlResponse(client.performRequest(request));
         } catch (IOException e) {
             throw new IllegalStateException(StringUtils.format(
-                "Exception occurred during sending request %s", this), e);
+                "Exception occurred during sending request %s", KIBANA.format(request)), e);
         }
     }
 
@@ -62,17 +60,6 @@ public class SqlRequest {
         restOptionsBuilder.addHeader("Content-Type", "application/json");
         request.setOptions(restOptionsBuilder);
         return request;
-    }
-
-    private String body() {
-        String body;
-        try {
-            InputStream content = request.getEntity().getContent();
-            body = CharStreams.toString(new InputStreamReader(content, Charsets.UTF_8));
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to parse body from request", e);
-        }
-        return body;
     }
 
     static class UrlParam {
