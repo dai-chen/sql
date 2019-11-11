@@ -15,12 +15,22 @@
 
 package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
+import java.io.Closeable;
+
 /**
  * Document for different format and markup
  */
-public interface Document {
+public interface Document extends Closeable {
 
-    void add(Section section);
+    Document section(String title);
+
+    Document subSection(String title);
+
+    Document paragraph(String text);
+
+    Document codeBlock(String description, String code);
+
+    Document table(String description, DataTable table);
 
     class Section {
         String title;

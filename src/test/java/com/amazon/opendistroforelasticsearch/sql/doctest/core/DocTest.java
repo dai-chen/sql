@@ -119,14 +119,23 @@ public abstract class DocTest extends SQLIntegTestCase {
     // -----------------------------------------------------------------
     // Internal DSL
 
-    protected void section(String title, Document.Example... examples) {
+    protected void section(String title, String description, Document.Example... examples) {
         DocTestConfig config = getClass().getAnnotation(DocTestConfig.class);
         Document.Section section = new Document.Section();
         section.title = title;
         section.examples = examples;
 
-        RstDocument document = new RstDocument(documentPath(config));
-        document.add(section);
+        try (RstDocument document = new RstDocument(documentPath(config))) {
+            document.section(section.title).
+                     paragraph(description).
+                     subSection("Examples");
+
+            for (Document.Example example : section.examples) {
+                document.codeBlock("SQL query", example.query).
+                         codeBlock("Explain", example.explainResult).
+                         codeBlock("Result set", example.result);
+            }
+        }
     }
 
     protected Document.Example example(String description, SqlRequest[] request) {
@@ -196,7 +205,7 @@ public abstract class DocTest extends SQLIntegTestCase {
         }
 
         section.examples = new Document.Example[]{ example };
-        document.add(section);
+        //document.add(section);
     }
 
     private Section section() {

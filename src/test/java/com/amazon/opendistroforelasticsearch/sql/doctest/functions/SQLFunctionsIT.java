@@ -24,6 +24,7 @@ import com.amazon.opendistroforelasticsearch.sql.doctest.core.Document;
 import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -65,7 +66,9 @@ public class SQLFunctionsIT extends DocTest {
         }
 
         section(
-            title(function.getName()), examples
+            title(function.getName()),
+            description("Syntax: " + Arrays.toString(specs)),
+            examples
         );
     }
 

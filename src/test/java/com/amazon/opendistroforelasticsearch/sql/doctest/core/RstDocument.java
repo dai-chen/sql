@@ -15,7 +15,6 @@
 
 package com.amazon.opendistroforelasticsearch.sql.doctest.core;
 
-import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
 import com.google.common.base.Strings;
 
 import java.io.IOException;
@@ -30,63 +29,68 @@ import static java.nio.file.StandardOpenOption.APPEND;
  */
 public class RstDocument implements Document {
 
-    private final Path documentPath;
+    private final PrintWriter docWriter;
 
     RstDocument(Path documentPath) {
-        this.documentPath = documentPath;
+        try {
+            docWriter = new PrintWriter(Files.newBufferedWriter(documentPath, APPEND));
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to open document file " + documentPath, e);
+        }
     }
 
     @Override
-    public void add(Section section) {
-        try (PrintWriter docWriter = new PrintWriter(Files.newBufferedWriter(documentPath, APPEND))) {
-            docWriter.println(section.title);
-            docWriter.println(Strings.repeat("=", section.title.length()));
-            docWriter.println();
+    public Document section(String title) {
+        return println(
+            title,
+            Strings.repeat("=", title.length())
+        );
+    }
 
-            if (section.description != null) {
-                docWriter.println(section.description + "::");
-            }
+    @Override
+    public Document subSection(String title) {
+        return println(
+            title,
+            Strings.repeat("-", title.length())
+        );
+    }
 
-            for (Example example : section.examples) {
-                if (example.description != null) {
-                    docWriter.println(example.description + "::");
-                }
-                docWriter.println();
+    @Override
+    public Document paragraph(String text) {
+        return println(text);
+    }
 
-                if (example.query != null) {
-                    docWriter.println(indent(example.query));
-                    docWriter.println();
-                }
+    @Override
+    public Document codeBlock(String description, String code) {
+        return println(
+            description + "::",
+            indent(code)
+        );
+    }
 
-                if (example.explainQuery != null) {
-                    docWriter.println(indent(example.explainQuery));
-                    if (example.explainResult != null) {
-                        docWriter.println(indent(example.explainResult));
-                    }
-                    docWriter.println();
-                }
+    @Override
+    public Document table(String description, DataTable table) {
+        docWriter.println(description + "::");
+        docWriter.println(table);
+        docWriter.println();
+        return this;
+    }
 
-                if (example.result != null) {
-                    docWriter.println(indent(example.result));
-                    docWriter.println();
-                }
+    @Override
+    public void close() {
+        docWriter.close();
+    }
 
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(StringUtils.format(
-                "Failed to open document file [%s]", documentPath), e);
+    private Document println(String... lines) {
+        for (String line : lines) {
+            docWriter.println(line);
         }
+        docWriter.println();
+        return this;
     }
 
     private String indent(String text) {
-        if (isTable(text)) {
-            return text;
-        }
         return "\t" + text.replaceAll("\\n", "\n\t");
-    }
-
-    private boolean isTable(String text) {
-        return text.startsWith("+-");
     }
 
 }

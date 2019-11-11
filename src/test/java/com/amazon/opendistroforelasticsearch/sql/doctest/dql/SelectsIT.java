@@ -30,6 +30,7 @@ public class SelectsIT extends DocTest {
     public void test1() {
         section(
             title("Select"),
+            description(""),
             example(
                 description("SELECT and FROM clause are basic part of query to specify which fields from which index to fetch"),
                 query("SELECT balance, firstname, lastname FROM accounts")
