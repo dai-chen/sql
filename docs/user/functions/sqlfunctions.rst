@@ -15,12 +15,17 @@ ABS
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -67,12 +72,17 @@ ASCII
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(STRING T) -> T]
+Specifications: (STRING T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type STRING as string.
+
 
 Examples
 --------
@@ -119,12 +129,17 @@ ATAN
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -171,12 +186,17 @@ ATAN2
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T, NUMBER) -> T]
+Specifications: (NUMBER T, NUMBER) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number and an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -223,12 +243,17 @@ CBRT
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -275,12 +300,17 @@ CEIL
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -327,12 +357,16 @@ CONCAT
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[]
+Specifications: 
+
+Semantics:
+
+
 
 CONCAT_WS
 =========
@@ -340,12 +374,16 @@ CONCAT_WS
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[]
+Specifications: 
+
+Semantics:
+
+
 
 COS
 ===
@@ -353,12 +391,17 @@ COS
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -405,12 +448,17 @@ COSH
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -457,12 +505,17 @@ COT
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -509,12 +562,16 @@ DATE_FORMAT
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[]
+Specifications: 
+
+Semantics:
+
+
 
 DEGREES
 =======
@@ -522,12 +579,17 @@ DEGREES
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -574,12 +636,17 @@ E
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[() -> DOUBLE]
+Specifications: () -> DOUBLE
+
+Semantics:
+
+ 1. The function accepts .
+
 
 Examples
 --------
@@ -626,12 +693,17 @@ EXP
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -678,12 +750,17 @@ EXPM1
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -730,12 +807,17 @@ FLOOR
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -782,12 +864,17 @@ LENGTH
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(STRING) -> INTEGER]
+Specifications: (STRING) -> INTEGER
+
+Semantics:
+
+ 1. The function accepts an argument of type STRING as string.
+
 
 Examples
 --------
@@ -834,12 +921,18 @@ LOCATE
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(STRING, STRING, INTEGER) -> INTEGER, (STRING, STRING) -> INTEGER]
+Specifications: (STRING, STRING, INTEGER) -> INTEGER, (STRING, STRING) -> INTEGER
+
+Semantics:
+
+ 1. The function accepts an argument of type STRING as string and an argument of type STRING as string and an argument of type INTEGER as integer.
+ 2. The function accepts an argument of type STRING as string and an argument of type STRING as string.
+
 
 Examples
 --------
@@ -922,12 +1015,18 @@ LOG
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T, (NUMBER T, NUMBER) -> T]
+Specifications: (NUMBER T) -> T, (NUMBER T, NUMBER) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+ 2. The function accepts an argument of type NUMBER as number and an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -1010,12 +1109,17 @@ LOG2
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -1062,12 +1166,17 @@ LOG10
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -1114,12 +1223,17 @@ LN
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -1166,12 +1280,16 @@ LOWER
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[]
+Specifications: 
+
+Semantics:
+
+
 
 LTRIM
 =====
@@ -1179,12 +1297,17 @@ LTRIM
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(STRING T) -> T]
+Specifications: (STRING T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type STRING as string.
+
 
 Examples
 --------
@@ -1231,12 +1354,17 @@ PI
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[() -> DOUBLE]
+Specifications: () -> DOUBLE
+
+Semantics:
+
+ 1. The function accepts .
+
 
 Examples
 --------
@@ -1283,12 +1411,16 @@ POW
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[]
+Specifications: 
+
+Semantics:
+
+
 
 POWER
 =====
@@ -1296,12 +1428,16 @@ POWER
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[]
+Specifications: 
+
+Semantics:
+
+
 
 RADIANS
 =======
@@ -1309,12 +1445,17 @@ RADIANS
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -1361,12 +1502,17 @@ REPLACE
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(STRING T, STRING, STRING) -> T]
+Specifications: (STRING T, STRING, STRING) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type STRING as string and an argument of type STRING as string and an argument of type STRING as string.
+
 
 Examples
 --------
@@ -1413,12 +1559,17 @@ RINT
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -1465,12 +1616,17 @@ ROUND
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -1517,12 +1673,17 @@ RTRIM
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(STRING T) -> T]
+Specifications: (STRING T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type STRING as string.
+
 
 Examples
 --------
@@ -1569,12 +1730,17 @@ SIGN
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -1621,12 +1787,17 @@ SIGNUM
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -1673,12 +1844,17 @@ SIN
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -1725,12 +1901,17 @@ SINH
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -1777,12 +1958,17 @@ SQRT
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -1829,12 +2015,17 @@ SUBSTRING
 Description
 -----------
 
-
+The SUBSTRING() function extracts a substring from a string.
 
 Syntax
 ------
 
-[(STRING T, INTEGER, INTEGER) -> T]
+Specifications: (STRING T, INTEGER, INTEGER) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type STRING as string and an argument of type INTEGER as start position and an argument of type INTEGER as length.
+
 
 Examples
 --------
@@ -1879,12 +2070,17 @@ TAN
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(NUMBER T) -> T]
+Specifications: (NUMBER T) -> T
+
+Semantics:
+
+ 1. The function accepts an argument of type NUMBER as number.
+
 
 Examples
 --------
@@ -1931,12 +2127,16 @@ UPPER
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[]
+Specifications: 
+
+Semantics:
+
+
 
 YEAR
 ====
@@ -1944,12 +2144,17 @@ YEAR
 Description
 -----------
 
-
+null
 
 Syntax
 ------
 
-[(DATE) -> INTEGER]
+Specifications: (DATE) -> INTEGER
+
+Semantics:
+
+ 1. The function accepts an argument of type DATE as date.
+
 
 Examples
 --------

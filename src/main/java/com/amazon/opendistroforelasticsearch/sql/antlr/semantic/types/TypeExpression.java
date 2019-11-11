@@ -74,9 +74,16 @@ public interface TypeExpression extends Type {
      * A specification is combination of a construct function and arg types
      * for a type expression (represent a constructor)
      */
-    class TypeExpressionSpec implements Iterable<Type> {
+    class TypeExpressionSpec implements Iterable<Argument> {
+        Argument[] args;//TODO: either use this or zip argName and argType when iterated
         Type[] argTypes;
         Function<Type[], Type> constructFunc;
+
+        public TypeExpressionSpec map(Argument... args) {
+            this.args = args;
+            this.argTypes = Arrays.stream(args).map(arg -> arg.type).toArray(Type[]::new);
+            return this;
+        }
 
         public TypeExpressionSpec map(Type... args) {
             this.argTypes = args;
@@ -116,8 +123,11 @@ public interface TypeExpression extends Type {
         }
 
         @Override
-        public Iterator<Type> iterator() {
-            return Arrays.asList(argTypes).iterator();
+        public Iterator<Argument> iterator() {
+            if (args == null) {
+                return Arrays.stream(argTypes).map(Argument::new).iterator();
+            }
+            return Arrays.asList(args).iterator();
         }
 
         @Override
@@ -131,6 +141,41 @@ public interface TypeExpression extends Type {
             String returnTypeStr = (returnType instanceof Generic) ? returnType.getName() : returnType.usage();
 
             return StringUtils.format("(%s) -> %s", argTypesStr, returnTypeStr);
+        }
+    }
+
+    class Argument {
+        private final String name;
+        private final Type type;
+
+        public Argument(Type type) {
+            this.type = type;
+            this.name = realType().getName().toLowerCase();
+        }
+
+        public Argument(String name, Type type) {
+            this.name = name;
+            this.type = type;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public Type type() {
+            return type;
+        }
+
+        @Override
+        public String toString() {
+            return StringUtils.format("an argument of type %s as %s", realType().getName(), name);
+        }
+
+        private Type realType() {
+            if (type instanceof Generic) {
+                return ((Generic) type).binding();
+            }
+            return type;
         }
     }
 

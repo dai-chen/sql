@@ -16,6 +16,7 @@
 package com.amazon.opendistroforelasticsearch.sql.doctest.functions;
 
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.Type;
+import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.TypeExpression;
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.function.ScalarFunction;
 import com.amazon.opendistroforelasticsearch.sql.antlr.semantic.types.special.Generic;
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfig;
@@ -24,8 +25,6 @@ import com.amazon.opendistroforelasticsearch.sql.doctest.core.Document;
 import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -67,15 +66,15 @@ public class SQLFunctionsIT extends DocTest {
 
         section(
             title(function.getName()),
-            description(""),
-            syntax(Arrays.toString(specs)),
+            description(function.getDescription()),
+            syntax(function.getSyntax()),
             examples
         );
     }
 
     private String functionCall(String functionName, TypeExpressionSpec spec) {
         return functionName + StreamSupport.stream(spec.spliterator(), false).
-                                            map(this::bindFunctionArg).
+                                            map(arg -> bindFunctionArg(arg.type())).
                                             collect(Collectors.joining(", ", "(", ")"));
     }
 
@@ -97,22 +96,18 @@ public class SQLFunctionsIT extends DocTest {
         }
     }
 
-    private static class FakeType implements Type {
+    private String semantics(TypeExpressionSpec[] specs) {
+        StringBuilder semantics = new StringBuilder();
+        for (int i = 0; i < specs.length; i++) {
+            String args = StreamSupport.stream(specs[i].spliterator(), false).
+                                        map(TypeExpression.Argument::toString).
+                                        collect(Collectors.joining(" and "));
 
-        @Override
-        public String getName() {
-            return null;
+            semantics.append(i).append(". ").
+                      append("The function accepts ").append(args).
+                      append('\n');
         }
-
-        @Override
-        public Type construct(List<Type> others) {
-            return null;
-        }
-
-        @Override
-        public String usage() {
-            return null;
-        }
+        return semantics.toString();
     }
 
 }
