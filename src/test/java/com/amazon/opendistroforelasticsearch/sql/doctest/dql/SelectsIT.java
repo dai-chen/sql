@@ -18,15 +18,7 @@ package com.amazon.opendistroforelasticsearch.sql.doctest.dql;
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfig;
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Section;
 import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.LexerGrammar;
-import org.antlr.v4.tool.Rule;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.net.URL;
 
 @DocTestConfig(
     template = "dql/selects.rst",
@@ -38,18 +30,19 @@ public class SelectsIT extends DocTest {
     public void test1() {
         section(
             title("Select"),
-            description(""),
-            syntax(""),
+            description(
+                "SELECT and FROM clause are basic part of query to specify which fields from which index to fetch",
+                "Optional you can alias index or field name for clarity and renaming purpose. ",
+                "In SQL standard, full table name can also be used as prefix if table alias not present. ",
+                "In both cases, table name and table alias are optional."
+            ),
+            syntax("SELECT [DISTINCT] items FROM index [WHERE conditions]"),
             example(
-                description("SELECT and FROM clause are basic part of query to specify which fields from which index to fetch"),
+                description(""),
                 query("SELECT balance, firstname, lastname FROM accounts")
             ),
             example(
-                description(
-                    "Optional you can alias index or field name for clarity and renaming purpose. " +
-                    "In SQL standard, full table name can also be used as prefix if table alias not present. ",
-                    "In both cases, table name and table alias are optional."
-                ),
+                description(""),
                 query("SELECT a.balance AS bal, a.firstname AS first, a.lastname AS last FROM accounts a")
             )
         );
