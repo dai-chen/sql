@@ -64,14 +64,18 @@ public class RstDocument implements Document {
     public Document codeBlock(String description, String code) {
         return println(
             description + "::",
-            indent(code)
+            (code.startsWith("+--")) ? code : indent(code)
         );
     }
 
     @Override
     public Document table(String description, DataTable table) {
         docWriter.println(description + "::");
-        docWriter.println(table);
+        if (table.toString().startsWith("+---")) {
+            docWriter.println(table);
+        } else {
+            docWriter.println(indent(table.toString()));
+        }
         docWriter.println();
         return this;
     }
