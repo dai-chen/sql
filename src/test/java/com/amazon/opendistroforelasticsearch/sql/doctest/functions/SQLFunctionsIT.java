@@ -84,11 +84,11 @@ public class SQLFunctionsIT extends DocTest {
         }
 
         if (type == NUMBER || type == INTEGER) {
-            return "10";
+            return "3";
         } else if (type == DOUBLE) {
             return "2.0";
         } else if (type == STRING) {
-            return "'abc'";
+            return "'hello world'";
         } else if (type == DATE) {
             return "'2019-11-09'";
         } else {
