@@ -64,7 +64,7 @@ public class RstDocument implements Document {
     public Document codeBlock(String description, String code) {
         return println(
             description + "::",
-            (code.startsWith("+--")) ? code : indent(code)
+            indent(code)
         );
     }
 
