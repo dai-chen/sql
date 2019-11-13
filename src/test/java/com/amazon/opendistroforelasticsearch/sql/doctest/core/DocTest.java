@@ -20,21 +20,26 @@ import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Section;
 import com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase;
 import com.amazon.opendistroforelasticsearch.sql.esintgtest.TestUtils;
 import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
+import com.carrotsearch.randomizedtesting.ClassModel;
+import com.carrotsearch.randomizedtesting.TestMethodProvider;
+import com.carrotsearch.randomizedtesting.annotations.TestCaseOrdering;
 import org.elasticsearch.test.ESIntegTestCase.ClusterScope;
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Map;
 
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.KIBANA;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.RequestFormat.NO_REQUEST;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.NO_RESPONSE;
-import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.ORIGINAL;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.PRETTY_JSON;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.ResponseFormat.TABLE;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.SqlRequest.UrlParam;
@@ -47,11 +52,37 @@ import static org.elasticsearch.test.ESIntegTestCase.Scope;
 /**
  * Documentation test base class
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING) // TODO Doesnt work!?
+//@TestMethodProviders({DocTest.TestMethodInOrder.class})
+//@FixMethodOrder(MethodSorters.NAME_ASCENDING) // TODO Doesnt work!?
+@TestCaseOrdering(value = TestCaseOrdering.AlphabeticOrder.class)
 @ClusterScope(scope= Scope.SUITE, numDataNodes=1, supportsDedicatedMasters=false, transportClientRatio=1)
 public abstract class DocTest extends SQLIntegTestCase {
 
     private static final String ROOT = "src/test/resources/doctest/"; // TODO: configure for docTest sourceSet
+
+    public static class TestMethodInOrder implements TestMethodProvider {
+
+        @Override
+        public Collection<Method> getTestMethods(Class<?> suiteClass, ClassModel classModel) {
+            Map<Method, ClassModel.MethodModel> methods = classModel.getMethods();
+            ArrayList<Method> result = new ArrayList<>();
+            for (ClassModel.MethodModel mm : methods.values()) {
+                // Skip any methods that have overrieds/ shadows.
+                if (mm.getDown() != null) continue;
+
+                Method m = mm.element;
+                if (m.getName().startsWith("test") &&
+                    Modifier.isPublic(m.getModifiers()) &&
+                    !Modifier.isStatic(m.getModifiers()) &&
+                    m.getParameterTypes().length == 0) {
+                    result.add(m);
+                }
+            }
+
+            result.sort(Comparator.comparing(Method::getName));
+            return result;
+        }
+    }
 
     @Override
     protected void init() throws Exception {

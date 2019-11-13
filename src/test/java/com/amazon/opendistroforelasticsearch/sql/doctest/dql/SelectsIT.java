@@ -18,7 +18,15 @@ package com.amazon.opendistroforelasticsearch.sql.doctest.dql;
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.DocTestConfig;
 import com.amazon.opendistroforelasticsearch.sql.doctest.annotation.Section;
 import com.amazon.opendistroforelasticsearch.sql.doctest.core.DocTest;
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
+import org.antlr.v4.tool.Rule;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.net.URL;
 
 @DocTestConfig(
     template = "dql/selects.rst",
@@ -54,6 +62,7 @@ public class SelectsIT extends DocTest {
         }
     }
 
+    @Test
     @Section(
         title = "Where",
         description = "WHERE clause can filter out the result set based on conditions"
@@ -62,6 +71,7 @@ public class SelectsIT extends DocTest {
         post("SELECT balance, firstname, lastname FROM accounts WHERE balance > 10000");
     }
 
+    @Test
     @Section(
         title = "Group By",
         description = "GROUP BY clause can be used to aggregate result of WHERE on some field(s)"
@@ -70,6 +80,7 @@ public class SelectsIT extends DocTest {
         post("SELECT state, AVG(balance) FROM accounts GROUP BY state");
     }
 
+    @Test
     @Section(
         title = "Having",
         description = "HAVING clause can help filter the result of GROUP BY"
