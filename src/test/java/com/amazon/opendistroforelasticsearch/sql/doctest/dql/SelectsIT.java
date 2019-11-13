@@ -56,7 +56,7 @@ public class SelectsIT extends DocTest {
         );
 
         try {
-            //parse();
+            parse();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -89,7 +89,6 @@ public class SelectsIT extends DocTest {
         post("SELECT state, AVG(balance) AS avg FROM accounts GROUP BY state HAVING avg > 10000");
     }
 
-    /*
     private String parse() throws Exception {
         Grammar grammar = new Grammar(
             readFileAsString(readFileAsString("antlr/OpenDistroSqlParser.g4")),
@@ -116,6 +115,5 @@ public class SelectsIT extends DocTest {
 
         return str.toString();
     }
-     */
 
 }
