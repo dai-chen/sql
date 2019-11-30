@@ -130,6 +130,8 @@ integTestRunner {
     systemProperty 'tests.security.manager', 'false'
     // allows integration test classes to access test resource from project root path
     systemProperty('project.root', project.rootDir.absolutePath)
+
+    exclude 'com/amazon/opendistroforelasticsearch/sql/esintgtest/**'
 }
 
 integTestCluster {
