@@ -21,6 +21,7 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.Node;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
@@ -41,12 +42,13 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 public class ESConnection implements DBConnection {
 
+    private final DBConnection connection;
     private final Client client;
-    private final RestClient restClient;
+    //private final RestClient restClient;
 
-    public ESConnection(Client client, RestClient restClient) {
+    public ESConnection(String connectionUrl, Client client) {
+        this.connection = new JDBCConnection(connectionUrl);
         this.client = client;
-        this.restClient = restClient;
     }
 
     @Override
@@ -83,6 +85,7 @@ public class ESConnection implements DBConnection {
 
     @Override
     public DBResult select(String query) {
+        /*
         try {
             String endpoint = "/_opendistro/_sql?format=jdbc";
             String requestBody = makeRequest(query);
@@ -109,6 +112,8 @@ public class ESConnection implements DBConnection {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        */
+        return connection.select(query);
     }
 
     private String makeRequest(String query) {

@@ -15,9 +15,11 @@
 
 package com.amazon.opendistroforelasticsearch.sql.correctness;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public interface DBConnection {
 
@@ -53,6 +55,11 @@ public interface DBConnection {
         public int hashCode() {
             return Objects.hash(/*names,*/ rows);
         }
+
+        @Override
+        public String toString() {
+            return "DBResult: " + rows.stream().map(Row::toString).collect(Collectors.joining("\n"));
+        }
     }
 
     class Row {
@@ -73,6 +80,11 @@ public interface DBConnection {
         @Override
         public int hashCode() {
             return Objects.hash(columns);
+        }
+
+        @Override
+        public String toString() {
+            return "Row " + columns;
         }
     }
 

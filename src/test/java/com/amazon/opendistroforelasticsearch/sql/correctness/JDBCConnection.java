@@ -19,6 +19,7 @@ import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
 import org.json.JSONObject;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -29,12 +30,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Database connection by JDBC standards.
+ */
 public class JDBCConnection implements DBConnection {
 
     private final Connection conn;
 
-    public JDBCConnection(Connection conn) {
-        this.conn = conn;
+    public JDBCConnection(String connectionUrl) {
+        try {
+            //Class.forName(driverName);
+            conn = DriverManager.getConnection(connectionUrl);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
