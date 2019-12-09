@@ -40,7 +40,7 @@ public class TestData {
         this.dataFilePath = DEFAULT_FOLDER + dataFilePath;
     }
 
-    public void create(DBConnection conn) {
+    public void createTable(Database conn) {
         try {
             URL url = Resources.getResource(schemaFilePath);
             String schema = Resources.toString(url, Charsets.UTF_8);
@@ -50,7 +50,7 @@ public class TestData {
         }
     }
 
-    public void loadData(DBConnection conn) {
+    public void loadData(Database conn) {
         try {
             URL url = Resources.getResource(dataFilePath);
             Stream<String[]> stream = Files.lines(Paths.get(url.toURI())).

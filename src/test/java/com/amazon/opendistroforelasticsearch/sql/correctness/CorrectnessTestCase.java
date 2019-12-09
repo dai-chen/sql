@@ -15,32 +15,70 @@
 
 package com.amazon.opendistroforelasticsearch.sql.correctness;
 
-import com.amazon.opendistroforelasticsearch.sql.correctness.DBConnection.DBResult;
-import com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase;
-import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
-import org.elasticsearch.client.Node;
-import org.json.JSONObject;
+import com.google.common.io.Resources;
 
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
-import java.util.Properties;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.hasSize;
+import static com.amazon.opendistroforelasticsearch.sql.correctness.Database.DBResult;
+import static com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.ErrorTestCase;
+import static com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.FailedTestCase;
+import static com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.SuccessTestCase;
 
 /**
  * Correctness test base class that intercepts query method to perform more testing by comparing with multiple databases.
  */
-public abstract class CorrectnessTestCase extends SQLIntegTestCase {
+public interface CorrectnessTestCase {
 
-    protected void prepareTableAndData(String schemaFile, String dataFile) throws Exception {
+
+    default void prepareTableAndData(String schemaFile, String dataFile) {
         TestData testData = new TestData(schemaFile, dataFile);
-        for (DBConnection conn : getConnections()) {
-            testData.create(conn);
-            testData.loadData(conn);
+        for (Database db : getDatabases()) {
+            testData.createTable(db); //TODO: db.createTable(testData)?
+            testData.loadData(db);
         }
     }
 
+    default void verify(List<String> sqls) {
+        TestReport report = new TestReport();
+
+        for (String sql : sqls) {
+            try {
+                Set<DBResult> results = Arrays.stream(getDatabases()).
+                    map(conn -> conn.select(sql)).
+                    collect(Collectors.toSet());
+
+                if (results.size() == 1) {
+                    report.addTestCase(new SuccessTestCase(sql));
+                } else {
+                    report.addTestCase(new FailedTestCase(sql, results));
+                }
+            } catch (Exception e) {
+                report.addTestCase(new ErrorTestCase(sql, e.getMessage()));
+            }
+        }
+
+        try {
+            URL url = Resources.getResource("correctness/report.json");
+            Files.write(Paths.get(url.toURI()), report.report().getBytes());
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+
+        //assertThat(StringUtils.format(
+        //    "Found difference between results from different databases when test query [%s]: %s ", sql, results),
+        //    results, hasSize(1));
+    }
+
+    Database[] getDatabases();
+
+    /*
     @Override
     protected JSONObject executeQuery(String sql) {
         Set<DBResult> results = Arrays.stream(getConnections()).
@@ -66,5 +104,5 @@ public abstract class CorrectnessTestCase extends SQLIntegTestCase {
             new ESConnection("jdbc:elasticsearch://" + node.getHost(), client()),
         };
     }
-
+    */
 }

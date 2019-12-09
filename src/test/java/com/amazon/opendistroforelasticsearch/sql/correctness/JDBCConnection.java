@@ -33,14 +33,17 @@ import java.util.stream.Collectors;
 /**
  * Database connection by JDBC standards.
  */
-public class JDBCConnection implements DBConnection {
+public class JDBCConnection implements Database {
 
-    private final Connection conn;
+    private final String databaseName;
 
-    public JDBCConnection(String connectionUrl) {
+    private final Connection connection;
+
+    public JDBCConnection(String databaseName, String connectionUrl) {
+        this.databaseName = databaseName;
         try {
             //Class.forName(driverName);
-            conn = DriverManager.getConnection(connectionUrl);
+            connection = DriverManager.getConnection(connectionUrl);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -54,7 +57,7 @@ public class JDBCConnection implements DBConnection {
                                          map(key -> key + " " + mapToJDBCType(json.getJSONObject(key).getString("type"))).
                                          collect(Collectors.joining(","));
 
-            Statement stmt = conn.createStatement();
+            Statement stmt = connection.createStatement();
             stmt.executeUpdate(StringUtils.format("CREATE TABLE %s(%s)", tableName, types));
         } catch (SQLException e) {
             throw new IllegalStateException(e);
@@ -62,9 +65,9 @@ public class JDBCConnection implements DBConnection {
     }
 
     @Override
-    public void insert(String tableName, String[] fieldNames, List<String[]> batch) {
+    public void insert(String tableName, String[] columnNames, List<String[]> batch) {
         try {
-            Statement stmt = conn.createStatement();
+            Statement stmt = connection.createStatement();
             for (String[] fieldValues : batch) {
 
                 String values = Arrays.stream(fieldValues).
@@ -76,7 +79,7 @@ public class JDBCConnection implements DBConnection {
                 sql.append("INSERT INTO ").
                     append(tableName).
                     append("(").
-                    append(String.join(",", fieldNames)).
+                    append(String.join(",", columnNames)).
                     append(") VALUES (").
                     append(values).
                     append(")");
@@ -95,7 +98,7 @@ public class JDBCConnection implements DBConnection {
     @Override
     public DBResult select(String query) {
         try {
-            Statement stmt = conn.createStatement();
+            Statement stmt = connection.createStatement();
             ResultSet resultSet = stmt.executeQuery(query);
             ResultSetMetaData metaData = resultSet.getMetaData();
 
@@ -104,7 +107,7 @@ public class JDBCConnection implements DBConnection {
                 names.add(metaData.getColumnName(i));
             }
 
-            DBResult result = new DBResult(new Row(names), new HashSet<>());
+            DBResult result = new DBResult(databaseName, new Row(names), new HashSet<>());
             while (resultSet.next()) {
                 List<String> row = new ArrayList<>();
                 for (int i = 1; i <= names.size(); i++) {

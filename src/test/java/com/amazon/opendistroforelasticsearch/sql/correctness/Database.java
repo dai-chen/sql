@@ -15,31 +15,47 @@
 
 package com.amazon.opendistroforelasticsearch.sql.correctness;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public interface DBConnection {
+/**
+ * Abstraction for different databases.
+ */
+public interface Database {
 
     void create(String tableName, String schema);
 
-    void insert(String tableName, String[] fieldNames, List<String[]> batch);
+    void insert(String tableName, String[] columnNames, List<String[]> batch);
 
     DBResult select(String query);
 
     class DBResult {
-        private final Row names;
-        private final Collection<Row> rows;
+        private final String databaseName;
+        private final Row columnNames;
+        private final Collection<Row> dataRows;
 
-        public DBResult(Row names, Collection<Row> rows) {
-            this.names = names;
-            this.rows = rows;
+        public DBResult(String databaseName, Row columnNames, Collection<Row> rows) {
+            this.databaseName = databaseName;
+            this.columnNames = columnNames;
+            this.dataRows = rows;
         }
 
         public void addRow(Row row) {
-            rows.add(row);
+            dataRows.add(row);
+        }
+
+        public String getDatabaseName() {
+            return databaseName;
+        }
+
+        public Row getColumnNames() {
+            return columnNames;
+        }
+
+        public Collection<Row> getDataRows() {
+            return dataRows;
         }
 
         @Override
@@ -48,17 +64,17 @@ public interface DBConnection {
             if (o == null || getClass() != o.getClass()) return false;
             DBResult dbResult = (DBResult) o;
             return //names.equals(dbResult.names) &&
-                rows.equals(dbResult.rows);
+                dataRows.equals(dbResult.dataRows);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(/*names,*/ rows);
+            return Objects.hash(/*names,*/ dataRows);
         }
 
         @Override
         public String toString() {
-            return "DBResult: " + rows.stream().map(Row::toString).collect(Collectors.joining("\n"));
+            return "DBResult: " + dataRows.stream().map(Row::toString).collect(Collectors.joining("\n"));
         }
     }
 
@@ -67,6 +83,10 @@ public interface DBConnection {
 
         public Row(Collection<?> columns) {
             this.columns = columns;
+        }
+
+        public Collection<?> getColumns() {
+            return columns;
         }
 
         @Override

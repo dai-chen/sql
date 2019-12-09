@@ -15,39 +15,27 @@
 
 package com.amazon.opendistroforelasticsearch.sql.correctness;
 
-import com.amazon.opendistroforelasticsearch.sql.esintgtest.TestUtils;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.Node;
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.Response;
-import org.elasticsearch.client.RestClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.test.ESIntegTestCase;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.junit.Assert;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
-public class ESConnection implements DBConnection {
+public class ESConnection implements Database {
 
-    private final DBConnection connection;
+    private final Database connection;
     private final Client client;
     //private final RestClient restClient;
 
     public ESConnection(String connectionUrl, Client client) {
-        this.connection = new JDBCConnection(connectionUrl);
+        this.connection = new JDBCConnection("Elasticsearch", connectionUrl);
         this.client = client;
     }
 
@@ -63,13 +51,13 @@ public class ESConnection implements DBConnection {
     }
 
     @Override
-    public void insert(String tableName, String[] fieldNames, List<String[]> batch) {
+    public void insert(String tableName, String[] columnNames, List<String[]> batch) {
         BulkRequestBuilder bulkReq = client.prepareBulk();
         for (String[] fieldValues : batch) {
             try {
                 XContentBuilder json = jsonBuilder().startObject();
-                for (int i = 0; i < fieldNames.length; i++) {
-                    json.field(fieldNames[i], fieldValues[i]);
+                for (int i = 0; i < columnNames.length; i++) {
+                    json.field(columnNames[i], fieldValues[i]);
                 }
                 bulkReq.add(client.prepareIndex(tableName, "_doc").setSource(json.endObject()));
 

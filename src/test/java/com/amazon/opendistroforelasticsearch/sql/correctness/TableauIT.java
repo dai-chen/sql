@@ -15,18 +15,21 @@
 
 package com.amazon.opendistroforelasticsearch.sql.correctness;
 
+import com.amazon.opendistroforelasticsearch.sql.esintgtest.SQLIntegTestCase;
 import com.google.common.io.Resources;
+import org.elasticsearch.client.Node;
 import org.junit.Test;
 
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.function.Consumer;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Test cases for Tableau integration testing
  */
-public class TableauIT extends CorrectnessTestCase {
+public class TableauIT extends SQLIntegTestCase implements CorrectnessTestCase {
 
     @Override
     protected void init() throws Exception {
@@ -35,16 +38,26 @@ public class TableauIT extends CorrectnessTestCase {
 
     @Test
     public void testIntegrationWithTableau() {
-        iterateFileByLine("correctness/tableau_integration_tests.txt", this::executeQuery);
+        //iterateFileByLine("correctness/tableau_integration_tests.txt", this::executeQuery);
+        verify(readTestQueriesInFile("correctness/tableau_integration_tests.txt"));
     }
 
-    private void iterateFileByLine(String filePath, Consumer<String> query) {
+    private List<String> readTestQueriesInFile(String filePath) {
         try {
             URL url = Resources.getResource(filePath);
-            Files.lines(Paths.get(url.toURI())).forEach(query);
+            return Files.lines(Paths.get(url.toURI())).collect(Collectors.toList());
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
     }
 
+    @Override
+    public Database[] getDatabases() {
+        Node node = getRestClient().getNodes().get(0);
+        return new Database[]{
+            //new ESConnection(client(), getRestClient()),
+            new JDBCConnection("H2", "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"),
+            new ESConnection("jdbc:elasticsearch://" + node.getHost(), client()),
+        };
+    }
 }
