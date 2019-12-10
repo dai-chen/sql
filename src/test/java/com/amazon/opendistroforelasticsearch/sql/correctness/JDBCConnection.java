@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 /**
  * Database connection by JDBC standards.
  */
-public class JDBCConnection implements Database {
+public class JDBCConnection implements DBConnection {
 
     private final String databaseName;
 

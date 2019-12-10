@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 /**
  * Abstraction for different databases.
  */
-public interface Database {
+public interface DBConnection {
 
     void create(String tableName, String schema);
 

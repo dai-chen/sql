@@ -15,7 +15,7 @@
 
 package com.amazon.opendistroforelasticsearch.sql.correctness.tests;
 
-import com.amazon.opendistroforelasticsearch.sql.correctness.Database;
+import com.amazon.opendistroforelasticsearch.sql.correctness.DBConnection;
 import com.amazon.opendistroforelasticsearch.sql.correctness.TestData;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.verify;
 public class TestDataTest {
 
     @Mock
-    private Database connection;
+    private DBConnection connection;
 
     private TestData testData = new TestData("test_data_test.json", "test_data_test.csv");
 

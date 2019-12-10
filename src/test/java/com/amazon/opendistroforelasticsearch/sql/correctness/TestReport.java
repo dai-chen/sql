@@ -15,8 +15,8 @@
 
 package com.amazon.opendistroforelasticsearch.sql.correctness;
 
-import com.amazon.opendistroforelasticsearch.sql.correctness.Database.DBResult;
-import com.amazon.opendistroforelasticsearch.sql.correctness.Database.Row;
+import com.amazon.opendistroforelasticsearch.sql.correctness.DBConnection.DBResult;
+import com.amazon.opendistroforelasticsearch.sql.correctness.DBConnection.Row;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

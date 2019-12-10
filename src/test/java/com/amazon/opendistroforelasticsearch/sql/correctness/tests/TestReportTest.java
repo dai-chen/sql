@@ -23,8 +23,8 @@ import org.junit.Test;
 
 import java.util.HashSet;
 
-import static com.amazon.opendistroforelasticsearch.sql.correctness.Database.DBResult;
-import static com.amazon.opendistroforelasticsearch.sql.correctness.Database.Row;
+import static com.amazon.opendistroforelasticsearch.sql.correctness.DBConnection.DBResult;
+import static com.amazon.opendistroforelasticsearch.sql.correctness.DBConnection.Row;
 import static com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.SuccessTestCase;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;

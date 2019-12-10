@@ -28,9 +28,9 @@ import java.util.List;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
-public class ESConnection implements Database {
+public class ESConnection implements DBConnection {
 
-    private final Database connection;
+    private final DBConnection connection;
     private final Client client;
     //private final RestClient restClient;
 

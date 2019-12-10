@@ -20,13 +20,13 @@ import com.google.common.io.Resources;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.amazon.opendistroforelasticsearch.sql.correctness.Database.DBResult;
+import static com.amazon.opendistroforelasticsearch.sql.correctness.DBConnection.DBResult;
 import static com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.ErrorTestCase;
 import static com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.FailedTestCase;
 import static com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.SuccessTestCase;
@@ -39,7 +39,7 @@ public interface CorrectnessTestCase {
 
     default void prepareTableAndData(String schemaFile, String dataFile) {
         TestData testData = new TestData(schemaFile, dataFile);
-        for (Database db : getDatabases()) {
+        for (DBConnection db : getDBConnections()) {
             testData.createTable(db); //TODO: db.createTable(testData)?
             testData.loadData(db);
         }
@@ -49,18 +49,32 @@ public interface CorrectnessTestCase {
         TestReport report = new TestReport();
 
         for (String sql : sqls) {
-            try {
-                Set<DBResult> results = Arrays.stream(getDatabases()).
-                    map(conn -> conn.select(sql)).
-                    collect(Collectors.toSet());
+            DBConnection[] connections = getDBConnections();
+            Set<DBResult> results = new HashSet<>();
 
-                if (results.size() == 1) {
-                    report.addTestCase(new SuccessTestCase(sql));
-                } else {
-                    report.addTestCase(new FailedTestCase(sql, results));
-                }
+            try {
+                results.add(connections[0].select(sql));
             } catch (Exception e) {
                 report.addTestCase(new ErrorTestCase(sql, e.getMessage()));
+                continue;
+            }
+
+            int otherDbWithError = 0;
+            for (int i = 1; i < connections.length; i++) {
+                try {
+                    results.add(connections[i].select(sql));
+                } catch (Exception e) {
+                    // Ignore
+                    otherDbWithError++;
+                }
+            }
+
+            if (otherDbWithError == connections.length - 1) {
+                report.addTestCase(new ErrorTestCase(sql, "No other databases support this query"));
+            } else if (results.size() == 1) {
+                report.addTestCase(new SuccessTestCase(sql));
+            } else {
+                report.addTestCase(new FailedTestCase(sql, results));
             }
         }
 
@@ -76,7 +90,7 @@ public interface CorrectnessTestCase {
         //    results, hasSize(1));
     }
 
-    Database[] getDatabases();
+    DBConnection[] getDBConnections();
 
     /*
     @Override

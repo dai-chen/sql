@@ -4,3 +4,4 @@ SELECT SUM(FlightDelayMin) AS sum_FlightDelayMin_ok FROM kibana_sample_data_flig
 SELECT SUM(FlightDelay) AS sum_FlightDelay_ok FROM kibana_sample_data_flights
 SELECT SUM(DistanceMiles) AS sum_DistanceMiles_ok FROM kibana_sample_data_flights
 SELECT year(timestamp) AS yr_timestamp_ok FROM kibana_sample_data_flights
+SELECT SUBSTRING(`kibana_sample_data_flights`.`OriginWeather`, 1, 1024) AS `OriginWeather` FROM `kibana_sample_data_flights` GROUP BY 1

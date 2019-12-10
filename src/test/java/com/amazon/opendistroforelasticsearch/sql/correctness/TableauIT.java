@@ -52,12 +52,14 @@ public class TableauIT extends SQLIntegTestCase implements CorrectnessTestCase {
     }
 
     @Override
-    public Database[] getDatabases() {
+    public DBConnection[] getDBConnections() {
         Node node = getRestClient().getNodes().get(0);
-        return new Database[]{
+        return new DBConnection[]{
             //new ESConnection(client(), getRestClient()),
-            new JDBCConnection("H2", "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"),
             new ESConnection("jdbc:elasticsearch://" + node.getHost(), client()),
+            new JDBCConnection("H2", "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"),
+            //new JDBCConnection("Apache Derby", "jdbc:derby:memory:myDb;create=true"),
+            new JDBCConnection("SQLite", "jdbc:sqlite:memory:myDb"),
         };
     }
 }
