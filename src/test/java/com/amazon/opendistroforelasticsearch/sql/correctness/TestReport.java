@@ -21,8 +21,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
 /**
  * Test report class to generate JSON report.
@@ -81,6 +82,28 @@ public class TestReport {
             report.put("sql", sql);
             return report;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            TestCaseReport that = (TestCaseReport) o;
+            return isSuccess == that.isSuccess &&
+                sql.equals(that.sql);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(isSuccess, sql);
+        }
+
+        @Override
+        public String toString() {
+            return "TestCaseReport{" +
+                "isSuccess=" + isSuccess +
+                ", sql='" + sql + '\'' +
+                '}';
+        }
     }
 
     public static class SuccessTestCase extends TestCaseReport {
@@ -91,9 +114,9 @@ public class TestReport {
     }
 
     public static class FailedTestCase extends TestCaseReport {
-        private final Set<DBResult> results;
+        private final Collection<DBResult> results;
 
-        public FailedTestCase(String sql, Set<DBResult> results) {
+        public FailedTestCase(String sql, Collection<DBResult> results) {
             super(false, sql);
             this.results = results;
         }
@@ -111,14 +134,42 @@ public class TestReport {
 
                 JSONObject resultSet = new JSONObject();
                 json.put("resultSet", resultSet);
-                resultSet.put("schema", result.getColumnNames().getColumns());
-                resultSet.put("dataRows", new JSONArray());
 
+                resultSet.put("schema", new JSONArray());
+                result.getColumnNameAndTypes().forEach((name, type) -> {
+                    JSONObject nameAndType = new JSONObject();
+                    nameAndType.put("name", name);
+                    nameAndType.put("type", type);
+                    resultSet.getJSONArray("schema").put(nameAndType);
+                });
+
+                resultSet.put("dataRows", new JSONArray());
                 for (Row row : result.getDataRows()) {
                     resultSet.getJSONArray("dataRows").put(row.getColumns());
                 }
             }
             return report;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            FailedTestCase that = (FailedTestCase) o;
+            return results.equals(that.results);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), results);
+        }
+
+        @Override
+        public String toString() {
+            return "FailedTestCase{" +
+                "results=" + results +
+                '}';
         }
     }
 
@@ -136,6 +187,46 @@ public class TestReport {
             report.put("reason", reason);
             return report;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            ErrorTestCase that = (ErrorTestCase) o;
+            return reason.equals(that.reason);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), reason);
+        }
+
+        @Override
+        public String toString() {
+            return "ErrorTestCase{" +
+                "reason='" + reason + '\'' +
+                '}';
+        }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TestReport that = (TestReport) o;
+        return testCases.equals(that.testCases);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(testCases);
+    }
+
+    @Override
+    public String toString() {
+        return "TestReport{" +
+            "testCases=" + testCases +
+            '}';
+    }
 }

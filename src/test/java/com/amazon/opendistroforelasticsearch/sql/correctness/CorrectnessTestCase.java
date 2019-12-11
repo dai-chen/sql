@@ -21,10 +21,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.amazon.opendistroforelasticsearch.sql.correctness.DBConnection.DBResult;
 import static com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.ErrorTestCase;
@@ -34,63 +31,80 @@ import static com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.S
 /**
  * Correctness test base class that intercepts query method to perform more testing by comparing with multiple databases.
  */
-public interface CorrectnessTestCase {
+public class CorrectnessTestCase {
 
+    /**
+     * Database connection for test data load and query.
+     * Assumption is that the first connection is for the database to be targeted such as Elasticsearch.
+     */
+    private final DBConnection[] connections;
 
-    default void prepareTableAndData(String schemaFile, String dataFile) {
-        TestData testData = new TestData(schemaFile, dataFile);
-        for (DBConnection db : getDBConnections()) {
-            testData.createTable(db); //TODO: db.createTable(testData)?
-            testData.loadData(db);
+    public CorrectnessTestCase(DBConnection[] connections) {
+        this.connections = connections;
+    }
+
+    public void initialize(String schemaFilePath, String dataFilePath) {
+        TestData testData = new TestData(schemaFilePath, dataFilePath);
+        for (DBConnection conn : connections) {
+            testData.createTable(conn);
+            testData.loadData(conn);
         }
     }
 
-    default void verify(List<String> sqls) {
+    public TestReport verify(List<String> sqls) {
         TestReport report = new TestReport();
-
         for (String sql : sqls) {
-            DBConnection[] connections = getDBConnections();
-            Set<DBResult> results = new HashSet<>();
-
+            DBResult esResult;
             try {
-                results.add(connections[0].select(sql));
+                esResult = connections[0].select(sql);
+
+                int otherDbWithError = 0;
+                String reasons = "";
+                for (int i = 1; i < connections.length; i++) {
+                    try {
+                        DBResult otherDbResult = connections[i].select(sql);
+                        if (esResult.isCloseTo(otherDbResult)) {
+                            report.addTestCase(new SuccessTestCase(sql));
+                        } else {
+                            report.addTestCase(new FailedTestCase(sql, Arrays.asList(esResult, otherDbResult)));
+                        }
+                        break;
+                    } catch (Exception e) {
+                        // Ignore
+                        otherDbWithError++;
+                        reasons += e.getMessage() + ";";
+                    }
+                }
+
+                if (otherDbWithError == connections.length - 1) {
+                    report.addTestCase(new ErrorTestCase(sql, "No other databases support this query: " + reasons));
+                }
             } catch (Exception e) {
                 report.addTestCase(new ErrorTestCase(sql, e.getMessage()));
-                continue;
-            }
-
-            int otherDbWithError = 0;
-            for (int i = 1; i < connections.length; i++) {
-                try {
-                    results.add(connections[i].select(sql));
-                } catch (Exception e) {
-                    // Ignore
-                    otherDbWithError++;
-                }
-            }
-
-            if (otherDbWithError == connections.length - 1) {
-                report.addTestCase(new ErrorTestCase(sql, "No other databases support this query"));
-            } else if (results.size() == 1) {
-                report.addTestCase(new SuccessTestCase(sql));
-            } else {
-                report.addTestCase(new FailedTestCase(sql, results));
             }
         }
+        return report;
+    }
 
+    public void report(TestReport report) {
         try {
             URL url = Resources.getResource("correctness/report.json");
             Files.write(Paths.get(url.toURI()), report.report().getBytes());
         } catch (Exception e) {
             throw new IllegalStateException(e);
+        } finally {
+            for (DBConnection conn : connections) {
+                conn.close();
+            }
         }
-
-        //assertThat(StringUtils.format(
-        //    "Found difference between results from different databases when test query [%s]: %s ", sql, results),
-        //    results, hasSize(1));
     }
 
-    DBConnection[] getDBConnections();
+    /**
+     * Get database connection for test data load and query.
+     * Assumption is that the first connection is for the database to be targeted such as Elasticsearch.
+     * @return  database connections
+     */
+    //DBConnection[] getDBConnections();
 
     /*
     @Override

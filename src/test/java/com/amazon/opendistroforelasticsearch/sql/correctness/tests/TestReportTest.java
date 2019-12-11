@@ -18,6 +18,7 @@ package com.amazon.opendistroforelasticsearch.sql.correctness.tests;
 import com.amazon.opendistroforelasticsearch.sql.correctness.TestReport;
 import com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.ErrorTestCase;
 import com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.FailedTestCase;
+import com.google.common.collect.ImmutableMap;
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -40,19 +41,19 @@ public class TestReportTest {
         JSONObject actual = new JSONObject(report.report());
         JSONObject expected = new JSONObject(
             "{" +
-                "  \"summary\": {" +
-                "    \"total\": 1," +
-                "    \"success\": 1," +
-                "    \"failure\": 0" +
-                "  }," +
-                "  \"tests\": [" +
-                "    {" +
-                "      \"id\": 1," +
-                "      \"result\": 'Success'," +
-                "      \"sql\": \"SELECT * FROM accounts\"," +
-                "    }" +
-                "  ]" +
-                "}"
+            "  \"summary\": {" +
+            "    \"total\": 1," +
+            "    \"success\": 1," +
+            "    \"failure\": 0" +
+            "  }," +
+            "  \"tests\": [" +
+            "    {" +
+            "      \"id\": 1," +
+            "      \"result\": 'Success'," +
+            "      \"sql\": \"SELECT * FROM accounts\"," +
+            "    }" +
+            "  ]" +
+            "}"
         );
 
         if (!actual.similar(expected)) {
@@ -63,41 +64,51 @@ public class TestReportTest {
     @Test
     public void testFailedReport() {
         report.addTestCase(new FailedTestCase("SELECT * FROM accounts", new HashSet<>(asList(
-            new DBResult("Elasticsearch", new Row(asList("firstName")), singleton(new Row(asList("hello")))),
-            new DBResult("H2", new Row(asList("firstName")), singleton(new Row(asList("world"))))
+            new DBResult("Elasticsearch", ImmutableMap.of("firstName", "text"), singleton(new Row(asList("hello")))),
+            new DBResult("H2", ImmutableMap.of("firstName", "text"), singleton(new Row(asList("world"))))
         ))));
         JSONObject actual = new JSONObject(report.report());
         JSONObject expected = new JSONObject(
             "{" +
-                "  \"summary\": {" +
-                "    \"total\": 1," +
-                "    \"success\": 0," +
-                "    \"failure\": 1" +
-                "  }," +
-                "  \"tests\": [" +
-                "    {" +
-                "      \"id\": 1," +
-                "      \"result\": 'Failed'," +
-                "      \"sql\": \"SELECT * FROM accounts\"," +
-                "      \"resultSets\": [" +
-                "        {" +
-                "          \"database\": \"Elasticsearch\"," +
-                "          \"resultSet\": {" +
-                "            \"schema\": [\"firstName\"]," +
-                "            \"dataRows\": [[\"hello\"]]" +
-                "          }" +
-                "        }," +
-                "        {" +
-                "          \"database\": \"H2\"," +
-                "          \"resultSet\": {" +
-                "            \"schema\": [\"firstName\"]," +
-                "            \"dataRows\": [[\"world\"]]" +
-                "          }" +
-                "        }" +
-                "      ]" +
-                "    }" +
-                "  ]" +
-                "}"
+            "  \"summary\": {" +
+            "    \"total\": 1," +
+            "    \"success\": 0," +
+            "    \"failure\": 1" +
+            "  }," +
+            "  \"tests\": [" +
+            "    {" +
+            "      \"id\": 1," +
+            "      \"result\": 'Failed'," +
+            "      \"sql\": \"SELECT * FROM accounts\"," +
+            "      \"resultSets\": [" +
+            "        {" +
+            "          \"database\": \"Elasticsearch\"," +
+            "          \"resultSet\": {" +
+            "            \"schema\": [" +
+            "              {" +
+            "                \"name\": \"firstName\"," +
+            "                \"type\": \"text\"" +
+            "              }" +
+            "            ]," +
+            "            \"dataRows\": [[\"hello\"]]" +
+            "          }" +
+            "        }," +
+            "        {" +
+            "          \"database\": \"H2\"," +
+            "          \"resultSet\": {" +
+            "            \"schema\": [" +
+            "              {" +
+            "                \"name\": \"firstName\"," +
+            "                \"type\": \"text\"" +
+            "              }" +
+            "            ]," +
+            "            \"dataRows\": [[\"world\"]]" +
+            "          }" +
+            "        }" +
+            "      ]" +
+            "    }" +
+            "  ]" +
+            "}"
         );
 
         if (!actual.similar(expected)) {
@@ -111,20 +122,20 @@ public class TestReportTest {
         JSONObject actual = new JSONObject(report.report());
         JSONObject expected = new JSONObject(
             "{" +
-                "  \"summary\": {" +
-                "    \"total\": 1," +
-                "    \"success\": 0," +
-                "    \"failure\": 1" +
-                "  }," +
-                "  \"tests\": [" +
-                "    {" +
-                "      \"id\": 1," +
-                "      \"result\": 'Failed'," +
-                "      \"sql\": \"SELECT * FROM\"," +
-                "      \"reason\": \"Missing table name in query\"," +
-                "    }" +
-                "  ]" +
-                "}"
+            "  \"summary\": {" +
+            "    \"total\": 1," +
+            "    \"success\": 0," +
+            "    \"failure\": 1" +
+            "  }," +
+            "  \"tests\": [" +
+            "    {" +
+            "      \"id\": 1," +
+            "      \"result\": 'Failed'," +
+            "      \"sql\": \"SELECT * FROM\"," +
+            "      \"reason\": \"Missing table name in query\"," +
+            "    }" +
+            "  ]" +
+            "}"
         );
 
         if (!actual.similar(expected)) {

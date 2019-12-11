@@ -26,8 +26,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -102,22 +104,40 @@ public class JDBCConnection implements DBConnection {
             ResultSet resultSet = stmt.executeQuery(query);
             ResultSetMetaData metaData = resultSet.getMetaData();
 
-            List<String> names = new ArrayList<>();
+            Map<String, String> nameAndTypes = new HashMap<>();
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                names.add(metaData.getColumnName(i));
+                nameAndTypes.put(metaData.getColumnName(i), metaData.getColumnTypeName(i));
             }
 
-            DBResult result = new DBResult(databaseName, new Row(names), new HashSet<>());
+            DBResult result = new DBResult(databaseName, nameAndTypes, new HashSet<>()); //TODO: List for ORDER BY
             while (resultSet.next()) {
-                List<String> row = new ArrayList<>();
-                for (int i = 1; i <= names.size(); i++) {
-                    row.add(resultSet.getString(i));
+                List<Object> row = new ArrayList<>();
+                for (int i = 1; i <= nameAndTypes.size(); i++) {
+                    /*
+                    Object value = resultSet.getObject(i);
+                    if (value instanceof Float || value instanceof Double) {
+                        DecimalFormat df = new DecimalFormat("#.##");
+                        df.setRoundingMode(RoundingMode.CEILING);
+                        value = df.format(value);
+                    }
+                    row.add(value);
+                    */
+                    row.add(resultSet.getObject(i));
                 }
                 result.addRow(new Row(row));
             }
             return result;
         } catch (SQLException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public void close() {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

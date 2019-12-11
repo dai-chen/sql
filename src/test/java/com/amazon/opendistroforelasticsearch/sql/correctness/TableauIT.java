@@ -29,17 +29,16 @@ import java.util.stream.Collectors;
 /**
  * Test cases for Tableau integration testing
  */
-public class TableauIT extends SQLIntegTestCase implements CorrectnessTestCase {
-
-    @Override
-    protected void init() throws Exception {
-        prepareTableAndData("kibana_sample_data_flights.json", "kibana_sample_data_flights.csv");
-    }
+public class TableauIT extends SQLIntegTestCase {
 
     @Test
     public void testIntegrationWithTableau() {
         //iterateFileByLine("correctness/tableau_integration_tests.txt", this::executeQuery);
-        verify(readTestQueriesInFile("correctness/tableau_integration_tests.txt"));
+        DBConnection[] connections = getDBConnections();
+        CorrectnessTestCase correctnessTest = new CorrectnessTestCase(connections);
+        correctnessTest.initialize("kibana_sample_data_flights.json", "kibana_sample_data_flights.csv");
+        TestReport report = correctnessTest.verify(readTestQueriesInFile("correctness/tableau_integration_tests_full.txt"));
+        correctnessTest.report(report);
     }
 
     private List<String> readTestQueriesInFile(String filePath) {
@@ -51,15 +50,13 @@ public class TableauIT extends SQLIntegTestCase implements CorrectnessTestCase {
         }
     }
 
-    @Override
-    public DBConnection[] getDBConnections() {
+    private DBConnection[] getDBConnections() {
         Node node = getRestClient().getNodes().get(0);
         return new DBConnection[]{
-            //new ESConnection(client(), getRestClient()),
             new ESConnection("jdbc:elasticsearch://" + node.getHost(), client()),
             new JDBCConnection("H2", "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"),
-            //new JDBCConnection("Apache Derby", "jdbc:derby:memory:myDb;create=true"),
             new JDBCConnection("SQLite", "jdbc:sqlite:memory:myDb"),
+            //new JDBCConnection("Apache Derby", "jdbc:derby:memory:myDb;create=true"),
         };
     }
 }

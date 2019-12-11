@@ -28,6 +28,9 @@ import java.util.List;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
+/**
+ * Elasticsearch database connection.
+ */
 public class ESConnection implements DBConnection {
 
     private final DBConnection connection;
@@ -73,35 +76,12 @@ public class ESConnection implements DBConnection {
 
     @Override
     public DBResult select(String query) {
-        /*
-        try {
-            String endpoint = "/_opendistro/_sql?format=jdbc";
-            String requestBody = makeRequest(query);
-
-            Request sqlRequest = new Request("POST", endpoint);
-            sqlRequest.setJsonEntity(requestBody);
-
-            Response response = restClient.performRequest(sqlRequest);
-            Assert.assertEquals(200, response.getStatusLine().getStatusCode());
-            String body = TestUtils.getResponseBody(response, true);
-
-            JSONObject json = new JSONObject(body);
-            JSONArray schema = json.getJSONArray("schema");
-            List<String> names = StreamSupport.stream(schema.spliterator(), false).
-                                               map(nameType -> ((JSONObject) nameType).getString("name")).
-                                               collect(Collectors.toList());
-            DBResult result = new DBResult(new Row(names), new HashSet<>());
-            JSONArray dataRows = json.getJSONArray("datarows");
-            for (Object row : dataRows) {
-                result.addRow(new Row(((JSONArray) row).toList()));
-            }
-            return result;
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        */
         return connection.select(query);
+    }
+
+    @Override
+    public void close() {
+        // DO nothing
     }
 
     private String makeRequest(String query) {
