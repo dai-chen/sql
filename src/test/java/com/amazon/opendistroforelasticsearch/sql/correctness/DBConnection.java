@@ -15,6 +15,7 @@
 
 package com.amazon.opendistroforelasticsearch.sql.correctness;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -39,11 +40,14 @@ public interface DBConnection {
         private final String databaseName;
         private final Map<String, String> colTypeByName;
         private final Collection<Row> dataRows;
+        private final List<String> colNames = new ArrayList<>(); // for equals & hashCode
 
         public DBResult(String databaseName, Map<String, String> colTypeByName, Collection<Row> rows) {
             this.databaseName = databaseName;
             this.colTypeByName = colTypeByName;
             this.dataRows = rows;
+
+            colTypeByName.forEach((name, type) -> this.colNames.add(name.toUpperCase()));
         }
 
         public void addRow(Row row) {
@@ -85,14 +89,13 @@ public interface DBConnection {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             DBResult result = (DBResult) o;
-            return /*databaseName.equals(result.databaseName) &&
-                colTypeByName.equals(result.colTypeByName) && */
+            return colNames.equals(result.colNames) &&
                 dataRows.equals(result.dataRows);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(/*databaseName, colTypeByName,*/ dataRows);
+            return Objects.hash(colNames, dataRows);
         }
 
         @Override
