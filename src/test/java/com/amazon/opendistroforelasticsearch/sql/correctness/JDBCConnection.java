@@ -18,12 +18,14 @@ package com.amazon.opendistroforelasticsearch.sql.correctness;
 import com.amazon.opendistroforelasticsearch.sql.utils.StringUtils;
 import org.json.JSONObject;
 
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -113,16 +115,17 @@ public class JDBCConnection implements DBConnection {
             while (resultSet.next()) {
                 List<Object> row = new ArrayList<>();
                 for (int i = 1; i <= nameAndTypes.size(); i++) {
-                    /*
+
                     Object value = resultSet.getObject(i);
                     if (value instanceof Float || value instanceof Double) {
                         DecimalFormat df = new DecimalFormat("#.##");
                         df.setRoundingMode(RoundingMode.CEILING);
-                        value = df.format(value);
+                        String numStr = df.format(value);
+                        value = (value instanceof Float) ? Float.parseFloat(numStr) : Double.parseDouble(numStr);
                     }
                     row.add(value);
-                    */
-                    row.add(resultSet.getObject(i));
+
+                    //row.add(resultSet.getObject(i));
                 }
                 result.addRow(new Row(row));
             }

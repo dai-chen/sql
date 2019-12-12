@@ -63,7 +63,8 @@ public class CorrectnessTestCase {
                 for (int i = 1; i < connections.length; i++) {
                     try {
                         DBResult otherDbResult = connections[i].select(sql);
-                        if (esResult.isCloseTo(otherDbResult)) {
+                        //if (esResult.isCloseTo(otherDbResult)) {
+                        if (esResult.equals(otherDbResult)) {
                             report.addTestCase(new SuccessTestCase(sql));
                         } else {
                             report.addTestCase(new FailedTestCase(sql, Arrays.asList(esResult, otherDbResult)));
@@ -72,7 +73,7 @@ public class CorrectnessTestCase {
                     } catch (Exception e) {
                         // Ignore
                         otherDbWithError++;
-                        reasons += e.getMessage() + ";";
+                        reasons += extractRootCause(e) + ";";
                     }
                 }
 
@@ -80,7 +81,7 @@ public class CorrectnessTestCase {
                     report.addTestCase(new ErrorTestCase(sql, "No other databases support this query: " + reasons));
                 }
             } catch (Exception e) {
-                report.addTestCase(new ErrorTestCase(sql, e.getMessage()));
+                report.addTestCase(new ErrorTestCase(sql, extractRootCause(e)));
             }
         }
         return report;
@@ -99,38 +100,18 @@ public class CorrectnessTestCase {
         }
     }
 
-    /**
-     * Get database connection for test data load and query.
-     * Assumption is that the first connection is for the database to be targeted such as Elasticsearch.
-     * @return  database connections
-     */
-    //DBConnection[] getDBConnections();
-
-    /*
-    @Override
-    protected JSONObject executeQuery(String sql) {
-        Set<DBResult> results = Arrays.stream(getConnections()).
-                                       map(conn -> conn.select(sql)).
-                                       collect(Collectors.toSet());
-        assertThat(StringUtils.format(
-            "Found difference between results from different databases when test query [%s]: %s ", sql, results),
-            results, hasSize(1));
-
-        try {
-            JSONObject response = super.executeQuery(sql);
-            return response;
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+    private String extractRootCause(Throwable e) {
+        while (e.getCause() != null) {
+            e = e.getCause();
         }
+
+        if (e.getLocalizedMessage() != null) {
+            return e.getLocalizedMessage();
+        }
+        if (e.getMessage() != null) {
+            return e.getMessage();
+        }
+        return e.toString();
     }
 
-    private DBConnection[] getConnections() {
-        Node node = getRestClient().getNodes().get(0);
-        return new DBConnection[]{
-            //new ESConnection(client(), getRestClient()),
-            new JDBCConnection("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"),
-            new ESConnection("jdbc:elasticsearch://" + node.getHost(), client()),
-        };
-    }
-    */
 }

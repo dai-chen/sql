@@ -29,7 +29,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Arrays;
 
 import static com.amazon.opendistroforelasticsearch.sql.correctness.DBConnection.Row;
-import static com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.*;
+import static com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.ErrorTestCase;
+import static com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.FailedTestCase;
+import static com.amazon.opendistroforelasticsearch.sql.correctness.TestReport.SuccessTestCase;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;

@@ -101,7 +101,7 @@ SELECT `kibana_sample_data_flights`.`OriginCityName` AS `OriginCityName` FROM `k
 SELECT `kibana_sample_data_flights`.`DestCityName` AS `DestCityName`,   SUM(`kibana_sample_data_flights`.`AvgTicketPrice`) AS `$__alias__0` FROM `kibana_sample_data_flights` GROUP BY 1 ORDER BY `$__alias__0` DESC,   `DestCityName` ASC LIMIT 10
 SELECT 'DESKTOP-7APIVOE\\\\Rupal' AS `Calculation_1122522251639717888` FROM `kibana_sample_data_flights` GROUP BY 1
 SELECT 0 AS `Calculation_1122522251639717888` FROM `kibana_sample_data_flights` GROUP BY 1
-SELECT 0 AS `Calculation_1122522251639717888` FROM `kibana_sample_data_flights` GROUP BY 1.1000000000000002
+SELECT 0 AS `Calculation_1122522251639717888` FROM `kibana_sample_data_flights` GROUP BY 1
 SELECT 1 AS `Calculation_1122522251639717888` FROM `kibana_sample_data_flights` GROUP BY 1
 SELECT 'DESKTOP-7APIVOE' AS `Calculation_1122522251639717888` FROM `kibana_sample_data_flights` GROUP BY 1
 SELECT 'ABC' AS `Calculation_1122522251639717888` FROM `kibana_sample_data_flights` GROUP BY 1

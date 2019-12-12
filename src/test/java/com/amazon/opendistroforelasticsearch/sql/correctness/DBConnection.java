@@ -85,14 +85,14 @@ public interface DBConnection {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             DBResult result = (DBResult) o;
-            return databaseName.equals(result.databaseName) &&
-                colTypeByName.equals(result.colTypeByName) &&
+            return /*databaseName.equals(result.databaseName) &&
+                colTypeByName.equals(result.colTypeByName) && */
                 dataRows.equals(result.dataRows);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(databaseName, colTypeByName, dataRows);
+            return Objects.hash(/*databaseName, colTypeByName,*/ dataRows);
         }
 
         @Override
