@@ -43,6 +43,10 @@ public interface Document extends Closeable {
     Document codeBlock(String description, String code);
 
     Document table(String description, String table);
+    
+    default Document viewInConsole() {
+        return this;
+    }
 
     default Document code(String code) {
         return this;

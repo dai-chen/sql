@@ -44,6 +44,8 @@ SQL query::
 	  }
 	}
 
+`View in Console <http://ec2co-ecsel-1n2oqfionlflu-1608091797.us-west-2.elb.amazonaws.com/app/kibana#/dev_tools/console?load_from=https://raw.githubusercontent.com/dai-chen/sql/docs-for-long-living-es/docs/user/admin/settings.rst.console>`_
+
 Result set::
 
 	{
@@ -69,6 +71,8 @@ SQL query::
 	{
 	  "query" : "SELECT * FROM accounts"
 	}
+
+`View in Console <http://ec2co-ecsel-1n2oqfionlflu-1608091797.us-west-2.elb.amazonaws.com/app/kibana#/dev_tools/console?load_from=https://raw.githubusercontent.com/dai-chen/sql/docs-for-long-living-es/docs/user/admin/settings.rst.console>`_
 
 Result set::
 
@@ -107,6 +111,8 @@ SQL query::
 	    "opendistro.sql.query.slowlog" : 10
 	  }
 	}
+
+`View in Console <http://ec2co-ecsel-1n2oqfionlflu-1608091797.us-west-2.elb.amazonaws.com/app/kibana#/dev_tools/console?load_from=https://raw.githubusercontent.com/dai-chen/sql/docs-for-long-living-es/docs/user/admin/settings.rst.console>`_
 
 Result set::
 
@@ -150,6 +156,8 @@ SQL query::
 	    "opendistro.sql.query.analysis.enabled" : false
 	  }
 	}
+
+`View in Console <http://ec2co-ecsel-1n2oqfionlflu-1608091797.us-west-2.elb.amazonaws.com/app/kibana#/dev_tools/console?load_from=https://raw.githubusercontent.com/dai-chen/sql/docs-for-long-living-es/docs/user/admin/settings.rst.console>`_
 
 Result set::
 
@@ -196,6 +204,8 @@ SQL query::
 	  }
 	}
 
+`View in Console <http://ec2co-ecsel-1n2oqfionlflu-1608091797.us-west-2.elb.amazonaws.com/app/kibana#/dev_tools/console?load_from=https://raw.githubusercontent.com/dai-chen/sql/docs-for-long-living-es/docs/user/admin/settings.rst.console>`_
+
 Result set::
 
 	{
@@ -227,6 +237,8 @@ SQL query::
 	{
 	  "query" : "SELECT first FROM accounts"
 	}
+
+`View in Console <http://ec2co-ecsel-1n2oqfionlflu-1608091797.us-west-2.elb.amazonaws.com/app/kibana#/dev_tools/console?load_from=https://raw.githubusercontent.com/dai-chen/sql/docs-for-long-living-es/docs/user/admin/settings.rst.console>`_
 
 Result set::
 
@@ -265,6 +277,8 @@ SQL query::
 	    "opendistro.sql.query.analysis.semantic.threshold" : 50
 	  }
 	}
+
+`View in Console <http://ec2co-ecsel-1n2oqfionlflu-1608091797.us-west-2.elb.amazonaws.com/app/kibana#/dev_tools/console?load_from=https://raw.githubusercontent.com/dai-chen/sql/docs-for-long-living-es/docs/user/admin/settings.rst.console>`_
 
 Result set::
 

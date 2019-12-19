@@ -88,6 +88,7 @@ public interface DocBuilder {
                 }
 
                 document.codeBlock("SQL query", example.getQuery()).
+                         viewInConsole().
                          code(example.getQuery()).
                          codeBlock("Explain query", example.getExplainQuery()).
                          codeBlock("Explain", example.getExplainResult());
