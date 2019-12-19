@@ -1,0 +1,45 @@
+PUT /_cluster/settings
+{
+  "transient" : {
+    "opendistro.sql.enabled" : false
+  }
+}
+
+POST /_opendistro/_sql
+{
+  "query" : "SELECT * FROM accounts"
+}
+
+PUT /_cluster/settings
+{
+  "transient" : {
+    "opendistro.sql.query.slowlog" : 10
+  }
+}
+
+PUT /_cluster/settings
+{
+  "transient" : {
+    "opendistro.sql.query.analysis.enabled" : false
+  }
+}
+
+PUT /_cluster/settings
+{
+  "transient" : {
+    "opendistro.sql.query.analysis.semantic.suggestion" : true
+  }
+}
+
+POST /_opendistro/_sql
+{
+  "query" : "SELECT first FROM accounts"
+}
+
+PUT /_cluster/settings
+{
+  "transient" : {
+    "opendistro.sql.query.analysis.semantic.threshold" : 50
+  }
+}
+

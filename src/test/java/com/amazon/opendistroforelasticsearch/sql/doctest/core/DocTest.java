@@ -35,6 +35,7 @@ import java.nio.file.Path;
 import java.util.Comparator;
 
 import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 import static org.elasticsearch.test.ESIntegTestCase.Scope.SUITE;
 
 /**
@@ -61,9 +62,11 @@ public abstract class DocTest extends SQLIntegTestCase implements DocBuilder {
     public Document openDocument() {
         DocTestConfig config = getClass().getAnnotation(DocTestConfig.class);
         Path docPath = Document.path(config.template());
+        Path codePath = Document.path(config.template() + ".console");
         try {
             PrintWriter docWriter = new PrintWriter(Files.newBufferedWriter(docPath, APPEND));
-            return new RstDocument(docWriter);
+            PrintWriter codeWriter = new PrintWriter(Files.newBufferedWriter(codePath, CREATE, APPEND));
+            return new RstDocument(docWriter, codeWriter);
         } catch (IOException e) {
             throw new IllegalStateException("Failed to open document file " + docPath, e);
         }

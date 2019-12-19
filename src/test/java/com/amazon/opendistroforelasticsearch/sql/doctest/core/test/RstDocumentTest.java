@@ -31,13 +31,18 @@ import static org.junit.Assert.assertThat;
 public class RstDocumentTest {
 
     private ByteArrayOutputStream content;
+    private ByteArrayOutputStream code;
 
     private RstDocument document;
 
     @Before
     public void setUp() {
         content = new ByteArrayOutputStream();
-        document = new RstDocument(new PrintWriter(content, true)); // Enable auto flush
+        code = new ByteArrayOutputStream();
+        document = new RstDocument(
+            new PrintWriter(content, true), // Enable auto flush
+            new PrintWriter(code, true)
+        );
     }
 
     @Test

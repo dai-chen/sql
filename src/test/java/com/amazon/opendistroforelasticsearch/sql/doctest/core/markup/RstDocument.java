@@ -25,9 +25,11 @@ import java.io.PrintWriter;
 public class RstDocument implements Document {
 
     private final PrintWriter docWriter;
+    private final PrintWriter codeWriter;
 
-    public RstDocument(PrintWriter docWriter) {
+    public RstDocument(PrintWriter docWriter, PrintWriter codeWriter) {
         this.docWriter = docWriter;
+        this.codeWriter = codeWriter;
     }
 
     @Override
@@ -54,6 +56,14 @@ public class RstDocument implements Document {
     }
 
     @Override
+    public Document code(String code) {
+        if (!Strings.isNullOrEmpty(code)) {
+            printCode(code);
+        }
+        return this;
+    }
+
+    @Override
     public Document table(String description, String table) {
         if (!Strings.isNullOrEmpty(table)) {
             // RST table is different and not supposed to indent
@@ -64,6 +74,7 @@ public class RstDocument implements Document {
 
     @Override
     public void close() {
+        codeWriter.close();
         docWriter.close();
     }
 
@@ -90,6 +101,11 @@ public class RstDocument implements Document {
             docWriter.println();
         }
         return this;
+    }
+
+    private void printCode(String code) {
+        codeWriter.println(code);
+        codeWriter.println();
     }
 
     private String indent(String text) {

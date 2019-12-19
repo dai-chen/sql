@@ -37,11 +37,12 @@ You can update the setting with a new value like this.
 
 SQL query::
 
-	>> curl -H 'Content-Type: application/json' -X PUT localhost:9200/_cluster/settings -d '{
+	PUT /_cluster/settings
+	{
 	  "transient" : {
 	    "opendistro.sql.enabled" : false
 	  }
-	}'
+	}
 
 Result set::
 
@@ -64,9 +65,10 @@ Query result after the setting updated is like:
 
 SQL query::
 
-	>> curl -H 'Content-Type: application/json' -X POST localhost:9200/_opendistro/_sql -d '{
+	POST /_opendistro/_sql
+	{
 	  "query" : "SELECT * FROM accounts"
-	}'
+	}
 
 Result set::
 
@@ -99,11 +101,12 @@ You can update the setting with a new value like this.
 
 SQL query::
 
-	>> curl -H 'Content-Type: application/json' -X PUT localhost:9200/_cluster/settings -d '{
+	PUT /_cluster/settings
+	{
 	  "transient" : {
 	    "opendistro.sql.query.slowlog" : 10
 	  }
-	}'
+	}
 
 Result set::
 
@@ -141,11 +144,12 @@ You can update the setting with a new value like this.
 
 SQL query::
 
-	>> curl -H 'Content-Type: application/json' -X PUT localhost:9200/_cluster/settings -d '{
+	PUT /_cluster/settings
+	{
 	  "transient" : {
 	    "opendistro.sql.query.analysis.enabled" : false
 	  }
-	}'
+	}
 
 Result set::
 
@@ -185,11 +189,12 @@ You can update the setting with a new value like this.
 
 SQL query::
 
-	>> curl -H 'Content-Type: application/json' -X PUT localhost:9200/_cluster/settings -d '{
+	PUT /_cluster/settings
+	{
 	  "transient" : {
 	    "opendistro.sql.query.analysis.semantic.suggestion" : true
 	  }
-	}'
+	}
 
 Result set::
 
@@ -218,9 +223,10 @@ Query result after the setting updated is like:
 
 SQL query::
 
-	>> curl -H 'Content-Type: application/json' -X POST localhost:9200/_opendistro/_sql -d '{
+	POST /_opendistro/_sql
+	{
 	  "query" : "SELECT first FROM accounts"
-	}'
+	}
 
 Result set::
 
@@ -253,11 +259,12 @@ You can update the setting with a new value like this.
 
 SQL query::
 
-	>> curl -H 'Content-Type: application/json' -X PUT localhost:9200/_cluster/settings -d '{
+	PUT /_cluster/settings
+	{
 	  "transient" : {
 	    "opendistro.sql.query.analysis.semantic.threshold" : 50
 	  }
-	}'
+	}
 
 Result set::
 

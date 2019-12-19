@@ -26,8 +26,8 @@ import org.elasticsearch.common.settings.Setting;
 
 import java.util.EnumSet;
 
-import static com.amazon.opendistroforelasticsearch.sql.doctest.core.request.SqlRequestFormat.CURL_REQUEST;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.request.SqlRequestFormat.IGNORE_REQUEST;
+import static com.amazon.opendistroforelasticsearch.sql.doctest.core.request.SqlRequestFormat.KIBANA_REQUEST;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.response.SqlResponseFormat.IGNORE_RESPONSE;
 import static com.amazon.opendistroforelasticsearch.sql.doctest.core.response.SqlResponseFormat.PRETTY_JSON_RESPONSE;
 import static com.amazon.opendistroforelasticsearch.sql.plugin.SqlSettings.QUERY_ANALYSIS_ENABLED;
@@ -126,13 +126,13 @@ public class PluginSettingIT extends DocTest {
         Example[] examples = new Example[sampleQueries.length + 1];
         examples[0] = example("You can update the setting with a new value like this.",
                               put(name, sampleValue),
-                              queryFormat(CURL_REQUEST, PRETTY_JSON_RESPONSE),
+                              queryFormat(KIBANA_REQUEST, PRETTY_JSON_RESPONSE),
                               explainFormat(IGNORE_REQUEST, IGNORE_RESPONSE));
 
         for (int i = 0; i < sampleQueries.length; i++) {
             examples[i + 1] = example("Query result after the setting updated is like:",
                                       post(sampleQueries[i]),
-                                      queryFormat(CURL_REQUEST, PRETTY_JSON_RESPONSE),
+                                      queryFormat(KIBANA_REQUEST, PRETTY_JSON_RESPONSE),
                                       explainFormat(IGNORE_REQUEST, IGNORE_RESPONSE));
         }
         return examples;
