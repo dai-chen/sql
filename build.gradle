@@ -13,12 +13,15 @@
  *   permissions and limitations under the License.
  */
 
+import org.elasticsearch.gradle.testclusters.TestClustersRegistry
+import org.elasticsearch.gradle.testclusters.TestClustersPlugin
+
 buildscript {
 
     ext {
         // When upgrading to version after 7.3.0, must remove also
         // project substitution from configurations.all (line 39)
-        es_version = System.getProperty("es.version", "7.4.2")
+        es_version = System.getProperty("es.version", "7.5.0")
     }
     // This isn't applying from repositories.gradle so repeating it here
     repositories {
@@ -62,13 +65,17 @@ ext {
 version = "${opendistroVersion}.0" 
 
 apply plugin: 'elasticsearch.esplugin'
-apply plugin: 'jacoco'
-apply from: 'build-tools/sqlplugin-coverage.gradle'
+apply plugin: 'elasticsearch.testclusters'
+
+//apply plugin: 'jacoco'
+//apply from: 'build-tools/sqlplugin-coverage.gradle'
 apply plugin: 'antlr'
 
+/*
 jacoco {
     toolVersion = "0.8.3"
 }
+*/
 
 ext {
     projectSubstitutions = [:]
@@ -128,7 +135,11 @@ test {
     systemProperty('project.root', project.rootDir.absolutePath)
 }
 
-integTestRunner {
+testClusters.integTest {
+    testDistribution = 'oss'
+}
+
+integTest.runner {
     // add "-Dtests.security.manager=false" to VM options if you want to run integ tests in IntelliJ
     systemProperty 'tests.security.manager', 'false'
     // allows integration test classes to access test resource from project root path
@@ -162,10 +173,12 @@ integTestRunner {
     }
 }
 
+/*
 integTestCluster {
     // use elasticsearch oss distribution for integration test.
     distribution = "oss-zip"
 }
+*/
 
 generateGrammarSource {
     arguments += ['-visitor', '-package', 'com.amazon.opendistroforelasticsearch.sql.antlr.parser']
@@ -180,7 +193,7 @@ configurations {
     }
 }
 
-check.dependsOn jacocoTestReport
+//check.dependsOn jacocoTestReport
 
 // TODO: fix code style in main and test source code
 checkstyle {
@@ -301,3 +314,7 @@ afterEvaluate {
     }
 }
 
+TestClustersRegistry registry = project.rootProject.extensions.create("testClustersRegistry", TestClustersRegistry)
+TestClustersPlugin.configureClaimClustersHook(project.gradle, registry)
+TestClustersPlugin.configureStartClustersHook(project.gradle, registry)
+TestClustersPlugin.configureStopClustersHook(project.gradle, registry)
