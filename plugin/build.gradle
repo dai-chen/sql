@@ -80,7 +80,7 @@ test {
     exclude 'com/amazon/opendistroforelasticsearch/sql/intgtest/**'
     // Gradle runs unit test using a working directory other and project root
     // set 'project.root' property to allow unit test classes to access test resources
-    systemProperty('project.root', project.rootDir.absolutePath)
+    systemProperty('project.root', project.projectDir.absolutePath)
 }
 
 testClusters.integTest {
