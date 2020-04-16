@@ -16,16 +16,34 @@ esplugin {
     name 'opendistro_sql'
     description 'Open Distro for Elasticsearch SQL'
     classname 'com.amazon.opendistroforelasticsearch.sql.plugin.SQLPlugin'
+    licenseFile rootProject.file("LICENSE.txt")
+    noticeFile rootProject.file("NOTICE")
 }
 
 test.enabled = false
 integTest.enabled = false
 dependencyLicenses.enabled = false
 thirdPartyAudit.enabled = false
+javadoc.enabled = false
+
+// ANTLR generated parser file is too large to be checked which caused licenseHeaders stuck.
+licenseHeaders {
+    enabled = true
+    excludes = ['com/amazon/opendistroforelasticsearch/sql/antlr/parser/**']
+}
 
 configurations.all {
     // conflict with spring-jcl
     exclude group: "commons-logging", module: "commons-logging"
+}
+
+bundlePlugin {
+    doLast {
+        copy {
+            from buildDir
+            into rootProject.buildDir
+        }
+    }
 }
 
 dependencies {
@@ -33,4 +51,55 @@ dependencies {
     compile project(":ppl")
     compile project(':elasticsearch')
     compile project(':legacy')
+}
+
+apply plugin: 'nebula.ospackage'
+
+// This is afterEvaluate because the bundlePlugin ZIP task is updated afterEvaluate and changes the ZIP name to match the plugin name
+afterEvaluate {
+    ospackage {
+        packageName = "${name}"
+        release = isSnapshot ? "0.1" : '1'
+        version = "${project.version}" - "-SNAPSHOT"
+
+        into '/usr/share/elasticsearch/plugins'
+        from(zipTree(bundlePlugin.archivePath)) {
+            into esplugin.name
+        }
+
+        user 'root'
+        permissionGroup 'root'
+        fileMode 0644
+        dirMode 0755
+
+        requires('elasticsearch-oss', versions.elasticsearch, EQUAL)
+        packager = 'Amazon'
+        vendor = 'Amazon'
+        os = 'LINUX'
+        prefix '/usr'
+
+        license 'ASL-2.0'
+        maintainer 'OpenDistro for Elasticsearch Team <opendistro@amazon.com>'
+        url 'https://opendistro.github.io/elasticsearch/downloads'
+        summary '''
+         SQL plugin for OpenDistro for Elasticsearch.
+         Reference documentation can be found at https://opendistro.github.io/for-elasticsearch-docs/.
+    '''.stripIndent().replace('\n', ' ').trim()
+    }
+
+    buildRpm {
+        arch = 'NOARCH'
+        archiveName "${packageName}-${version}.rpm"
+        dependsOn 'assemble'
+    }
+
+    buildDeb {
+        arch = 'amd64'
+        archiveName "${packageName}-${version}.deb"
+        dependsOn 'assemble'
+    }
+
+    task buildPackages(type: GradleBuild) {
+        tasks = ['build', 'buildRpm', 'buildDeb']
+    }
 }
