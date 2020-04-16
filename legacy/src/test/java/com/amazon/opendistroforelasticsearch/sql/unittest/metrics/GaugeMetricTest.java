@@ -13,12 +13,29 @@
  *   permissions and limitations under the License.
  */
 
-rootProject.name = 'opendistro-sql'
+package com.amazon.opendistroforelasticsearch.sql.unittest.metrics;
 
-include 'plugin'
-include 'ppl'
-include 'integ-test'
-include 'common'
-include 'elasticsearch'
-include 'legacy'
+import com.amazon.opendistroforelasticsearch.sql.metrics.GaugeMetric;
+import org.junit.Test;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
+
+public class GaugeMetricTest {
+
+    private static long x = 0;
+
+    @Test
+    public void getValue() {
+        GaugeMetric gaugeMetric = new GaugeMetric<>("test", this::getSeq);
+
+        assertThat(gaugeMetric.getValue(), equalTo(1L));
+        assertThat(gaugeMetric.getValue(), equalTo(2L));
+
+    }
+
+    private long getSeq() {
+        return ++x;
+    }
+
+}
