@@ -38,6 +38,7 @@ configurations.all {
 }
 
 bundlePlugin {
+    // Copy artifacts to root build/distributions
     doLast {
         copy {
             from buildDir
