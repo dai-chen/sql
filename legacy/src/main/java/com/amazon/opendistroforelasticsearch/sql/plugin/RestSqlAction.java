@@ -36,6 +36,8 @@ import com.amazon.opendistroforelasticsearch.sql.request.SqlRequest;
 import com.amazon.opendistroforelasticsearch.sql.request.SqlRequestFactory;
 import com.amazon.opendistroforelasticsearch.sql.request.SqlRequestParam;
 import com.amazon.opendistroforelasticsearch.sql.rewriter.matchtoterm.VerificationException;
+import com.amazon.opendistroforelasticsearch.sql.sql.SQLQueryRequest;
+import com.amazon.opendistroforelasticsearch.sql.sql.SQLService;
 import com.amazon.opendistroforelasticsearch.sql.utils.JsonPrettyFormatter;
 import com.amazon.opendistroforelasticsearch.sql.utils.LogUtils;
 import org.apache.logging.log4j.LogManager;
@@ -115,6 +117,12 @@ public class RestSqlAction extends BaseRestHandler {
 
             final SqlRequest sqlRequest = SqlRequestFactory.getSqlRequest(request);
             LOG.info("[{}] Incoming request {}: {}", LogUtils.getRequestId(), request.uri(), sqlRequest.getSql());
+
+            SQLService sqlService = new SQLService();
+            String result = sqlService.execute(new SQLQueryRequest(sqlRequest.getSql()));
+            if (result != null) {
+                return channel -> sendResponse(channel, result, OK);
+            }
 
             final QueryAction queryAction =
                     explainRequest(client, sqlRequest, SqlRequestParam.getFormat(request.params()));

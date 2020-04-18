@@ -13,13 +13,18 @@
  *   permissions and limitations under the License.
  */
 
-rootProject.name = 'opendistro-sql'
+package com.amazon.opendistroforelasticsearch.sql.sql;
 
-include 'plugin'
-include 'ppl'
-include 'integ-test'
-include 'common'
-include 'elasticsearch'
-include 'legacy'
-include 'sql'
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+/**
+ * SQL query request
+ */
+@Getter
+@RequiredArgsConstructor
+public class SQLQueryRequest {
+
+    private final String sqlQuery;
+
+}

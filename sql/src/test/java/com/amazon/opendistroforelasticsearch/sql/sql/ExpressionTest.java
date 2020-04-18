@@ -13,13 +13,19 @@
  *   permissions and limitations under the License.
  */
 
-rootProject.name = 'opendistro-sql'
+package com.amazon.opendistroforelasticsearch.sql.sql;
 
-include 'plugin'
-include 'ppl'
-include 'integ-test'
-include 'common'
-include 'elasticsearch'
-include 'legacy'
-include 'sql'
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
+public class ExpressionTest {
+
+    @Test
+    public void test() {
+        Expression expr = new Expression("1 + 2");
+        Object result = expr.evaluate(new Tuple());
+        assertEquals(3, result);
+    }
+
+}
