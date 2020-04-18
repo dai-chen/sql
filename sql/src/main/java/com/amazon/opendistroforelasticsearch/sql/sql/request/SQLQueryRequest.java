@@ -13,21 +13,18 @@
  *   permissions and limitations under the License.
  */
 
-package com.amazon.opendistroforelasticsearch.sql.sql;
+package com.amazon.opendistroforelasticsearch.sql.sql.request;
 
-import com.amazon.opendistroforelasticsearch.sql.sql.engine.Expression;
-import com.amazon.opendistroforelasticsearch.sql.sql.engine.Tuple;
-import org.junit.Test;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import static org.junit.Assert.assertEquals;
+/**
+ * SQL query request
+ */
+@Getter
+@RequiredArgsConstructor
+public class SQLQueryRequest {
 
-public class ExpressionTest {
-
-    @Test
-    public void test() {
-        Expression expr = new Expression("1 + 2");
-        Object result = expr.evaluate(new Tuple());
-        assertEquals(3, result);
-    }
+    private final String sqlQuery;
 
 }

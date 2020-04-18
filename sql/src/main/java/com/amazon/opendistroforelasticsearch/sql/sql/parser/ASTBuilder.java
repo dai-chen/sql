@@ -13,8 +13,10 @@
  *   permissions and limitations under the License.
  */
 
-package com.amazon.opendistroforelasticsearch.sql.sql;
+package com.amazon.opendistroforelasticsearch.sql.sql.parser;
 
+import com.amazon.opendistroforelasticsearch.sql.sql.engine.Expression;
+import com.amazon.opendistroforelasticsearch.sql.sql.engine.Projection;
 import com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSqlParserBaseVisitor;
 
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSqlParser.SelectElementContext;

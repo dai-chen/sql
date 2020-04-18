@@ -13,7 +13,7 @@
  *   permissions and limitations under the License.
  */
 
-package com.amazon.opendistroforelasticsearch.sql.sql;
+package com.amazon.opendistroforelasticsearch.sql.sql.engine;
 
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;

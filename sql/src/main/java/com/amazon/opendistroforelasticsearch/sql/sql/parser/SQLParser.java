@@ -13,13 +13,17 @@
  *   permissions and limitations under the License.
  */
 
-package com.amazon.opendistroforelasticsearch.sql.sql;
+package com.amazon.opendistroforelasticsearch.sql.sql.parser;
 
 import com.amazon.opendistroforelasticsearch.sql.common.antlr.CaseInsensitiveCharStream;
+import com.amazon.opendistroforelasticsearch.sql.sql.engine.Projection;
 import com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSqlLexer;
 import com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSqlParser;
 import com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSqlParser.RootContext;
+import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
 
 /**
  * SQL parser
@@ -35,8 +39,21 @@ public class SQLParser {
                 new CommonTokenStream(
                     new OpenDistroSqlLexer(
                         new CaseInsensitiveCharStream(sql))));
+
+        parser.addErrorListener(createErrorListener());
+
         RootContext parseTree = parser.root();
         return parseTree.accept(new ASTBuilder());
+    }
+
+    private BaseErrorListener createErrorListener() {
+        return new BaseErrorListener() {
+            @Override
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+                                    int line, int charPositionInLine, String msg, RecognitionException e) {
+                throw new SQLSyntaxError();
+            }
+        };
     }
 
 }

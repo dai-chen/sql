@@ -13,18 +13,10 @@
  *   permissions and limitations under the License.
  */
 
-package com.amazon.opendistroforelasticsearch.sql.sql;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+package com.amazon.opendistroforelasticsearch.sql.sql.parser;
 
 /**
- * SQL query request
+ * Syntax error
  */
-@Getter
-@RequiredArgsConstructor
-public class SQLQueryRequest {
-
-    private final String sqlQuery;
-
+public class SQLSyntaxError extends RuntimeException {
 }

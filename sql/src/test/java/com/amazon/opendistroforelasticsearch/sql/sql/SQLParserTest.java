@@ -15,6 +15,9 @@
 
 package com.amazon.opendistroforelasticsearch.sql.sql;
 
+import com.amazon.opendistroforelasticsearch.sql.sql.engine.Expression;
+import com.amazon.opendistroforelasticsearch.sql.sql.engine.Projection;
+import com.amazon.opendistroforelasticsearch.sql.sql.parser.SQLParser;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

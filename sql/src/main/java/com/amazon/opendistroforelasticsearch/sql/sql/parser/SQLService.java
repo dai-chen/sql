@@ -13,8 +13,11 @@
  *   permissions and limitations under the License.
  */
 
-package com.amazon.opendistroforelasticsearch.sql.sql;
+package com.amazon.opendistroforelasticsearch.sql.sql.parser;
 
+import com.amazon.opendistroforelasticsearch.sql.sql.engine.Projection;
+import com.amazon.opendistroforelasticsearch.sql.sql.engine.Tuple;
+import com.amazon.opendistroforelasticsearch.sql.sql.request.SQLQueryRequest;
 import com.amazon.opendistroforelasticsearch.sql.sql.response.SQLQueryResponse;
 import com.amazon.opendistroforelasticsearch.sql.sql.response.Schema;
 import org.json.JSONObject;
@@ -25,8 +28,12 @@ import org.json.JSONObject;
 public class SQLService {
 
     public String execute(SQLQueryRequest request) {
-        Projection ast = new SQLParser().parse(request.getSqlQuery());
-        return planAndExecute(ast);
+        try {
+            Projection ast = new SQLParser().parse(request.getSqlQuery());
+            return planAndExecute(ast);
+        } catch (SQLSyntaxError error) {
+            return null;
+        }
     }
 
     private String planAndExecute(Projection ast) {
