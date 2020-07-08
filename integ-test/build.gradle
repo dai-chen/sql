@@ -1,5 +1,10 @@
 import org.elasticsearch.gradle.test.RestIntegTestTask
 
+plugins {
+    id "com.wiredforcode.spawn" version "0.8.2"
+    id 'base'
+}
+
 apply plugin: 'elasticsearch.build'
 apply plugin: 'elasticsearch.rest-test'
 apply plugin: 'java'
@@ -140,4 +145,40 @@ testClusters.comparisonTest {
     testDistribution = 'oss'
     plugin file(tasks.getByPath(':plugin:bundlePlugin').archiveFile)
 }
+
+
+// Tableau TDVT Test Task
+
+def path = project(':').projectDir
+// temporary fix, because currently we are under migration to new architecture. Need to run ./gradlew run from
+// plugin module, and will only build ppl in it.
+def plugin_path = project(':plugin').projectDir
+
+task bootstrap(type: Exec) {
+    def dir = './src/tdvt'
+    inputs.file "$dir/bootstrap.sh"
+    outputs.dir "$dir/.venv"
+
+    commandLine 'sh', "$dir/bootstrap.sh"
+}
+
+//evaluationDependsOn(':')
+task startES(type: SpawnProcessTask) {
+    command "${path}/gradlew -p ${plugin_path} run"
+    ready 'started'
+}
+
+task tdvtTest(type: Exec, dependsOn: ['bootstrap']) {
+
+    //commandLine "$projectDir/bin/test-docs"
+
+    doLast {
+        println("TDVT test done")
+    }
+}
+
+task stopES(type: KillProcessTask)
+
+//tdvtTest.dependsOn startES
+//tdvtTest.finalizedBy stopES
 
