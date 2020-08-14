@@ -86,7 +86,7 @@ public class SQLQueryRequest {
    * @return      parameter value
    */
   public String getParam(String key) {
-    return params.getOrDefault(key, "");
+    return params.get(key);
   }
 
   private boolean isOnlyQueryFieldInPayload() {

@@ -101,7 +101,7 @@ public class RestSQLQueryAction extends BaseRestHandler {
     }
 
     if (request.isExplainRequest()) {
-      boolean isProfiling = Boolean.parseBoolean(request.getParam("isProfiling"));
+      boolean isProfiling = isProfiling(request);
       return channel -> sqlService.explain(plan, isProfiling, createExplainResponseListener(channel));
     }
     return channel -> sqlService.execute(plan, createQueryResponseListener(channel));
@@ -164,6 +164,11 @@ public class RestSQLQueryAction extends BaseRestHandler {
   private void sendResponse(RestChannel channel, RestStatus status, String content) {
     channel.sendResponse(new BytesRestResponse(
         status, "application/json; charset=UTF-8", content));
+  }
+
+  private boolean isProfiling(SQLQueryRequest request) {
+    String isProfiling = request.getParam("isProfiling");
+    return Boolean.parseBoolean(isProfiling);
   }
 
 }

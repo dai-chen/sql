@@ -16,6 +16,7 @@
 
 package com.amazon.opendistroforelasticsearch.sql.sql.domain;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -28,33 +29,33 @@ public class SQLQueryRequestTest {
 
   @Test
   public void shouldSupportQuery() {
-    SQLQueryRequest request = SQLQueryRequestBuilder.request("SELECT 1").build();
+    SQLQueryRequest request = request().query("SELECT 1").build();
     assertTrue(request.isSupported());
   }
 
   @Test
   public void shouldSupportQueryWithJDBCFormat() {
-    SQLQueryRequest request = SQLQueryRequestBuilder.request("SELECT 1")
-                                                    .format("jdbc")
-                                                    .build();
+    SQLQueryRequest request = request().query("SELECT 1")
+                                       .format("jdbc")
+                                       .build();
     assertTrue(request.isSupported());
   }
 
   @Test
   public void shouldSupportQueryWithZeroFetchSize() {
     SQLQueryRequest request =
-        SQLQueryRequestBuilder.request("SELECT 1")
-                              .jsonContent("{\"query\": \"SELECT 1\", \"fetch_size\": 0}")
-                              .build();
+        request().query("SELECT 1")
+                 .jsonContent("{\"query\": \"SELECT 1\", \"fetch_size\": 0}")
+                 .build();
     assertTrue(request.isSupported());
   }
 
   @Test
   public void shouldSupportExplain() {
     SQLQueryRequest explainRequest =
-        SQLQueryRequestBuilder.request("SELECT 1")
-                              .path("_opendistro/_sql/_explain")
-                              .build();
+        request().query("SELECT 1")
+                 .path("_opendistro/_sql/_explain")
+                 .build();
     assertTrue(explainRequest.isExplainRequest());
     assertTrue(explainRequest.isSupported());
   }
@@ -62,25 +63,34 @@ public class SQLQueryRequestTest {
   @Test
   public void shouldNotSupportCursorRequest() {
     SQLQueryRequest fetchSizeRequest =
-        SQLQueryRequestBuilder.request("SELECT 1")
-                              .jsonContent("{\"query\": \"SELECT 1\", \"fetch_size\": 5}")
-                              .build();
+        request().query("SELECT 1")
+                  .jsonContent("{\"query\": \"SELECT 1\", \"fetch_size\": 5}")
+                  .build();
     assertFalse(fetchSizeRequest.isSupported());
 
     SQLQueryRequest cursorRequest =
-        SQLQueryRequestBuilder.request("SELECT 1")
-                              .jsonContent("{\"cursor\": \"abcdefgh...\"}")
-                              .build();
+        request().query("SELECT 1")
+                 .jsonContent("{\"cursor\": \"abcdefgh...\"}")
+                 .build();
     assertFalse(cursorRequest.isSupported());
   }
 
   @Test
   public void shouldNotSupportCSVFormat() {
-    SQLQueryRequest csvRequest =
-        SQLQueryRequestBuilder.request("SELECT 1")
-                              .format("csv")
-                              .build();
+    SQLQueryRequest csvRequest = request().query("SELECT 1")
+                                          .format("csv")
+                                          .build();
     assertFalse(csvRequest.isSupported());
+  }
+
+  @Test
+  public void testParameters() {
+    SQLQueryRequest request = request().param("isProfiling", "true").build();
+    assertEquals("true", request.getParam("isProfiling"));
+  }
+
+  private SQLQueryRequestBuilder request() {
+    return new SQLQueryRequestBuilder();
   }
 
   /**
@@ -93,10 +103,9 @@ public class SQLQueryRequestTest {
     private String format;
     private Map<String, String> params = new HashMap<>();
 
-    static SQLQueryRequestBuilder request(String query) {
-      SQLQueryRequestBuilder builder = new SQLQueryRequestBuilder();
-      builder.query = query;
-      return builder;
+    SQLQueryRequestBuilder query(String query) {
+      this.query = query;
+      return this;
     }
 
     SQLQueryRequestBuilder jsonContent(String jsonContent) {
@@ -111,6 +120,11 @@ public class SQLQueryRequestTest {
 
     SQLQueryRequestBuilder format(String format) {
       this.format = format;
+      return this;
+    }
+
+    SQLQueryRequestBuilder param(String key, String value) {
+      params.put(key, value);
       return this;
     }
 
