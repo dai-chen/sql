@@ -16,6 +16,7 @@
 
 package com.amazon.opendistroforelasticsearch.sql.executor;
 
+import static com.amazon.opendistroforelasticsearch.sql.data.model.ExprValueUtils.tupleValue;
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.INTEGER;
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.STRING;
 import static com.amazon.opendistroforelasticsearch.sql.expression.DSL.literal;
@@ -34,14 +35,14 @@ import com.amazon.opendistroforelasticsearch.sql.planner.physical.PhysicalPlan;
 import com.amazon.opendistroforelasticsearch.sql.planner.physical.RenameOperator;
 import com.amazon.opendistroforelasticsearch.sql.storage.TableScanOperator;
 import com.google.common.collect.ImmutableMap;
+import java.util.Arrays;
+import java.util.Iterator;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class ExplainTest extends ExpressionTestBase {
-
-  private final Explain explain = new Explain();
 
   @Test
   void can_explain_plan_with_project_filter_table_scan() {
@@ -79,7 +80,7 @@ class ExplainTest extends ExpressionTestBase {
             + "    }\n"
             + "  }\n"
             + "}",
-        explain.apply(plan)
+        new Explain(false).apply(plan)
     );
   }
 
@@ -98,19 +99,51 @@ class ExplainTest extends ExpressionTestBase {
             + "    }\n"
             + "  }\n"
             + "}",
+        new Explain(false).apply(plan)
+    );
+  }
+
+  @Test
+  void can_profile_plan_with_project_filter_table_scan() {
+    Expression filterExpr = dsl.greater(ref("age", INTEGER), literal(30));
+    NamedExpression[] projectList = {
+        named("age", ref("age", INTEGER))
+    };
+
+    PhysicalPlan plan =
+        project(
+            filter(
+                new FakeTableScan(),
+                filterExpr),
+            projectList);
+
+    Explain explain = new Explain(true);
+    plan = explain.profile(plan);
+    while (plan.hasNext()) {
+      plan.next();
+    }
+
+    assertEquals(
+        "",
         explain.apply(plan)
     );
   }
 
   private static class FakeTableScan extends TableScanOperator {
+    private final Iterator<ExprValue> it =
+        Arrays.asList(
+            tupleValue(ImmutableMap.of("age", 20)),
+            tupleValue(ImmutableMap.of("age", 50))
+        ).iterator();
+
     @Override
     public boolean hasNext() {
-      return false;
+      return it.hasNext();
     }
 
     @Override
     public ExprValue next() {
-      return null;
+      return it.next();
     }
 
     @Override

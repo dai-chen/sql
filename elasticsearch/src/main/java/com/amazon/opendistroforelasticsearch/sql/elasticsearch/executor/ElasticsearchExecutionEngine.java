@@ -59,10 +59,23 @@ public class ElasticsearchExecutionEngine implements ExecutionEngine {
   }
 
   @Override
-  public void explain(PhysicalPlan plan, boolean isProfiling, ResponseListener<String> listener) {
+  public void explain(PhysicalPlan physicalPlan, boolean isProfiling,
+                      ResponseListener<String> listener) {
     client.schedule(() -> {
       try {
-        listener.onResponse(new Explain().apply(plan));
+        Explain explain = new Explain(isProfiling);
+        if (isProfiling) {
+          try (PhysicalPlan plan = executionProtector.protect(
+                                    explain.profile(physicalPlan))) {
+            plan.open();
+            while (plan.hasNext()) {
+              plan.next();
+            }
+            listener.onResponse(explain.apply(plan));
+          }
+        } else {
+          listener.onResponse(explain.apply(physicalPlan));
+        }
       } catch (Exception e) {
         listener.onFailure(e);
       }

@@ -89,6 +89,11 @@ public class SQLQueryRequest {
     return params.get(key);
   }
 
+  public boolean isProfile() {
+    String isProfiling = getParam("profile");
+    return Boolean.parseBoolean(isProfiling);
+  }
+
   private boolean isOnlyQueryFieldInPayload() {
     return (jsonContent.keySet().size() == 1 && jsonContent.has("query"))
         || (jsonContent.keySet().size() == 2 && jsonContent.has("query")
