@@ -19,6 +19,8 @@ package com.amazon.opendistroforelasticsearch.sql.sql.domain;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
@@ -89,6 +91,7 @@ public class SQLQueryRequestTest {
     private String query;
     private String path = "_/opendistro/_sql";
     private String format;
+    private Map<String, String> params = new HashMap<>();
 
     static SQLQueryRequestBuilder request(String query) {
       SQLQueryRequestBuilder builder = new SQLQueryRequestBuilder();
@@ -115,7 +118,7 @@ public class SQLQueryRequestTest {
       if (jsonContent == null) {
         jsonContent = "{\"query\": \"" + query + "\"}";
       }
-      return new SQLQueryRequest(new JSONObject(jsonContent), query, path, format);
+      return new SQLQueryRequest(new JSONObject(jsonContent), query, path, format, params);
     }
   }
 

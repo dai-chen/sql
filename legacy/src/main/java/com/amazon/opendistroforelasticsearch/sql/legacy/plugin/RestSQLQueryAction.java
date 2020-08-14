@@ -101,7 +101,8 @@ public class RestSQLQueryAction extends BaseRestHandler {
     }
 
     if (request.isExplainRequest()) {
-      return channel -> sqlService.explain(plan, createExplainResponseListener(channel));
+      boolean isProfiling = Boolean.parseBoolean(request.getParam("isProfiling"));
+      return channel -> sqlService.explain(plan, isProfiling, createExplainResponseListener(channel));
     }
     return channel -> sqlService.execute(plan, createQueryResponseListener(channel));
   }

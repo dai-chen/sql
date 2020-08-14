@@ -38,11 +38,11 @@ public interface ExecutionEngine {
 
   /**
    * Explain physical plan and call back response listener.
-   *
-   * @param plan     executable physical plan
-   * @param listener response listener
+   * @param plan        executable physical plan
+   * @param isProfiling is profiling required
+   * @param listener    response listener
    */
-  void explain(PhysicalPlan plan, ResponseListener<String> listener);
+  void explain(PhysicalPlan plan, boolean isProfiling, ResponseListener<String> listener);
 
   /**
    * Data class that encapsulates ExprValue.

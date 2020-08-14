@@ -17,9 +17,11 @@
 package com.amazon.opendistroforelasticsearch.sql.sql;
 
 import static com.amazon.opendistroforelasticsearch.sql.executor.ExecutionEngine.QueryResponse;
+import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -73,7 +75,7 @@ class SQLServiceTest {
     }).when(executionEngine).execute(any(), any());
 
     sqlService.execute(
-        new SQLQueryRequest(new JSONObject(), "SELECT 123", "_opendistro/_sql", "jdbc"),
+        new SQLQueryRequest(new JSONObject(), "SELECT 123", "_opendistro/_sql", "jdbc", emptyMap()),
         new ResponseListener<QueryResponse>() {
           @Override
           public void onResponse(QueryResponse response) {
@@ -90,12 +92,12 @@ class SQLServiceTest {
   @Test
   public void canExplainSqlQuery() {
     doAnswer(invocation -> {
-      ResponseListener<String> listener = invocation.getArgument(1);
+      ResponseListener<String> listener = invocation.getArgument(2);
       listener.onResponse("Explain test");
       return null;
-    }).when(executionEngine).explain(any(), any());
+    }).when(executionEngine).explain(any(), anyBoolean(), any());
 
-    sqlService.explain(mock(PhysicalPlan.class),
+    sqlService.explain(mock(PhysicalPlan.class), false,
         new ResponseListener<String>() {
           @Override
           public void onResponse(String response) {
@@ -134,7 +136,7 @@ class SQLServiceTest {
   @Test
   public void canCaptureErrorDuringExecution() {
     sqlService.execute(
-        new SQLQueryRequest(new JSONObject(), "SELECT", "_opendistro/_sql", ""),
+        new SQLQueryRequest(new JSONObject(), "SELECT", "_opendistro/_sql", "", emptyMap()),
         new ResponseListener<QueryResponse>() {
           @Override
           public void onResponse(QueryResponse response) {
@@ -168,9 +170,9 @@ class SQLServiceTest {
 
   @Test
   public void canCaptureErrorDuringExplain() {
-    doThrow(new RuntimeException()).when(executionEngine).explain(any(), any());
+    doThrow(new RuntimeException()).when(executionEngine).explain(any(), anyBoolean(), any());
 
-    sqlService.explain(mock(PhysicalPlan.class),
+    sqlService.explain(mock(PhysicalPlan.class), false,
         new ResponseListener<String>() {
           @Override
           public void onResponse(String response) {

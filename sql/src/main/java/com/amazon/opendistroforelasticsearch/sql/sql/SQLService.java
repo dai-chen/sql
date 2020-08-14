@@ -93,9 +93,9 @@ public class SQLService {
    * @param plan        physical plan
    * @param listener    callback listener
    */
-  public void explain(PhysicalPlan plan, ResponseListener<String> listener) {
+  public void explain(PhysicalPlan plan, boolean isProfiling, ResponseListener<String> listener) {
     try {
-      executionEngine.explain(plan, listener);
+      executionEngine.explain(plan, isProfiling, listener);
     } catch (Exception e) {
       listener.onFailure(e);
     }

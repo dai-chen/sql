@@ -135,7 +135,7 @@ class ElasticsearchExecutionEngineTest {
     when(json.toPrettyString()).thenReturn("Explain test");
 
     AtomicReference<String> result = new AtomicReference<>();
-    executor.explain(plan, new ResponseListener<String>() {
+    executor.explain(plan, false, new ResponseListener<String>() {
       @Override
       public void onResponse(String response) {
         result.set(response);
@@ -157,7 +157,7 @@ class ElasticsearchExecutionEngineTest {
     when(plan.accept(any(), any())).thenThrow(IllegalStateException.class);
 
     AtomicReference<Exception> result = new AtomicReference<>();
-    executor.explain(plan, new ResponseListener<String>() {
+    executor.explain(plan, false, new ResponseListener<String>() {
       @Override
       public void onResponse(String response) {
         fail("Should fail as expected");

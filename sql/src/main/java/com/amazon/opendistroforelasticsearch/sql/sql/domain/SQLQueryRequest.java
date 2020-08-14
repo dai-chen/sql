@@ -17,6 +17,7 @@
 package com.amazon.opendistroforelasticsearch.sql.sql.domain;
 
 import com.google.common.base.Strings;
+import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,11 @@ public class SQLQueryRequest {
   private final String format;
 
   /**
+   * URL parameters.
+   */
+  private final Map<String, String> params;
+
+  /**
    * Pre-check if the request can be supported by meeting the following criteria:
    *  1.Only "query" field in payload. In other word, it's not a cursor request
    *   (with either non-zero "fetch_size" or "cursor" field) or request with extra field
@@ -72,6 +78,15 @@ public class SQLQueryRequest {
    */
   public boolean isExplainRequest() {
     return path.endsWith("/_explain");
+  }
+
+  /**
+   * Get URL parameter by its name.
+   * @param key   parameter name
+   * @return      parameter value
+   */
+  public String getParam(String key) {
+    return params.getOrDefault(key, "");
   }
 
   private boolean isOnlyQueryFieldInPayload() {
