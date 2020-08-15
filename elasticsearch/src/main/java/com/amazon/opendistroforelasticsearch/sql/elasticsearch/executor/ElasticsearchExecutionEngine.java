@@ -21,7 +21,8 @@ import com.amazon.opendistroforelasticsearch.sql.data.model.ExprValue;
 import com.amazon.opendistroforelasticsearch.sql.elasticsearch.client.ElasticsearchClient;
 import com.amazon.opendistroforelasticsearch.sql.elasticsearch.executor.protector.ExecutionProtector;
 import com.amazon.opendistroforelasticsearch.sql.executor.ExecutionEngine;
-import com.amazon.opendistroforelasticsearch.sql.executor.Explain;
+import com.amazon.opendistroforelasticsearch.sql.executor.explain.Explain;
+import com.amazon.opendistroforelasticsearch.sql.executor.explain.Profiler;
 import com.amazon.opendistroforelasticsearch.sql.planner.physical.PhysicalPlan;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,10 +64,11 @@ public class ElasticsearchExecutionEngine implements ExecutionEngine {
                       ResponseListener<String> listener) {
     client.schedule(() -> {
       try {
-        Explain explain = new Explain(isProfiling);
+        Profiler profiler = new Profiler();
+        Explain explain = new Explain(profiler);
         if (isProfiling) {
           try (PhysicalPlan plan = executionProtector.protect(
-                                    explain.profile(physicalPlan))) {
+                                    profiler.apply(physicalPlan))) {
             plan.open();
             while (plan.hasNext()) {
               plan.next();

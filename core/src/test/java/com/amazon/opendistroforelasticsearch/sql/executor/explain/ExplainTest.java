@@ -14,7 +14,7 @@
  *
  */
 
-package com.amazon.opendistroforelasticsearch.sql.executor;
+package com.amazon.opendistroforelasticsearch.sql.executor.explain;
 
 import static com.amazon.opendistroforelasticsearch.sql.data.model.ExprValueUtils.tupleValue;
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.INTEGER;
@@ -26,6 +26,8 @@ import static com.amazon.opendistroforelasticsearch.sql.planner.physical.Physica
 import static com.amazon.opendistroforelasticsearch.sql.planner.physical.PhysicalPlanDSL.project;
 import static com.amazon.opendistroforelasticsearch.sql.planner.physical.PhysicalPlanDSL.rename;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprValue;
 import com.amazon.opendistroforelasticsearch.sql.expression.Expression;
@@ -34,6 +36,7 @@ import com.amazon.opendistroforelasticsearch.sql.expression.NamedExpression;
 import com.amazon.opendistroforelasticsearch.sql.planner.physical.PhysicalPlan;
 import com.amazon.opendistroforelasticsearch.sql.planner.physical.RenameOperator;
 import com.amazon.opendistroforelasticsearch.sql.storage.TableScanOperator;
+import com.google.common.base.Ticker;
 import com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -80,7 +83,7 @@ class ExplainTest extends ExpressionTestBase {
             + "    }\n"
             + "  }\n"
             + "}",
-        new Explain(false).apply(plan)
+        new Explain(new Profiler()).apply(plan)
     );
   }
 
@@ -99,7 +102,7 @@ class ExplainTest extends ExpressionTestBase {
             + "    }\n"
             + "  }\n"
             + "}",
-        new Explain(false).apply(plan)
+        new Explain(new Profiler()).apply(plan)
     );
   }
 
@@ -117,8 +120,11 @@ class ExplainTest extends ExpressionTestBase {
                 filterExpr),
             projectList);
 
-    Explain explain = new Explain(true);
-    plan = explain.profile(plan);
+    Ticker ticker = mock(Ticker.class);
+    when(ticker.read()).thenReturn(0L);
+    Profiler profiler = new Profiler(ticker);
+    Explain explain = new Explain(profiler);
+    plan = profiler.apply(plan);
     while (plan.hasNext()) {
       plan.next();
     }
