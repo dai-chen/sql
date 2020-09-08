@@ -16,6 +16,8 @@
 
 package com.amazon.opendistroforelasticsearch.sql.executor;
 
+import static com.amazon.opendistroforelasticsearch.sql.executor.ExplainContext.Profile;
+
 import com.amazon.opendistroforelasticsearch.sql.common.response.ResponseListener;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprValue;
 import com.amazon.opendistroforelasticsearch.sql.data.type.ExprType;
@@ -85,6 +87,7 @@ public interface ExecutionEngine {
   class ExplainResponseNode {
     private final String name;
     private Map<String, Object> description;
+    private Profile profile;
     private List<ExplainResponseNode> children;
   }
 

@@ -23,6 +23,8 @@ import com.amazon.opendistroforelasticsearch.sql.elasticsearch.executor.protecto
 import com.amazon.opendistroforelasticsearch.sql.elasticsearch.storage.ElasticsearchIndexScan;
 import com.amazon.opendistroforelasticsearch.sql.executor.ExecutionEngine;
 import com.amazon.opendistroforelasticsearch.sql.executor.Explain;
+import com.amazon.opendistroforelasticsearch.sql.executor.ExplainContext;
+import com.amazon.opendistroforelasticsearch.sql.executor.Profiler;
 import com.amazon.opendistroforelasticsearch.sql.planner.physical.PhysicalPlan;
 import com.amazon.opendistroforelasticsearch.sql.storage.TableScanOperator;
 import com.google.common.collect.ImmutableMap;
@@ -65,18 +67,28 @@ public class ElasticsearchExecutionEngine implements ExecutionEngine {
   public void explain(PhysicalPlan plan, ResponseListener<ExplainResponse> listener) {
     client.schedule(() -> {
       try {
-        Explain esExplain = new Explain() {
-          @Override
-          public ExplainResponseNode visitTableScan(TableScanOperator node, Object context) {
-            return explain(node, context, explainNode -> {
-              ElasticsearchIndexScan indexScan = (ElasticsearchIndexScan) node;
-              explainNode.setDescription(ImmutableMap.of(
-                  "request", indexScan.getRequest().toString()));
-            });
+        ExplainContext context = new ExplainContext();
+        Profiler profiler = new Profiler();
+        try (PhysicalPlan securedPlan = executionProtector.protect(profiler.apply(plan, context))) {
+          securedPlan.open();
+          while (securedPlan.hasNext()) {
+            securedPlan.next();
           }
-        };
 
-        listener.onResponse(esExplain.apply(plan));
+          Explain esExplain = new Explain() {
+            @Override
+            public ExplainResponseNode visitTableScan(TableScanOperator node,
+                                                      ExplainContext context) {
+              return explain(node, context, explainNode -> {
+                ElasticsearchIndexScan indexScan = (ElasticsearchIndexScan) node;
+                explainNode.setDescription(ImmutableMap.of(
+                    "request", indexScan.getRequest().toString()));
+              });
+            }
+          };
+          listener.onResponse(esExplain.apply(plan, context));
+        }
+
       } catch (Exception e) {
         listener.onFailure(e);
       }

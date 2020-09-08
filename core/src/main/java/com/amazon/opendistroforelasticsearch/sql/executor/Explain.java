@@ -35,35 +35,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Visitor that explains a physical plan to JSON format.
  */
-public class Explain extends PhysicalPlanNodeVisitor<ExplainResponseNode, Object>
-                     implements Function<PhysicalPlan, ExplainResponse> {
+public class Explain extends PhysicalPlanNodeVisitor<ExplainResponseNode, ExplainContext>
+                     /*implements Function<PhysicalPlan, ExplainResponse>*/ {
 
-  @Override
-  public ExplainResponse apply(PhysicalPlan plan) {
-    return new ExplainResponse(plan.accept(this, null));
+  public ExplainResponse apply(PhysicalPlan plan, ExplainContext context) {
+    return new ExplainResponse(plan.accept(this, context));
   }
 
   @Override
-  public ExplainResponseNode visitProject(ProjectOperator node, Object context) {
+  public ExplainResponseNode visitProject(ProjectOperator node, ExplainContext context) {
     return explain(node, context, explainNode -> explainNode.setDescription(ImmutableMap.of(
         "fields", node.getProjectList().toString())));
   }
 
   @Override
-  public ExplainResponseNode visitFilter(FilterOperator node, Object context) {
+  public ExplainResponseNode visitFilter(FilterOperator node, ExplainContext context) {
     return explain(node, context, explainNode -> explainNode.setDescription(ImmutableMap.of(
         "conditions", node.getConditions().toString())));
   }
 
   @Override
-  public ExplainResponseNode visitSort(SortOperator node, Object context) {
+  public ExplainResponseNode visitSort(SortOperator node, ExplainContext context) {
     Map<String, Map<String, String>> sortListDescription =
         node.getSortList()
             .stream()
@@ -79,20 +77,20 @@ public class Explain extends PhysicalPlanNodeVisitor<ExplainResponseNode, Object
   }
 
   @Override
-  public ExplainResponseNode visitTableScan(TableScanOperator node, Object context) {
+  public ExplainResponseNode visitTableScan(TableScanOperator node, ExplainContext context) {
     return explain(node, context, explainNode -> explainNode.setDescription(ImmutableMap.of(
         "request", node.toString())));
   }
 
   @Override
-  public ExplainResponseNode visitAggregation(AggregationOperator node, Object context) {
+  public ExplainResponseNode visitAggregation(AggregationOperator node, ExplainContext context) {
     return explain(node, context, explainNode -> explainNode.setDescription(ImmutableMap.of(
         "aggregators", node.getAggregatorList().toString(),
         "groupBy", node.getGroupByExprList().toString())));
   }
 
   @Override
-  public ExplainResponseNode visitRename(RenameOperator node, Object context) {
+  public ExplainResponseNode visitRename(RenameOperator node, ExplainContext context) {
     Map<String, String> renameMappingDescription =
         node.getMapping()
             .entrySet()
@@ -106,19 +104,19 @@ public class Explain extends PhysicalPlanNodeVisitor<ExplainResponseNode, Object
   }
 
   @Override
-  public ExplainResponseNode visitRemove(RemoveOperator node, Object context) {
+  public ExplainResponseNode visitRemove(RemoveOperator node, ExplainContext context) {
     return explain(node, context, explainNode -> explainNode.setDescription(ImmutableMap.of(
         "removeList", node.getRemoveList().toString())));
   }
 
   @Override
-  public ExplainResponseNode visitEval(EvalOperator node, Object context) {
+  public ExplainResponseNode visitEval(EvalOperator node, ExplainContext context) {
     return explain(node, context, explainNode -> explainNode.setDescription(ImmutableMap.of(
         "expressions", convertPairListToMap(node.getExpressionList()))));
   }
 
   @Override
-  public ExplainResponseNode visitDedupe(DedupeOperator node, Object context) {
+  public ExplainResponseNode visitDedupe(DedupeOperator node, ExplainContext context) {
     return explain(node, context, explainNode -> explainNode.setDescription(ImmutableMap.of(
         "dedupeList", node.getDedupeList().toString(),
         "allowedDuplication", node.getAllowedDuplication(),
@@ -127,12 +125,12 @@ public class Explain extends PhysicalPlanNodeVisitor<ExplainResponseNode, Object
   }
 
   @Override
-  public ExplainResponseNode visitValues(ValuesOperator node, Object context) {
+  public ExplainResponseNode visitValues(ValuesOperator node, ExplainContext context) {
     return explain(node, context, explainNode -> explainNode.setDescription(ImmutableMap.of(
         "values", node.getValues())));
   }
 
-  protected ExplainResponseNode explain(PhysicalPlan node, Object context,
+  protected ExplainResponseNode explain(PhysicalPlan node, ExplainContext context,
                                         Consumer<ExplainResponseNode> doExplain) {
     ExplainResponseNode explainNode = new ExplainResponseNode(getOperatorName(node));
 
@@ -143,6 +141,7 @@ public class Explain extends PhysicalPlanNodeVisitor<ExplainResponseNode, Object
     explainNode.setChildren(children);
 
     doExplain.accept(explainNode);
+    explainNode.setProfile(context.getProfile(node));
     return explainNode;
   }
 
