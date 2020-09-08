@@ -53,7 +53,7 @@ public class Profiler extends PhysicalPlanInterceptor<ExplainContext> {
 
       @Override
       public <R, C> R accept(PhysicalPlanNodeVisitor<R, C> visitor, C context) {
-        return intercept(node.accept(visitor, context), context);
+        return node.accept(visitor, context);
       }
 
       @Override
