@@ -21,10 +21,12 @@ import static com.amazon.opendistroforelasticsearch.sql.expression.function.Buil
 import static com.amazon.opendistroforelasticsearch.sql.expression.function.BuiltinFunctionName.LIKE;
 import static com.amazon.opendistroforelasticsearch.sql.expression.function.BuiltinFunctionName.NOT_LIKE;
 import static com.amazon.opendistroforelasticsearch.sql.expression.function.BuiltinFunctionName.REGEXP;
+import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.*;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.AggregateFunctionContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.BinaryComparisonPredicateContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.BooleanContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.DateLiteralContext;
+import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.FunctionArgsContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.IdentsAsQualifiedNameContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.IsNullPredicateContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.KeywordsAsQualifiedNameContext;
@@ -34,15 +36,15 @@ import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDis
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.NullLiteralContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.OrderByElementContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.OverClauseContext;
-import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.RankingWindowFunctionContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.RegexpPredicateContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.ScalarFunctionCallContext;
+import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.ScalarWindowFunctionContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.SignedDecimalContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.SignedRealContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.StringContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.TimeLiteralContext;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.TimestampLiteralContext;
-import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.WindowFunctionContext;
+import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.WindowFunctionClauseContext;
 
 import com.amazon.opendistroforelasticsearch.sql.ast.dsl.AstDSL;
 import com.amazon.opendistroforelasticsearch.sql.ast.expression.AggregateFunction;
@@ -56,6 +58,7 @@ import com.amazon.opendistroforelasticsearch.sql.ast.expression.QualifiedName;
 import com.amazon.opendistroforelasticsearch.sql.ast.expression.UnresolvedExpression;
 import com.amazon.opendistroforelasticsearch.sql.ast.expression.WindowFunction;
 import com.amazon.opendistroforelasticsearch.sql.common.utils.StringUtils;
+import com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser;
 import com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.AndExpressionContext;
 import com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.ColumnNameContext;
 import com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.IdentContext;
@@ -131,7 +134,7 @@ public class AstExpressionBuilder extends OpenDistroSQLParserBaseVisitor<Unresol
   }
 
   @Override
-  public UnresolvedExpression visitWindowFunction(WindowFunctionContext ctx) {
+  public UnresolvedExpression visitWindowFunctionClause(WindowFunctionClauseContext ctx) {
     OverClauseContext overClause = ctx.overClause();
 
     List<UnresolvedExpression> partitionByList = Collections.emptyList();
@@ -151,12 +154,17 @@ public class AstExpressionBuilder extends OpenDistroSQLParserBaseVisitor<Unresol
                            .map(item -> ImmutablePair.of(getOrder(item), visit(item.expression())))
                            .collect(Collectors.toList());
     }
-    return new WindowFunction((Function) visit(ctx.function), partitionByList, sortList);
+    return new WindowFunction(visit(ctx.function), partitionByList, sortList);
   }
 
   @Override
-  public UnresolvedExpression visitRankingWindowFunction(RankingWindowFunctionContext ctx) {
-    return new Function(ctx.functionName.getText(), Collections.emptyList());
+  public UnresolvedExpression visitScalarWindowFunction(ScalarWindowFunctionContext ctx) {
+    return visitFunction(ctx.functionName.getText(), ctx.functionArgs());
+  }
+
+  @Override
+  public UnresolvedExpression visitAggregateWindowFunction(AggregateWindowFunctionContext ctx) {
+    return new AggregateFunction(ctx.functionName.getText(), visitFunctionArg(ctx.functionArg()));
   }
 
   @Override
@@ -257,6 +265,19 @@ public class AstExpressionBuilder extends OpenDistroSQLParserBaseVisitor<Unresol
     return new Function(
         functionName.equals("<>") ? "!=" : functionName,
         Arrays.asList(visit(ctx.left), visit(ctx.right))
+    );
+  }
+
+  private Function visitFunction(String functionName, FunctionArgsContext args) {
+    if (args == null) {
+      return new Function(functionName, Collections.emptyList());
+    }
+    return new Function(
+        functionName,
+        args.functionArg()
+            .stream()
+            .map(this::visitFunctionArg)
+            .collect(Collectors.toList())
     );
   }
 

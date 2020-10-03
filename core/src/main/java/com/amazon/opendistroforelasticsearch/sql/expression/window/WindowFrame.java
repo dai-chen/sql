@@ -20,6 +20,7 @@ import com.amazon.opendistroforelasticsearch.sql.data.model.ExprTupleValue;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprValue;
 import com.amazon.opendistroforelasticsearch.sql.expression.Expression;
 import com.amazon.opendistroforelasticsearch.sql.expression.env.Environment;
+import com.amazon.opendistroforelasticsearch.sql.storage.bindingtuple.BindingTuple;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -57,6 +58,10 @@ public class WindowFrame implements Environment<Expression, ExprValue> {
     return expressions.stream()
                       .map(expr -> expr.valueOf(valueEnv))
                       .collect(Collectors.toList());
+  }
+
+  public BindingTuple tuple() {
+    return current.bindingTuples();
   }
 
   /**

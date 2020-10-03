@@ -107,12 +107,15 @@ orderByElement
 
 
 //  Window Function's Details
-windowFunction
-    : function=rankingWindowFunction overClause
+windowFunctionClause
+    : function=windowFunction overClause
     ;
 
-rankingWindowFunction
-    : functionName=(ROW_NUMBER | RANK | DENSE_RANK) LR_BRACKET RR_BRACKET
+windowFunction
+    : functionName=(ROW_NUMBER | RANK | DENSE_RANK)
+        LR_BRACKET functionArgs? RR_BRACKET              #scalarWindowFunction
+    | functionName=(SUM | AVG)
+        LR_BRACKET functionArg RR_BRACKET                #aggregateWindowFunction
     ;
 
 overClause
@@ -234,7 +237,7 @@ nullNotnull
 
 functionCall
     : scalarFunctionName LR_BRACKET functionArgs? RR_BRACKET        #scalarFunctionCall
-    | windowFunction                                                #windowFunctionCall
+    | windowFunctionClause                                          #windowFunctionCall
     | aggregateFunction                                             #aggregateFunctionCall
     ;
 
