@@ -16,7 +16,7 @@
 
 package com.amazon.opendistroforelasticsearch.sql.planner.logical;
 
-import com.amazon.opendistroforelasticsearch.sql.expression.Expression;
+import com.amazon.opendistroforelasticsearch.sql.expression.NamedExpression;
 import com.amazon.opendistroforelasticsearch.sql.expression.window.WindowDefinition;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +36,7 @@ import lombok.ToString;
 @ToString
 public class LogicalWindow extends LogicalPlan {
   private final LogicalPlan child;
-  private final Expression windowFunction;
+  private final NamedExpression windowFunction;
   private final WindowDefinition windowDefinition;
 
   @Override

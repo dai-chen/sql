@@ -96,7 +96,7 @@ class WindowOperatorTest extends PhysicalPlanTestBase {
         WindowDefinition definition = new WindowDefinition(partitionByList, sortList);
         windowOperator = new WindowOperator(
             new SortOperator(new TestScan(), 10000, definition.getAllSortItems()),
-            windowFunction,
+            null,//windowFunction,
             definition);
         windowOperator.open();
       }

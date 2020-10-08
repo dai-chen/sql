@@ -85,7 +85,7 @@ public class PhysicalPlanDSL {
   public WindowOperator window(PhysicalPlan input,
                                Expression windowFunction,
                                WindowDefinition windowDefinition) {
-    return new WindowOperator(input, windowFunction, windowDefinition);
+    return new WindowOperator(input, null, windowDefinition);
   }
 
   public static HeadOperator head(PhysicalPlan input, boolean keepLast, Expression whileExpr,

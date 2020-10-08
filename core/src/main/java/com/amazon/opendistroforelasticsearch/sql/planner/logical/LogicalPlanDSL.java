@@ -61,7 +61,7 @@ public class LogicalPlanDSL {
   public LogicalPlan window(LogicalPlan input,
                             Expression windowFunction,
                             WindowDefinition windowDefinition) {
-    return new LogicalWindow(input, windowFunction, windowDefinition);
+    return new LogicalWindow(input, null, windowDefinition);
   }
 
   public static LogicalPlan remove(LogicalPlan input, ReferenceExpression... fields) {
