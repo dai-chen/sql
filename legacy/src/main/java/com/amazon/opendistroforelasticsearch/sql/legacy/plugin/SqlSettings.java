@@ -76,7 +76,7 @@ public class SqlSettings {
                 NodeScope, Dynamic));
 
         // Settings for cursor
-        settings.put(CURSOR_ENABLED, Setting.boolSetting(CURSOR_ENABLED, false, NodeScope, Dynamic));
+        settings.put(CURSOR_ENABLED, Setting.boolSetting(CURSOR_ENABLED, true, NodeScope, Dynamic));
         settings.put(CURSOR_FETCH_SIZE, Setting.intSetting(CURSOR_FETCH_SIZE, 1000,
                 1, NodeScope, Dynamic));
         settings.put(CURSOR_KEEPALIVE, Setting.positiveTimeSetting(CURSOR_KEEPALIVE, timeValueMinutes(1),
