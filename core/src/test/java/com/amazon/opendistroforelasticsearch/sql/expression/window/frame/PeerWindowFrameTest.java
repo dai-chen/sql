@@ -49,7 +49,43 @@ class PeerWindowFrameTest {
           ImmutableList.of(Pair.of(DEFAULT_ASC, DSL.ref("age", INTEGER)))));
 
   @Test
-  void test() {
+  void single_row_test() {
+    Iterator<ExprValue> tuples = ImmutableList.of(tuple("WA", 10, 100)).iterator();
+    windowFrame.load(tuples);
+    assertTrue(windowFrame.isNewPartition());
+    assertEquals(ImmutableList.of(tuple("WA", 10, 100)), windowFrame.move());
+    assertFalse(windowFrame.hasNext());
+  }
+
+  @Test
+  void single_partition_test() {
+    Iterator<ExprValue> tuples = ImmutableList.of(
+        tuple("WA", 10, 100),
+        tuple("WA", 20, 200),
+        tuple("WA", 20, 50)
+    ).iterator();
+
+    windowFrame.load(tuples);
+    assertTrue(windowFrame.isNewPartition());
+    assertEquals(ImmutableList.of(tuple("WA", 10, 100)), windowFrame.move());
+
+    assertFalse(windowFrame.hasNext());
+    windowFrame.load(tuples);
+    assertFalse(windowFrame.isNewPartition());
+    assertEquals(
+        ImmutableList.of(tuple("WA", 20, 200), tuple("WA", 20, 50)),
+        windowFrame.move());
+
+    assertTrue(windowFrame.hasNext());
+    windowFrame.load(tuples);
+    assertFalse(windowFrame.isNewPartition());
+    assertEquals(ImmutableList.of(), windowFrame.move());
+
+    assertFalse(windowFrame.hasNext());
+  }
+
+  @Test
+  void two_partitions_test() {
     Iterator<ExprValue> tuples = ImmutableList.of(
         tuple("WA", 10, 100),
         tuple("WA", 20, 200),
@@ -69,6 +105,7 @@ class PeerWindowFrameTest {
             tuple("WA", 10, 100)),
         windowFrame.move());
 
+    assertFalse(windowFrame.hasNext());
     windowFrame.load(tuples);
     assertFalse(windowFrame.isNewPartition());
     assertEquals(
@@ -77,12 +114,14 @@ class PeerWindowFrameTest {
             tuple("WA", 20, 50)),
         windowFrame.move());
 
+    assertTrue(windowFrame.hasNext());
     windowFrame.load(tuples);
     assertFalse(windowFrame.isNewPartition());
     assertEquals(
         ImmutableList.of(),
         windowFrame.move());
 
+    assertFalse(windowFrame.hasNext());
     windowFrame.load(tuples);
     assertFalse(windowFrame.isNewPartition());
     assertEquals(
@@ -90,6 +129,7 @@ class PeerWindowFrameTest {
             tuple("WA", 35, 150)),
         windowFrame.move());
 
+    assertFalse(windowFrame.hasNext());
     windowFrame.load(tuples);
     assertTrue(windowFrame.isNewPartition());
     assertEquals(
@@ -98,18 +138,22 @@ class PeerWindowFrameTest {
             tuple("CA", 18, 100)),
         windowFrame.move());
 
+    assertTrue(windowFrame.hasNext());
     windowFrame.load(tuples);
     assertFalse(windowFrame.isNewPartition());
     assertEquals(
         ImmutableList.of(),
         windowFrame.move());
 
+    assertFalse(windowFrame.hasNext());
     windowFrame.load(tuples);
     assertFalse(windowFrame.isNewPartition());
     assertEquals(
         ImmutableList.of(
             tuple("CA", 30, 200)),
         windowFrame.move());
+
+    assertFalse(windowFrame.hasNext());
   }
 
   private ExprValue tuple(String state, int age, int balance) {

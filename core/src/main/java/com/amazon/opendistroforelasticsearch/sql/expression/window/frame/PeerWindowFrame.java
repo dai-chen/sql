@@ -44,6 +44,10 @@ public class PeerWindowFrame implements WindowFrame {
 
   private boolean isNewPartition = true;
 
+  public boolean hasNext() {
+    return count > 0;
+  }
+
   public void load(Iterator<ExprValue> it) {
     if (count > 0) {
       return;
