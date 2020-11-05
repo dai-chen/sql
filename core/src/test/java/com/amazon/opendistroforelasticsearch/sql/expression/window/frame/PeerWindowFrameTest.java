@@ -63,14 +63,14 @@ class PeerWindowFrameTest {
     // Here we simulate how WindowFrame interacts with WindowOperator which calls load()
     // and WindowFunction which calls isNewPartition() and move()
     windowFrame.load(tuples);
-    //assertTrue(windowFrame.isNewPartition());
+    assertTrue(windowFrame.isNewPartition());
     assertEquals(
         ImmutableList.of(
             tuple("WA", 10, 100)),
         windowFrame.move());
 
     windowFrame.load(tuples);
-    //assertFalse(windowFrame.isNewPartition());
+    assertFalse(windowFrame.isNewPartition());
     assertEquals(
         ImmutableList.of(
             tuple("WA", 20, 200),
@@ -78,20 +78,20 @@ class PeerWindowFrameTest {
         windowFrame.move());
 
     windowFrame.load(tuples);
-    //assertFalse(windowFrame.isNewPartition());
+    assertFalse(windowFrame.isNewPartition());
     assertEquals(
         ImmutableList.of(),
         windowFrame.move());
 
     windowFrame.load(tuples);
-    //assertFalse(windowFrame.isNewPartition());
+    assertFalse(windowFrame.isNewPartition());
     assertEquals(
         ImmutableList.of(
             tuple("WA", 35, 150)),
         windowFrame.move());
 
     windowFrame.load(tuples);
-    //assertTrue(windowFrame.isNewPartition());
+    assertTrue(windowFrame.isNewPartition());
     assertEquals(
         ImmutableList.of(
             tuple("CA", 18, 150),
@@ -99,13 +99,13 @@ class PeerWindowFrameTest {
         windowFrame.move());
 
     windowFrame.load(tuples);
-    //assertFalse(windowFrame.isNewPartition());
+    assertFalse(windowFrame.isNewPartition());
     assertEquals(
         ImmutableList.of(),
         windowFrame.move());
 
     windowFrame.load(tuples);
-    //assertFalse(windowFrame.isNewPartition());
+    assertFalse(windowFrame.isNewPartition());
     assertEquals(
         ImmutableList.of(
             tuple("CA", 30, 200)),

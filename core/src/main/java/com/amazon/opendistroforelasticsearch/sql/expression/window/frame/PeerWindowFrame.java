@@ -42,7 +42,7 @@ public class PeerWindowFrame implements WindowFrame {
   private ExprValue next;
   private int count;
 
-  private boolean isNewPartition;
+  private boolean isNewPartition = true;
 
   public void load(Iterator<ExprValue> it) {
     if (count > 0) {
@@ -50,6 +50,7 @@ public class PeerWindowFrame implements WindowFrame {
     }
 
     if (count == 0 && next != null) {
+      isNewPartition = !isSamePartition(peers.get(peers.size() - 1), next);
       peers.clear();
       peers.add(next);
     }
@@ -85,6 +86,7 @@ public class PeerWindowFrame implements WindowFrame {
   }
 
   public List<ExprValue> move() {
+    isNewPartition = false;
     if (count-- == peers.size()) {
       return peers;
     }
@@ -107,17 +109,17 @@ public class PeerWindowFrame implements WindowFrame {
 
   private boolean isSamePartitionAndSortValues(ExprValue cur) {
     if (peers.isEmpty()) {
-      isNewPartition = true;
       return true;
     }
+
     ExprValue prev = peers.get(peers.size() - 1);
-    boolean isSamePartitionValues = resolve(windowDefinition.getPartitionByList(), prev)
-        .equals(resolve(windowDefinition.getPartitionByList(), cur));
-
-    isNewPartition = !isSamePartitionValues;
-
-    return isSamePartitionValues
+    return isSamePartition(cur, prev)
         && resolve(getSortFields(), prev).equals(resolve(getSortFields(), cur));
+  }
+
+  private boolean isSamePartition(ExprValue cur, ExprValue prev) {
+    return resolve(windowDefinition.getPartitionByList(), prev)
+        .equals(resolve(windowDefinition.getPartitionByList(), cur));
   }
 
 }
