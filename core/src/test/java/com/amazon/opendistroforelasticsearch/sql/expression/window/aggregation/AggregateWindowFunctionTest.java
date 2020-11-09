@@ -157,10 +157,12 @@ class AggregateWindowFunctionTest extends ExpressionTestBase {
       this.windowFunction = new AggregateWindowFunction(windowFunction);
     }
 
+
     AggregateWindowFunctionAssertion add(String state, int age) {
-      windowFrame.add(fromExprValueMap(ImmutableMap.of(
+      /*windowFrame.add(fromExprValueMap(ImmutableMap.of(
           "state", new ExprStringValue(state),
           "age", new ExprIntegerValue(age))));
+       */
       return this;
     }
 

@@ -42,6 +42,7 @@ class CumulativeWindowFrameTest {
 
   private final WindowFrame windowFrame = new CumulativeWindowFrame(windowDefinition);
 
+  /*
   @Test
   void should_return_new_partition_if_partition_by_field_value_changed() {
     ExprTupleValue tuple1 = ExprTupleValue.fromExprValueMap(ImmutableMap.of(
@@ -77,5 +78,6 @@ class CumulativeWindowFrameTest {
   void should_throw_exception_if_access_row_out_of_boundary() {
     assertThrows(IndexOutOfBoundsException.class, () -> windowFrame.get(2));
   }
+  */
 
 }

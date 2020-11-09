@@ -16,7 +16,6 @@
 
 package com.amazon.opendistroforelasticsearch.sql.expression.window.frame;
 
-import com.amazon.opendistroforelasticsearch.sql.data.model.ExprTupleValue;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprValue;
 import com.amazon.opendistroforelasticsearch.sql.expression.Expression;
 import com.amazon.opendistroforelasticsearch.sql.expression.env.Environment;
@@ -40,20 +39,22 @@ public class PeerWindowFrame implements WindowFrame {
 
   private List<ExprValue> peers = new ArrayList<>();
   private ExprValue next;
-  private int count;
+  private int current;
 
   private boolean isNewPartition = true;
 
+  @Override
   public boolean hasNext() {
-    return count > 0;
+    return current < peers.size();
   }
 
+  @Override
   public void load(Iterator<ExprValue> it) {
-    if (count > 0) {
+    if (hasNext()) {
       return;
     }
 
-    if (count == 0 && next != null) {
+    if (next != null) {
       isNewPartition = !isSamePartition(peers.get(peers.size() - 1), next);
       peers.clear();
       peers.add(next);
@@ -65,7 +66,7 @@ public class PeerWindowFrame implements WindowFrame {
       peers.add(cur);
     }
 
-    count = peers.size();
+    current = 0;
     next = cur;
   }
 
@@ -75,26 +76,17 @@ public class PeerWindowFrame implements WindowFrame {
   }
 
   @Override
-  public int currentIndex() {
-    return 0;
-  }
-
-  @Override
-  public void add(ExprTupleValue row) {
-
-  }
-
-  @Override
-  public ExprTupleValue get(int index) {
-    return null;
-  }
-
-  public List<ExprValue> move() {
+  public List<ExprValue> next() {
     isNewPartition = false;
-    if (count-- == peers.size()) {
+    if (current++ == 0) {
       return peers;
     }
     return Collections.emptyList();
+  }
+
+  @Override
+  public ExprValue current() {
+    return peers.get(current);
   }
 
   private List<ExprValue> resolve(List<Expression> expressions, ExprValue row) {

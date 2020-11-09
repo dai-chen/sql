@@ -54,6 +54,7 @@ class RankingWindowFunctionTest extends ExpressionTestBase {
           ImmutableList.of(DSL.ref("state", STRING)),
           ImmutableList.of())); // No sort items defined
 
+  /*
   @Test
   void test_value_of() {
     windowFrame1.add(fromExprValueMap(ImmutableMap.of(
@@ -204,5 +205,6 @@ class RankingWindowFunctionTest extends ExpressionTestBase {
         "state", new ExprStringValue("CA"), "age", new ExprIntegerValue(15))));
     assertEquals(1, denseRank.rank(windowFrame2));
   }
+  */
 
 }

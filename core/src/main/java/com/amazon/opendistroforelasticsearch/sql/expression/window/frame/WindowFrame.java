@@ -16,10 +16,11 @@
 
 package com.amazon.opendistroforelasticsearch.sql.expression.window.frame;
 
-import com.amazon.opendistroforelasticsearch.sql.data.model.ExprTupleValue;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprValue;
 import com.amazon.opendistroforelasticsearch.sql.expression.Expression;
 import com.amazon.opendistroforelasticsearch.sql.expression.env.Environment;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Window frame that represents a subset of a window which is all data accessible to
@@ -30,12 +31,15 @@ import com.amazon.opendistroforelasticsearch.sql.expression.env.Environment;
  * Note that which type of window frame is used is determined by both window function itself
  * and frame definition in a window definition.
  */
-public interface WindowFrame extends Environment<Expression, ExprValue> {
+public interface WindowFrame extends Environment<Expression, ExprValue>,
+                                     Iterator<List<ExprValue>> {
 
   @Override
   default ExprValue resolve(Expression var) {
-    return var.valueOf(get(currentIndex()).bindingTuples());
+    return var.valueOf(current().bindingTuples());
   }
+
+  void load(Iterator<ExprValue> iterator);
 
   /**
    * Check is current row the beginning of a new partition according to window definition.
@@ -43,23 +47,6 @@ public interface WindowFrame extends Environment<Expression, ExprValue> {
    */
   boolean isNewPartition();
 
-  /**
-   * Get current row index in the frame.
-   * @return index
-   */
-  int currentIndex();
-
-  /**
-   * Add a row to the window frame.
-   * @param row   data row
-   */
-  void add(ExprTupleValue row);
-
-  /**
-   * Get a data rows within the frame by offset.
-   * @param index  index starting from 0 to upper boundary
-   * @return data row
-   */
-  ExprTupleValue get(int index);
+  ExprValue current();
 
 }

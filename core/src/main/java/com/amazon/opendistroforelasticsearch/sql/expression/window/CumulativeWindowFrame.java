@@ -16,11 +16,12 @@
 
 package com.amazon.opendistroforelasticsearch.sql.expression.window;
 
-import com.amazon.opendistroforelasticsearch.sql.data.model.ExprTupleValue;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprValue;
 import com.amazon.opendistroforelasticsearch.sql.expression.Expression;
 import com.amazon.opendistroforelasticsearch.sql.expression.env.Environment;
 import com.amazon.opendistroforelasticsearch.sql.expression.window.frame.WindowFrame;
+import com.google.common.collect.ImmutableList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -44,8 +45,8 @@ public class CumulativeWindowFrame implements WindowFrame {
 
   private final WindowDefinition windowDefinition;
 
-  private ExprTupleValue previous;
-  private ExprTupleValue current;
+  private ExprValue previous;
+  private ExprValue current;
 
   @Override
   public boolean isNewPartition() {
@@ -60,27 +61,32 @@ public class CumulativeWindowFrame implements WindowFrame {
     return !preValues.equals(curValues);
   }
 
-  @Override
-  public int currentIndex() {
-    // Current row index is always 1 since only 2 rows maintained
-    return 1;
+  public ExprValue previous() {
+    return previous;
   }
 
   @Override
-  public void add(ExprTupleValue row) {
+  public ExprValue current() {
+    return current;
+  }
+
+  @Override
+  public void load(Iterator<ExprValue> it) {
     previous = current;
-    current = row;
+    current = it.next();
   }
 
   @Override
-  public ExprTupleValue get(int index) {
-    if (index != 0 && index != 1) {
-      throw new IndexOutOfBoundsException("Index is out of boundary of window frame: " + index);
-    }
-    return (index == 0) ? previous : current;
+  public boolean hasNext() {
+    return false;
   }
 
-  private List<ExprValue> resolve(List<Expression> expressions, ExprTupleValue row) {
+  @Override
+  public List<ExprValue> next() {
+    return ImmutableList.of(current);
+  }
+
+  private List<ExprValue> resolve(List<Expression> expressions, ExprValue row) {
     Environment<Expression, ExprValue> valueEnv = row.bindingTuples();
     return expressions.stream()
                       .map(expr -> expr.valueOf(valueEnv))

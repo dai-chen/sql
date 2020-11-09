@@ -21,6 +21,7 @@ import com.amazon.opendistroforelasticsearch.sql.data.model.ExprValue;
 import com.amazon.opendistroforelasticsearch.sql.expression.NamedExpression;
 import com.amazon.opendistroforelasticsearch.sql.expression.window.CumulativeWindowFrame;
 import com.amazon.opendistroforelasticsearch.sql.expression.window.WindowDefinition;
+import com.amazon.opendistroforelasticsearch.sql.expression.window.WindowFunction;
 import com.amazon.opendistroforelasticsearch.sql.expression.window.frame.WindowFrame;
 import com.google.common.collect.ImmutableMap;
 import java.util.Collections;
@@ -75,7 +76,7 @@ public class WindowOperator extends PhysicalPlan {
 
   @Override
   public boolean hasNext() {
-    return input.hasNext();
+    return input.hasNext() || windowFrame.hasNext();
   }
 
   @Override
@@ -90,7 +91,7 @@ public class WindowOperator extends PhysicalPlan {
    *  2. Aggregate window functions: operates on cumulative or sliding window based on definition.
    */
   private WindowFrame createWindowFrame() {
-    return new CumulativeWindowFrame(windowDefinition);
+    return ((WindowFunction) windowFunction.getDelegated()).createWindowFrame(windowDefinition);
   }
 
   /**
@@ -98,7 +99,7 @@ public class WindowOperator extends PhysicalPlan {
    * should be based on window frame type.
    */
   private void loadRowsIntoWindowFrame() {
-    windowFrame.add((ExprTupleValue) input.next());
+    windowFrame.load(input);
   }
 
   private ExprValue enrichCurrentRowByWindowFunctionResult() {
@@ -109,7 +110,7 @@ public class WindowOperator extends PhysicalPlan {
   }
 
   private void preserveAllOriginalColumns(ImmutableMap.Builder<String, ExprValue> mapBuilder) {
-    ExprTupleValue inputValue = windowFrame.get(windowFrame.currentIndex());
+    ExprValue inputValue = windowFrame.current();
     inputValue.tupleValue().forEach(mapBuilder::put);
   }
 

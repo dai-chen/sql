@@ -43,7 +43,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class PeerWindowFrameTest {
 
-  private PeerWindowFrame windowFrame = new PeerWindowFrame(
+  private final PeerWindowFrame windowFrame = new PeerWindowFrame(
       new WindowDefinition(
           ImmutableList.of(DSL.ref("state", STRING)),
           ImmutableList.of(Pair.of(DEFAULT_ASC, DSL.ref("age", INTEGER)))));
@@ -53,7 +53,7 @@ class PeerWindowFrameTest {
     Iterator<ExprValue> tuples = ImmutableList.of(tuple("WA", 10, 100)).iterator();
     windowFrame.load(tuples);
     assertTrue(windowFrame.isNewPartition());
-    assertEquals(ImmutableList.of(tuple("WA", 10, 100)), windowFrame.move());
+    assertEquals(ImmutableList.of(tuple("WA", 10, 100)), windowFrame.next());
     assertFalse(windowFrame.hasNext());
   }
 
@@ -67,19 +67,19 @@ class PeerWindowFrameTest {
 
     windowFrame.load(tuples);
     assertTrue(windowFrame.isNewPartition());
-    assertEquals(ImmutableList.of(tuple("WA", 10, 100)), windowFrame.move());
+    assertEquals(ImmutableList.of(tuple("WA", 10, 100)), windowFrame.next());
 
     assertFalse(windowFrame.hasNext());
     windowFrame.load(tuples);
     assertFalse(windowFrame.isNewPartition());
     assertEquals(
         ImmutableList.of(tuple("WA", 20, 200), tuple("WA", 20, 50)),
-        windowFrame.move());
+        windowFrame.next());
 
     assertTrue(windowFrame.hasNext());
     windowFrame.load(tuples);
     assertFalse(windowFrame.isNewPartition());
-    assertEquals(ImmutableList.of(), windowFrame.move());
+    assertEquals(ImmutableList.of(), windowFrame.next());
 
     assertFalse(windowFrame.hasNext());
   }
@@ -103,7 +103,7 @@ class PeerWindowFrameTest {
     assertEquals(
         ImmutableList.of(
             tuple("WA", 10, 100)),
-        windowFrame.move());
+        windowFrame.next());
 
     assertFalse(windowFrame.hasNext());
     windowFrame.load(tuples);
@@ -112,14 +112,14 @@ class PeerWindowFrameTest {
         ImmutableList.of(
             tuple("WA", 20, 200),
             tuple("WA", 20, 50)),
-        windowFrame.move());
+        windowFrame.next());
 
     assertTrue(windowFrame.hasNext());
     windowFrame.load(tuples);
     assertFalse(windowFrame.isNewPartition());
     assertEquals(
         ImmutableList.of(),
-        windowFrame.move());
+        windowFrame.next());
 
     assertFalse(windowFrame.hasNext());
     windowFrame.load(tuples);
@@ -127,7 +127,7 @@ class PeerWindowFrameTest {
     assertEquals(
         ImmutableList.of(
             tuple("WA", 35, 150)),
-        windowFrame.move());
+        windowFrame.next());
 
     assertFalse(windowFrame.hasNext());
     windowFrame.load(tuples);
@@ -136,14 +136,14 @@ class PeerWindowFrameTest {
         ImmutableList.of(
             tuple("CA", 18, 150),
             tuple("CA", 18, 100)),
-        windowFrame.move());
+        windowFrame.next());
 
     assertTrue(windowFrame.hasNext());
     windowFrame.load(tuples);
     assertFalse(windowFrame.isNewPartition());
     assertEquals(
         ImmutableList.of(),
-        windowFrame.move());
+        windowFrame.next());
 
     assertFalse(windowFrame.hasNext());
     windowFrame.load(tuples);
@@ -151,7 +151,7 @@ class PeerWindowFrameTest {
     assertEquals(
         ImmutableList.of(
             tuple("CA", 30, 200)),
-        windowFrame.move());
+        windowFrame.next());
 
     assertFalse(windowFrame.hasNext());
   }
