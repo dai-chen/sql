@@ -16,10 +16,8 @@
 
 package com.amazon.opendistroforelasticsearch.sql.sql.parser;
 
-import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.IdentsAsQualifiedNameContext;
-import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.KeywordsAsQualifiedNameContext;
-
 import com.amazon.opendistroforelasticsearch.sql.ast.expression.UnresolvedExpression;
+import com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser;
 import com.amazon.opendistroforelasticsearch.sql.sql.parser.context.QuerySpecification;
 import lombok.RequiredArgsConstructor;
 
@@ -35,13 +33,8 @@ public class AstHavingFilterBuilder extends AstExpressionBuilder {
   private final QuerySpecification querySpec;
 
   @Override
-  public UnresolvedExpression visitIdentsAsQualifiedName(IdentsAsQualifiedNameContext ctx) {
-    return replaceAlias(super.visitIdentsAsQualifiedName(ctx));
-  }
-
-  @Override
-  public UnresolvedExpression visitKeywordsAsQualifiedName(KeywordsAsQualifiedNameContext ctx) {
-    return replaceAlias(super.visitKeywordsAsQualifiedName(ctx));
+  public UnresolvedExpression visitQualifiedName(OpenDistroSQLParser.QualifiedNameContext ctx) {
+    return replaceAlias(super.visitQualifiedName(ctx));
   }
 
   private UnresolvedExpression replaceAlias(UnresolvedExpression expr) {

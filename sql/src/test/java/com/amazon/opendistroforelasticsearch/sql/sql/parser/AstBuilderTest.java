@@ -426,18 +426,18 @@ class AstBuilderTest {
                 relationSubquery(
                     project(
                         relation("test"),
-                        alias("firstname", qualifiedName("firstname"), "firstName"),
-                        alias("lastname", qualifiedName("lastname"), "lastName")
+                        alias("firstname", qualifiedName("firstname"), "first"),
+                        alias("lastname", qualifiedName("lastname"), "last")
                     ),
                     "a"
                 ),
                 function(">", qualifiedName("age"), intLiteral(20))
             ),
-            alias("a.firstName", qualifiedName("a", "firstName")),
-            alias("lastName", qualifiedName("lastName"))),
+            alias("a.first", qualifiedName("a", "first")),
+            alias("last", qualifiedName("last"))),
         buildAST(
-            "SELECT a.firstName, lastName FROM ("
-                + "SELECT firstname AS firstName, lastname AS lastName FROM test"
+            "SELECT a.first, last FROM ("
+                + "SELECT firstname AS first, lastname AS last FROM test"
                 + ") AS a where age > 20"
         )
     );
