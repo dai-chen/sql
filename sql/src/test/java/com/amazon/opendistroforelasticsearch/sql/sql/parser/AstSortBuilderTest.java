@@ -68,7 +68,13 @@ class AstSortBuilderTest {
     ImmutableMap<SortOption, Pair<Boolean, Boolean>> expects =
         ImmutableMap.<SortOption, Pair<Boolean, Boolean>>builder()
             .put(new SortOption(null, null), ImmutablePair.of(true, true))
+            .put(new SortOption(ASC, null), ImmutablePair.of(true, true))
+            .put(new SortOption(DESC, null), ImmutablePair.of(false, false))
+            .put(new SortOption(null, NULL_FIRST), ImmutablePair.of(true, true))
+            .put(new SortOption(null, NULL_LAST), ImmutablePair.of(true, false))
             .put(new SortOption(ASC, NULL_FIRST), ImmutablePair.of(true, true))
+            .put(new SortOption(ASC, NULL_LAST), ImmutablePair.of(true, false))
+            .put(new SortOption(DESC, NULL_FIRST), ImmutablePair.of(false, true))
             .put(new SortOption(DESC, NULL_LAST), ImmutablePair.of(false, false))
             .build();
 

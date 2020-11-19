@@ -395,7 +395,7 @@ class AstBuilderTest {
                 ImmutableList.of(argument("count", intLiteral(0))),
                 field("name",
                     argument("asc", booleanLiteral(false)),
-                    argument("nullFirst", booleanLiteral(true)))),
+                    argument("nullFirst", booleanLiteral(false)))),
         alias("name", qualifiedName("name"))),
         buildAST("SELECT name FROM test ORDER BY 1 DESC"));
   }
@@ -412,7 +412,7 @@ class AstBuilderTest {
                     argument("nullFirst", booleanLiteral(true))),
             field("age",
                 argument("asc", booleanLiteral(false)),
-                argument("nullFirst", booleanLiteral(true)))),
+                argument("nullFirst", booleanLiteral(false)))),
         alias("name", qualifiedName("name")),
             alias("age", qualifiedName("age"))),
         buildAST("SELECT name, age FROM test ORDER BY name, age DESC"));

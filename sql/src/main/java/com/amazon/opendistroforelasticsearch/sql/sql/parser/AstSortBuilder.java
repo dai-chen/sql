@@ -19,7 +19,9 @@ package com.amazon.opendistroforelasticsearch.sql.sql.parser;
 import static com.amazon.opendistroforelasticsearch.sql.ast.expression.DataType.BOOLEAN;
 import static com.amazon.opendistroforelasticsearch.sql.ast.expression.DataType.INTEGER;
 import static com.amazon.opendistroforelasticsearch.sql.ast.tree.Sort.NullOrder.NULL_FIRST;
+import static com.amazon.opendistroforelasticsearch.sql.ast.tree.Sort.NullOrder.NULL_LAST;
 import static com.amazon.opendistroforelasticsearch.sql.ast.tree.Sort.SortOrder.ASC;
+import static com.amazon.opendistroforelasticsearch.sql.ast.tree.Sort.SortOrder.DESC;
 import static com.amazon.opendistroforelasticsearch.sql.sql.antlr.parser.OpenDistroSQLParser.OrderByClauseContext;
 
 import com.amazon.opendistroforelasticsearch.sql.ast.expression.Argument;
@@ -64,21 +66,26 @@ public class AstSortBuilder extends OpenDistroSQLParserBaseVisitor<UnresolvedPla
       fields.add(
           new Field(
               querySpec.replaceIfAliasOrOrdinal(items.get(i)),
-              createSortArgument(options.get(i))));
+              createArgumentsFromSortOptions(options.get(i))));
     }
     return fields;
   }
 
-  private List<Argument> createSortArgument(SortOption option) {
+  private List<Argument> createArgumentsFromSortOptions(SortOption option) {
     SortOrder sortOrder = option.getSortOrder();
     NullOrder nullOrder = option.getNullOrder();
+
+    // Note that if absent default nullOrder is different for ASC and DESC
+    if (sortOrder == DESC) {
+      return createSortArgument(DESC, (nullOrder == null) ? NULL_LAST : nullOrder);
+    }
+    return createSortArgument(ASC, (nullOrder == null) ? NULL_FIRST : nullOrder);
+  }
+
+  private List<Argument> createSortArgument(SortOrder sortOrder, NullOrder nullFirst) {
     return ImmutableList.of(
-        new Argument(
-            "asc",
-            new Literal((sortOrder == null) || ASC.equals(sortOrder), BOOLEAN)),
-        new Argument(
-            "nullFirst",
-            new Literal((nullOrder == null) || NULL_FIRST.equals(nullOrder), BOOLEAN)));
+        new Argument("asc", new Literal(sortOrder == ASC, BOOLEAN)),
+        new Argument("nullFirst", new Literal(nullFirst == NULL_FIRST, BOOLEAN)));
   }
 
 }

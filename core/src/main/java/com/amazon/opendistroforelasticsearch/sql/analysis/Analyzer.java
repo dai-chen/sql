@@ -15,7 +15,12 @@
 
 package com.amazon.opendistroforelasticsearch.sql.analysis;
 
+import static com.amazon.opendistroforelasticsearch.sql.ast.tree.Sort.NullOrder.NULL_FIRST;
+import static com.amazon.opendistroforelasticsearch.sql.ast.tree.Sort.NullOrder.NULL_LAST;
+import static com.amazon.opendistroforelasticsearch.sql.ast.tree.Sort.SortOrder.ASC;
+import static com.amazon.opendistroforelasticsearch.sql.ast.tree.Sort.SortOrder.DESC;
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.STRUCT;
+import static java.util.stream.Collectors.toMap;
 
 import com.amazon.opendistroforelasticsearch.sql.analysis.symbol.Namespace;
 import com.amazon.opendistroforelasticsearch.sql.analysis.symbol.Symbol;
@@ -316,12 +321,19 @@ public class Analyzer extends AbstractNodeVisitor<LogicalPlan, AnalysisContext> 
         node.getSortList().stream()
             .map(
                 sortField -> {
-                  // the first options is {"asc": "true/false"}
-                  Boolean asc = (Boolean) sortField.getFieldArgs().get(0).getValue().getValue();
                   Expression expression = optimizer.optimize(
                       expressionAnalyzer.analyze(sortField.getField(), context), context);
+
+                  java.util.Map<String, Literal> valueByArgNames =
+                      sortField.getFieldArgs()
+                               .stream()
+                               .collect(toMap(Argument::getArgName, Argument::getValue));
+
+                  boolean asc = (Boolean) valueByArgNames.get("asc").getValue();
+                  boolean nullFirst = (Boolean) valueByArgNames.get("nullFirst").getValue();
                   return ImmutablePair.of(
-                      asc ? SortOption.DEFAULT_ASC : SortOption.DEFAULT_DESC, expression);
+                      new SortOption(asc ? ASC : DESC, nullFirst ? NULL_FIRST : NULL_LAST),
+                      expression);
                 })
             .collect(Collectors.toList());
 
