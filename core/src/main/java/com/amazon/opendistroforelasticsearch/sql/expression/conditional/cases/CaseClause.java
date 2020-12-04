@@ -22,6 +22,9 @@ import com.amazon.opendistroforelasticsearch.sql.data.type.ExprType;
 import com.amazon.opendistroforelasticsearch.sql.expression.Expression;
 import com.amazon.opendistroforelasticsearch.sql.expression.ExpressionNodeVisitor;
 import com.amazon.opendistroforelasticsearch.sql.expression.env.Environment;
+import com.amazon.opendistroforelasticsearch.sql.expression.function.FunctionImplementation;
+import com.amazon.opendistroforelasticsearch.sql.expression.function.FunctionName;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -32,12 +35,15 @@ import lombok.ToString;
 /**
  * A CASE clause is very different from a regular function. Functions have well-defined signature,
  * though CASE clause is more like a function implementation which requires type check "manually".
+ * Note that FunctionImplementation is used rather than FunctionExpression base class. This is meant
+ * to avoid confusion in visitor. Basically we want to visit case/when clause and other functions
+ * separately because of the essential difference aforementioned.
  */
 @AllArgsConstructor
 @EqualsAndHashCode
 @Getter
 @ToString
-public class CaseClause implements Expression {
+public class CaseClause implements Expression, FunctionImplementation {
 
   /**
    * List of WHEN clauses.
@@ -50,9 +56,24 @@ public class CaseClause implements Expression {
   private final Expression defaultResult;
 
   @Override
+  public FunctionName getFunctionName() {
+    return FunctionName.of("case");
+  }
+
+  @Override
+  public List<Expression> getArguments() {
+    ImmutableList.Builder<Expression> args = ImmutableList.builder();
+    whenClauses.forEach(args::add);
+    if (defaultResult != null) {
+      args.add(defaultResult);
+    }
+    return args.build();
+  }
+
+  @Override
   public ExprValue valueOf(Environment<Expression, ExprValue> valueEnv) {
     for (WhenClause when : whenClauses) {
-      if (when.isTrue(valueEnv)) {
+      if (when.isSatisfied(valueEnv)) {
         return when.valueOf(valueEnv);
       }
     }

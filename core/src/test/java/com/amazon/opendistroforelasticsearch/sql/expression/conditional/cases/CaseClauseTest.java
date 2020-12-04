@@ -27,6 +27,7 @@ import com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType;
 import com.amazon.opendistroforelasticsearch.sql.expression.DSL;
 import com.amazon.opendistroforelasticsearch.sql.expression.Expression;
 import com.amazon.opendistroforelasticsearch.sql.expression.ExpressionTestBase;
+import com.amazon.opendistroforelasticsearch.sql.expression.function.FunctionName;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -43,8 +44,19 @@ class CaseClauseTest extends ExpressionTestBase {
   private WhenClause whenClause;
 
   @Test
+  void test_function_implementation() {
+    CaseClause caseClause = new CaseClause(ImmutableList.of(whenClause), null);
+    assertEquals(FunctionName.of("case"), caseClause.getFunctionName());
+    assertEquals(ImmutableList.of(whenClause), caseClause.getArguments());
+
+    Expression defaultResult = mock(Expression.class);
+    caseClause = new CaseClause(ImmutableList.of(whenClause), defaultResult);
+    assertEquals(ImmutableList.of(whenClause, defaultResult), caseClause.getArguments());
+  }
+
+  @Test
   void should_return_when_clause_result_if_matched() {
-    when(whenClause.isTrue(any())).thenReturn(true);
+    when(whenClause.isSatisfied(any())).thenReturn(true);
     when(whenClause.valueOf(any())).thenReturn(new ExprIntegerValue(30));
 
     CaseClause caseClause = new CaseClause(ImmutableList.of(whenClause), null);
@@ -53,7 +65,7 @@ class CaseClauseTest extends ExpressionTestBase {
 
   @Test
   void should_return_default_result_if_none_matched() {
-    when(whenClause.isTrue(any())).thenReturn(false);
+    when(whenClause.isSatisfied(any())).thenReturn(false);
 
     CaseClause caseClause = new CaseClause(ImmutableList.of(whenClause), DSL.literal(50));
     assertEquals(new ExprIntegerValue(50), caseClause.valueOf(valueEnv()));
@@ -61,7 +73,7 @@ class CaseClauseTest extends ExpressionTestBase {
 
   @Test
   void should_return_default_result_if_none_matched_and_no_default() {
-    when(whenClause.isTrue(any())).thenReturn(false);
+    when(whenClause.isSatisfied(any())).thenReturn(false);
 
     CaseClause caseClause = new CaseClause(ImmutableList.of(whenClause), null);
     assertEquals(ExprNullValue.of(), caseClause.valueOf(valueEnv()));

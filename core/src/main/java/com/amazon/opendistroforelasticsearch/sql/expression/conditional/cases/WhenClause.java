@@ -21,6 +21,10 @@ import com.amazon.opendistroforelasticsearch.sql.data.type.ExprType;
 import com.amazon.opendistroforelasticsearch.sql.expression.Expression;
 import com.amazon.opendistroforelasticsearch.sql.expression.ExpressionNodeVisitor;
 import com.amazon.opendistroforelasticsearch.sql.expression.env.Environment;
+import com.amazon.opendistroforelasticsearch.sql.expression.function.FunctionImplementation;
+import com.amazon.opendistroforelasticsearch.sql.expression.function.FunctionName;
+import com.google.common.collect.ImmutableList;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +37,7 @@ import lombok.ToString;
 @Getter
 @RequiredArgsConstructor
 @ToString
-public class WhenClause implements Expression {
+public class WhenClause implements Expression, FunctionImplementation {
 
   /**
    * Condition that must be a predicate.
@@ -45,8 +49,27 @@ public class WhenClause implements Expression {
    */
   private final Expression result;
 
-  public boolean isTrue(Environment<Expression, ExprValue> valueEnv) {
-    return condition.valueOf(valueEnv).booleanValue();
+  /**
+   * Evaluate when condition.
+   * @param valueEnv  value env
+   * @return          is condition satisfied
+   */
+  public boolean isSatisfied(Environment<Expression, ExprValue> valueEnv) {
+    ExprValue result = condition.valueOf(valueEnv);
+    if (result.isMissing() || result.isNull()) {
+      return false;
+    }
+    return result.booleanValue();
+  }
+
+  @Override
+  public FunctionName getFunctionName() {
+    return FunctionName.of("when");
+  }
+
+  @Override
+  public List<Expression> getArguments() {
+    return ImmutableList.of(condition, result);
   }
 
   @Override

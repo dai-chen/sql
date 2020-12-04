@@ -29,6 +29,7 @@ import com.amazon.opendistroforelasticsearch.sql.elasticsearch.storage.serializa
 import com.amazon.opendistroforelasticsearch.sql.expression.Expression;
 import com.amazon.opendistroforelasticsearch.sql.expression.ExpressionNodeVisitor;
 import com.amazon.opendistroforelasticsearch.sql.expression.FunctionExpression;
+import com.amazon.opendistroforelasticsearch.sql.expression.conditional.cases.CaseClause;
 import com.amazon.opendistroforelasticsearch.sql.expression.function.BuiltinFunctionName;
 import com.amazon.opendistroforelasticsearch.sql.expression.function.FunctionName;
 import com.google.common.collect.ImmutableMap;
@@ -40,9 +41,6 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.ScriptQueryBuilder;
 import org.elasticsearch.script.Script;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
 
 @RequiredArgsConstructor
 public class FilterQueryBuilder extends ExpressionNodeVisitor<QueryBuilder, Object> {
@@ -94,6 +92,11 @@ public class FilterQueryBuilder extends ExpressionNodeVisitor<QueryBuilder, Obje
     }
   }
 
+  @Override
+  public QueryBuilder visitCase(CaseClause node, Object context) {
+    return buildScriptQuery(node);
+  }
+
   private BoolQueryBuilder buildBoolQuery(FunctionExpression node,
                                           Object context,
                                           BiFunction<BoolQueryBuilder, QueryBuilder,
@@ -105,7 +108,7 @@ public class FilterQueryBuilder extends ExpressionNodeVisitor<QueryBuilder, Obje
     return boolQuery;
   }
 
-  private ScriptQueryBuilder buildScriptQuery(FunctionExpression node) {
+  private ScriptQueryBuilder buildScriptQuery(Expression node) {
     return new ScriptQueryBuilder(new Script(
         DEFAULT_SCRIPT_TYPE, EXPRESSION_LANG_NAME, serializer.serialize(node), emptyMap()));
   }

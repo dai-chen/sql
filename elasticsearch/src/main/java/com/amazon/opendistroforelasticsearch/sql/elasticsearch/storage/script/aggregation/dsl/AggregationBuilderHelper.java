@@ -26,6 +26,7 @@ import com.amazon.opendistroforelasticsearch.sql.elasticsearch.storage.serializa
 import com.amazon.opendistroforelasticsearch.sql.expression.Expression;
 import com.amazon.opendistroforelasticsearch.sql.expression.FunctionExpression;
 import com.amazon.opendistroforelasticsearch.sql.expression.ReferenceExpression;
+import com.amazon.opendistroforelasticsearch.sql.expression.conditional.cases.CaseClause;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.script.Script;
@@ -51,7 +52,7 @@ public class AggregationBuilderHelper<T> {
     if (expression instanceof ReferenceExpression) {
       String fieldName = ((ReferenceExpression) expression).getAttr();
       return fieldBuilder.apply(ScriptUtils.convertTextToKeyword(fieldName, expression.type()));
-    } else if (expression instanceof FunctionExpression) {
+    } else if (expression instanceof FunctionExpression || expression instanceof CaseClause) {
       return scriptBuilder.apply(new Script(
           DEFAULT_SCRIPT_TYPE, EXPRESSION_LANG_NAME, serializer.serialize(expression),
           emptyMap()));

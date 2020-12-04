@@ -265,6 +265,24 @@ class FilterQueryBuilderTest {
                 ref("name", ES_TEXT_KEYWORD), literal("John%"))));
   }
 
+  @Test
+  void should_build_script_query_for_case_clause() {
+    mockToStringSerializer();
+    assertJsonEquals(
+        "{\n"
+            + "  \"script\" : {\n"
+            + "    \"script\" : {\n"
+            + "      \"source\" : \"=(abs(age), 30)\",\n"
+            + "      \"lang\" : \"opendistro_expression\"\n"
+            + "    },\n"
+            + "    \"boost\" : 1.0\n"
+            + "  }\n"
+            + "}",
+        buildQuery(
+            dsl.equal(
+                dsl.abs(ref("age", INTEGER)), literal(30))));
+  }
+
   private static void assertJsonEquals(String expected, String actual) {
     assertTrue(new JSONObject(expected).similar(new JSONObject(actual)),
         StringUtils.format("Expected: %s, actual: %s", expected, actual));
