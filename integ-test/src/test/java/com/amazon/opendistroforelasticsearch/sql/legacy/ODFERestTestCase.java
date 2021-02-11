@@ -85,7 +85,7 @@ public abstract class ODFERestTestCase extends ESRestTestCase {
       JSONObject jsonObject = (JSONObject) object;
       String indexName = jsonObject.getString("index");
       //.opendistro_security isn't allowed to delete from cluster
-      if (indexName.startsWith(TestsConstants.TEST_INDEX)) {
+      if (!".opendistro_security".equals(indexName)) {
         TestUtils.performRequest(client(), new Request("DELETE", "/" + indexName));
       }
     }
