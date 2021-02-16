@@ -21,6 +21,7 @@ import static java.util.Collections.emptyMap;
 import static org.elasticsearch.script.Script.DEFAULT_SCRIPT_TYPE;
 
 import com.amazon.opendistroforelasticsearch.sql.elasticsearch.storage.script.filter.lucene.LuceneQuery;
+import com.amazon.opendistroforelasticsearch.sql.elasticsearch.storage.script.filter.lucene.MatchQuery;
 import com.amazon.opendistroforelasticsearch.sql.elasticsearch.storage.script.filter.lucene.RangeQuery;
 import com.amazon.opendistroforelasticsearch.sql.elasticsearch.storage.script.filter.lucene.RangeQuery.Comparison;
 import com.amazon.opendistroforelasticsearch.sql.elasticsearch.storage.script.filter.lucene.TermQuery;
@@ -40,9 +41,6 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.ScriptQueryBuilder;
 import org.elasticsearch.script.Script;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
 
 @RequiredArgsConstructor
 public class FilterQueryBuilder extends ExpressionNodeVisitor<QueryBuilder, Object> {
@@ -63,6 +61,7 @@ public class FilterQueryBuilder extends ExpressionNodeVisitor<QueryBuilder, Obje
           .put(BuiltinFunctionName.LTE.getName(), new RangeQuery(Comparison.LTE))
           .put(BuiltinFunctionName.GTE.getName(), new RangeQuery(Comparison.GTE))
           .put(BuiltinFunctionName.LIKE.getName(), new WildcardQuery())
+          .put(new FunctionName("match"), new MatchQuery())
           .build();
 
   /**
