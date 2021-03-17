@@ -57,12 +57,6 @@ public enum ExprCoreType implements ExprType {
   BOOLEAN(UNDEFINED),
 
   /**
-   * String.
-   */
-  STRING(UNDEFINED),
-
-
-  /**
    * Date.
    * Todo. compatible relationship.
    */
@@ -80,7 +74,12 @@ public enum ExprCoreType implements ExprType {
   /**
    * Array.
    */
-  ARRAY(UNDEFINED);
+  ARRAY(UNDEFINED),
+
+  /**
+   * String.
+   */
+  STRING(BOOLEAN);
 
   /**
    * Parents (wider/compatible types) of current base type.

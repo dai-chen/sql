@@ -15,7 +15,8 @@
 
 package com.amazon.opendistroforelasticsearch.sql.data.model;
 
-import com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType;
+import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.STRING;
+
 import com.amazon.opendistroforelasticsearch.sql.data.type.ExprType;
 import com.amazon.opendistroforelasticsearch.sql.exception.SemanticCheckException;
 import java.time.LocalDate;
@@ -38,12 +39,20 @@ public class ExprStringValue extends AbstractExprValue {
 
   @Override
   public ExprType type() {
-    return ExprCoreType.STRING;
+    return STRING;
   }
 
   @Override
   public String stringValue() {
     return value;
+  }
+
+  @Override
+  public Boolean booleanValue() {
+    if (!"true".equalsIgnoreCase(value) && !"false".equalsIgnoreCase(value)) {
+      return super.booleanValue();
+    }
+    return Boolean.valueOf(value);
   }
 
   @Override
@@ -92,7 +101,10 @@ public class ExprStringValue extends AbstractExprValue {
 
   @Override
   public boolean equal(ExprValue other) {
-    return value.equals(other.stringValue());
+    if (STRING.equals(other.type())) {
+      return value.equals(other.stringValue());
+    }
+    return other.equals(this);
   }
 
   @Override
