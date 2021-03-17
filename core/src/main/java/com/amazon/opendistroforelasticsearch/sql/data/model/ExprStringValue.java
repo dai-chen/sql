@@ -18,6 +18,7 @@ package com.amazon.opendistroforelasticsearch.sql.data.model;
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.STRING;
 
 import com.amazon.opendistroforelasticsearch.sql.data.type.ExprType;
+import com.amazon.opendistroforelasticsearch.sql.exception.ExpressionEvaluationException;
 import com.amazon.opendistroforelasticsearch.sql.exception.SemanticCheckException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,7 +51,8 @@ public class ExprStringValue extends AbstractExprValue {
   @Override
   public Boolean booleanValue() {
     if (!"true".equalsIgnoreCase(value) && !"false".equalsIgnoreCase(value)) {
-      return super.booleanValue();
+      throw new ExpressionEvaluationException(
+          "invalid to get booleanValue from value of type " + type());
     }
     return Boolean.valueOf(value);
   }
@@ -101,7 +103,7 @@ public class ExprStringValue extends AbstractExprValue {
 
   @Override
   public boolean equal(ExprValue other) {
-    if (STRING.equals(other.type())) {
+    if (other instanceof ExprStringValue) {
       return value.equals(other.stringValue());
     }
     return other.equals(this);
