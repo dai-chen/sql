@@ -38,6 +38,7 @@ import com.amazon.opendistroforelasticsearch.sql.data.model.ExprDoubleValue;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprFloatValue;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprIntegerValue;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprLongValue;
+import com.amazon.opendistroforelasticsearch.sql.data.model.ExprShortValue;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprStringValue;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprTimeValue;
 import com.amazon.opendistroforelasticsearch.sql.data.model.ExprTimestampValue;
@@ -57,6 +58,7 @@ public class TypeCastOperator {
    */
   public static void register(BuiltinFunctionRepository repository) {
     repository.register(castToString());
+    repository.register(castToShort());
     repository.register(castToInt());
     repository.register(castToLong());
     repository.register(castToFloat());
@@ -78,6 +80,17 @@ public class TypeCastOperator {
                     STRING, type)),
             Stream.of(impl(nullMissingHandling((v) -> v), STRING, STRING)))
             .collect(Collectors.toList())
+    );
+  }
+
+  private static FunctionResolver castToShort() {
+    return FunctionDSL.define(BuiltinFunctionName.CAST_TO_SHORT.getName(),
+        impl(nullMissingHandling(
+            (v) -> new ExprShortValue(Short.valueOf(v.stringValue()))), SHORT, STRING),
+        impl(nullMissingHandling(
+            (v) -> new ExprShortValue(v.shortValue())), SHORT, DOUBLE),
+        impl(nullMissingHandling(
+            (v) -> new ExprShortValue(v.booleanValue() ? 1 : 0)), SHORT, BOOLEAN)
     );
   }
 

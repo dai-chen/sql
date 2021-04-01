@@ -42,6 +42,11 @@ public enum ExprCoreType implements ExprType {
   UNDEFINED,
 
   /**
+   * String.
+   */
+  STRING(UNDEFINED),
+
+  /**
    * Numbers.
    */
   BYTE(UNDEFINED),
@@ -54,13 +59,7 @@ public enum ExprCoreType implements ExprType {
   /**
    * Boolean.
    */
-  BOOLEAN(UNDEFINED),
-
-  /**
-   * String.
-   */
-  STRING(UNDEFINED),
-
+  BOOLEAN(STRING),
 
   /**
    * Date.
@@ -129,6 +128,6 @@ public enum ExprCoreType implements ExprType {
   }
 
   public static List<ExprType> numberTypes() {
-    return ImmutableList.of(INTEGER, LONG, FLOAT, DOUBLE);
+    return ImmutableList.of(SHORT, INTEGER, LONG, FLOAT, DOUBLE);
   }
 }

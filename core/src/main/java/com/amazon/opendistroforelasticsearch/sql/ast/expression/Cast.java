@@ -23,6 +23,7 @@ import static com.amazon.opendistroforelasticsearch.sql.expression.function.Buil
 import static com.amazon.opendistroforelasticsearch.sql.expression.function.BuiltinFunctionName.CAST_TO_FLOAT;
 import static com.amazon.opendistroforelasticsearch.sql.expression.function.BuiltinFunctionName.CAST_TO_INT;
 import static com.amazon.opendistroforelasticsearch.sql.expression.function.BuiltinFunctionName.CAST_TO_LONG;
+import static com.amazon.opendistroforelasticsearch.sql.expression.function.BuiltinFunctionName.CAST_TO_SHORT;
 import static com.amazon.opendistroforelasticsearch.sql.expression.function.BuiltinFunctionName.CAST_TO_STRING;
 import static com.amazon.opendistroforelasticsearch.sql.expression.function.BuiltinFunctionName.CAST_TO_TIME;
 import static com.amazon.opendistroforelasticsearch.sql.expression.function.BuiltinFunctionName.CAST_TO_TIMESTAMP;
@@ -52,6 +53,7 @@ public class Cast extends UnresolvedExpression {
   private static Map<String, FunctionName> CONVERTED_TYPE_FUNCTION_NAME_MAP =
       new ImmutableMap.Builder<String, FunctionName>()
           .put("string", CAST_TO_STRING.getName())
+          .put("short", CAST_TO_SHORT.getName())
           .put("int", CAST_TO_INT.getName())
           .put("integer", CAST_TO_INT.getName())
           .put("long", CAST_TO_LONG.getName())

@@ -23,11 +23,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType;
+import com.amazon.opendistroforelasticsearch.sql.data.type.ExprType;
 import com.amazon.opendistroforelasticsearch.sql.exception.ExpressionEvaluationException;
 import com.amazon.opendistroforelasticsearch.sql.expression.Expression;
 import com.amazon.opendistroforelasticsearch.sql.expression.env.Environment;
 import java.util.Arrays;
 import java.util.Map;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,8 +64,11 @@ class BuiltinFunctionRepositoryTest {
 
   @Test
   void compile() {
+    when(mockExpression.type()).thenReturn(ExprCoreType.UNDEFINED);
+    when(functionSignature.getParamTypeList()).thenReturn(Arrays.asList(ExprCoreType.UNDEFINED));
     when(mockfunctionResolver.getFunctionName()).thenReturn(mockFunctionName);
-    when(mockfunctionResolver.resolve(any())).thenReturn(functionExpressionBuilder);
+    when(mockfunctionResolver.resolve(any())).thenReturn(
+        Pair.of(functionSignature, functionExpressionBuilder));
     when(mockMap.containsKey(any())).thenReturn(true);
     when(mockMap.get(any())).thenReturn(mockfunctionResolver);
     BuiltinFunctionRepository repo = new BuiltinFunctionRepository(mockMap);
@@ -78,7 +83,8 @@ class BuiltinFunctionRepositoryTest {
   void resolve() {
     when(functionSignature.getFunctionName()).thenReturn(mockFunctionName);
     when(mockfunctionResolver.getFunctionName()).thenReturn(mockFunctionName);
-    when(mockfunctionResolver.resolve(functionSignature)).thenReturn(functionExpressionBuilder);
+    when(mockfunctionResolver.resolve(functionSignature)).thenReturn(
+        Pair.of(functionSignature, functionExpressionBuilder));
     when(mockMap.containsKey(mockFunctionName)).thenReturn(true);
     when(mockMap.get(mockFunctionName)).thenReturn(mockfunctionResolver);
     BuiltinFunctionRepository repo = new BuiltinFunctionRepository(mockMap);

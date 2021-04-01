@@ -18,6 +18,7 @@
 package com.amazon.opendistroforelasticsearch.sql.data.type;
 
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.ARRAY;
+import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.BOOLEAN;
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.DOUBLE;
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.FLOAT;
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.INTEGER;
@@ -47,8 +48,14 @@ class ExprTypeTest {
     assertTrue(FLOAT.isCompatible(LONG));
     assertTrue(FLOAT.isCompatible(INTEGER));
     assertTrue(FLOAT.isCompatible(SHORT));
+    assertTrue(BOOLEAN.isCompatible(STRING));
+  }
+
+  @Test
+  public void isNotCompatible() {
     assertFalse(INTEGER.isCompatible(DOUBLE));
     assertFalse(STRING.isCompatible(DOUBLE));
+    assertFalse(STRING.isCompatible(BOOLEAN));
     assertFalse(INTEGER.isCompatible(UNKNOWN));
   }
 
