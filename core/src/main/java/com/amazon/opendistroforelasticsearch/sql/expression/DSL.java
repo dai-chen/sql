@@ -549,6 +549,11 @@ public class DSL {
         .compile(BuiltinFunctionName.CAST_TO_STRING.getName(), Arrays.asList(value));
   }
 
+  public FunctionExpression castShort(Expression value) {
+    return (FunctionExpression) repository
+        .compile(BuiltinFunctionName.CAST_TO_SHORT.getName(), Arrays.asList(value));
+  }
+
   public FunctionExpression castInt(Expression value) {
     return (FunctionExpression) repository
         .compile(BuiltinFunctionName.CAST_TO_INT.getName(), Arrays.asList(value));

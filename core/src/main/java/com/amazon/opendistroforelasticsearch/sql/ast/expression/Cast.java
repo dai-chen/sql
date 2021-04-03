@@ -30,6 +30,7 @@ import static com.amazon.opendistroforelasticsearch.sql.expression.function.Buil
 
 import com.amazon.opendistroforelasticsearch.sql.ast.AbstractNodeVisitor;
 import com.amazon.opendistroforelasticsearch.sql.ast.Node;
+import com.amazon.opendistroforelasticsearch.sql.data.type.ExprType;
 import com.amazon.opendistroforelasticsearch.sql.expression.function.FunctionName;
 import com.google.common.collect.ImmutableMap;
 import java.util.Collections;
@@ -50,7 +51,7 @@ import lombok.ToString;
 @ToString
 public class Cast extends UnresolvedExpression {
 
-  private static Map<String, FunctionName> CONVERTED_TYPE_FUNCTION_NAME_MAP =
+  private static final Map<String, FunctionName> CONVERTED_TYPE_FUNCTION_NAME_MAP =
       new ImmutableMap.Builder<String, FunctionName>()
           .put("string", CAST_TO_STRING.getName())
           .put("short", CAST_TO_SHORT.getName())
@@ -87,6 +88,15 @@ public class Cast extends UnresolvedExpression {
     } else {
       throw new IllegalStateException("unsupported cast type: " + type);
     }
+  }
+
+  public static boolean isCastFunction(FunctionName name) {
+    return CONVERTED_TYPE_FUNCTION_NAME_MAP.containsValue(name);
+  }
+
+  public static FunctionName getCastFunctionName(ExprType targetType) {
+    String type = targetType.typeName().toLowerCase(Locale.ROOT);
+    return CONVERTED_TYPE_FUNCTION_NAME_MAP.get(type);
   }
 
   @Override

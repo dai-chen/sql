@@ -23,6 +23,7 @@ import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.D
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.FLOAT;
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.INTEGER;
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.LONG;
+import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.SHORT;
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.STRING;
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.TIME;
 import static com.amazon.opendistroforelasticsearch.sql.data.type.ExprCoreType.TIMESTAMP;
@@ -100,11 +101,26 @@ class TypeCastOperatorTest {
     assertEquals(new ExprIntegerValue(value.integerValue()), expression.valueOf(null));
   }
 
+  @ParameterizedTest(name = "castToShort({0})")
+  @MethodSource({"numberData"})
+  void castToShort(ExprValue value) {
+    FunctionExpression expression = dsl.castShort(DSL.literal(value));
+    assertEquals(SHORT, expression.type());
+    assertEquals(new ExprShortValue(value.shortValue()), expression.valueOf(null));
+  }
+
   @Test
   void castStringToInt() {
     FunctionExpression expression = dsl.castInt(DSL.literal("100"));
     assertEquals(INTEGER, expression.type());
     assertEquals(new ExprIntegerValue(100), expression.valueOf(null));
+  }
+
+  @Test
+  void castStringToShort() {
+    FunctionExpression expression = dsl.castShort(DSL.literal("100"));
+    assertEquals(SHORT, expression.type());
+    assertEquals(new ExprShortValue(100), expression.valueOf(null));
   }
 
   @Test
@@ -122,6 +138,17 @@ class TypeCastOperatorTest {
     expression = dsl.castInt(DSL.literal(false));
     assertEquals(INTEGER, expression.type());
     assertEquals(new ExprIntegerValue(0), expression.valueOf(null));
+  }
+
+  @Test
+  void castBooleanToShort() {
+    FunctionExpression expression = dsl.castShort(DSL.literal(true));
+    assertEquals(SHORT, expression.type());
+    assertEquals(new ExprShortValue(1), expression.valueOf(null));
+
+    expression = dsl.castShort(DSL.literal(false));
+    assertEquals(SHORT, expression.type());
+    assertEquals(new ExprShortValue(0), expression.valueOf(null));
   }
 
   @ParameterizedTest(name = "castToLong({0})")
